@@ -1,18 +1,10 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
+import Link from 'next/link';
 
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const navLinks = [
     { name: 'Home', href: '#' },
@@ -23,72 +15,129 @@ const Header: React.FC = () => {
   ];
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-md py-2' : 'bg-white/95 backdrop-blur-sm py-4 shadow-sm'
-        }`}
-    >
-      <div className="container mx-auto px-4 md:px-6">
-        <div className="flex items-center justify-between">
-          {/* Logo */}
-          <a href="#" className="flex flex-col leading-none group">
-            <span className="text-2xl font-bold text-blue-700 tracking-tight group-hover:text-blue-800 transition-colors">Webel</span>
-            <span className="text-xs font-semibold text-gray-500 uppercase tracking-[0.2em]">Services</span>
+    <header className="w-full bg-white shadow-sm border-b border-gray-100 font-sans z-50 relative">
+      <div className="max-w-[1400px] mx-auto px-4 lg:px-8">
+        {/* Header container fixed height */}
+        <div className="flex items-center justify-between h-20">
+          
+          {/* --- LOGO SECTION (Kept exactly as provided) --- */}
+          <a href="#" className="flex flex-col items-center justify-center leading-none select-none">
+            {/* 'Webel' Main Text */}
+            <div className="relative">
+              <span className="text-4xl font-semibold text-[#0052cc] tracking-tight" style={{ fontFamily: 'Arial, sans-serif' }}>
+                Webel
+              </span>
+            </div>
+            
+            {/* 'opportunities infinite' Tagline */}
+            <span className="text-[0.55rem] text-black font-medium lowercase -mt-1 tracking-wide">
+              opportunities infinite
+            </span>
+            
+            {/* 'SERVICES' Text */}
+            <span className="text-sm font-bold text-[#002855] uppercase tracking-[0.2em] mt-0.5">
+              SERVICES
+            </span>
           </a>
 
-          {/* Desktop Nav */}
-          <nav className="hidden lg:flex items-center gap-6">
+          {/* --- DESKTOP NAVIGATION --- */}
+          {/* Added h-full to nav so children can span full height */}
+          <nav className="hidden lg:flex items-center gap-7 h-full">
             {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
-                className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors"
+                className="text-[15px] font-normal text-[#1a73e8] hover:text-[#0052cc] transition-colors whitespace-nowrap"
               >
                 {link.name}
               </a>
             ))}
 
-            {/* Dropdowns */}
-            <div className="relative group cursor-pointer flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-blue-600">
-              Organization <ChevronDown className="w-4 h-4" />
-            </div>
-            <div className="relative group cursor-pointer flex items-center gap-1 text-sm font-medium text-gray-600 hover:text-blue-600">
-              User <ChevronDown className="w-4 h-4" />
+            {/* Organization Dropdown */}
+            {/* h-full ensures the hover area goes all the way to the bottom edge */}
+            <div className="relative group cursor-pointer h-full flex items-center">
+              <button className="flex items-center gap-1 text-[15px] font-normal text-[#1a73e8] group-hover:text-[#0052cc] bg-transparent border-none outline-none h-full">
+                Organization <ChevronDown className="w-4 h-4 mt-0.5 transition-transform group-hover:rotate-180" />
+              </button>
+              
+              {/* Dropdown Menu */}
+              {/* changed top-10 to top-full so it sits exactly on the bottom line, no gaps */}
+              <div className="absolute top-full right-0 w-48 hidden group-hover:block z-50">
+                {/* Added a small negative margin top or border-top to bridge any sub-pixel gaps if necessary, 
+                    but top-full usually works perfectly with h-full parent */}
+                <div className="bg-white rounded-b shadow-lg border-x border-b border-t-2 border-t-blue-600 border-gray-100 py-2 mt-[1px]">
+                  <Link href="/company-sign-up" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
+                    Registration
+                  </Link>
+                  <Link href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
+                    Login
+                  </Link>
+                </div>
+              </div>
             </div>
 
+            {/* User Dropdown */}
+            <div className="relative group cursor-pointer h-full flex items-center">
+              <button className="flex items-center gap-1 text-[15px] font-normal text-[#1a73e8] group-hover:text-[#0052cc] bg-transparent border-none outline-none h-full">
+                User <ChevronDown className="w-4 h-4 mt-0.5 transition-transform group-hover:rotate-180" />
+              </button>
+              
+              {/* Dropdown Menu */}
+              <div className="absolute top-full right-0 w-48 hidden group-hover:block z-50">
+                <div className="bg-white rounded-b shadow-lg border-x border-b border-t-2 border-t-blue-600 border-gray-100 py-2 mt-[1px]">
+                  <Link href="/company-sign-up" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
+                    Registration
+                  </Link>
+                  <Link href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
+                    Login
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Contact Us */}
             <a
               href="#contact"
-              className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-all shadow-sm hover:shadow-md"
+              className="text-[15px] font-normal text-[#1a73e8] hover:text-[#0052cc] transition-colors whitespace-nowrap"
             >
               Contact Us
             </a>
           </nav>
 
-          {/* Mobile Menu Toggle */}
+          {/* --- MOBILE TOGGLE --- */}
           <button
             className="lg:hidden text-gray-600 p-2"
             onClick={() => setIsOpen(!isOpen)}
           >
-            {isOpen ? <X /> : <Menu />}
+            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Nav */}
+      {/* --- MOBILE NAVIGATION MENU --- */}
       {isOpen && (
-        <div className="lg:hidden absolute top-full left-0 right-0 bg-white border-t shadow-lg py-4 px-4 flex flex-col gap-4 animate-in slide-in-from-top-2">
-          {navLinks.map((link) => (
-            <a
-              key={link.name}
-              href={link.href}
-              className="text-gray-600 font-medium py-2 hover:text-blue-600"
-              onClick={() => setIsOpen(false)}
-            >
-              {link.name}
+        <div className="lg:hidden bg-white border-t border-gray-200 shadow-lg absolute w-full left-0 top-20">
+          <div className="flex flex-col px-4 py-4 gap-4">
+            {navLinks.map((link) => (
+              <a
+                key={link.name}
+                href={link.href}
+                className="text-[15px] font-medium text-gray-700 hover:text-[#1a73e8]"
+                onClick={() => setIsOpen(false)}
+              >
+                {link.name}
+              </a>
+            ))}
+            <div className="flex items-center justify-between text-[15px] font-medium text-gray-700">
+              Organization <ChevronDown className="w-4 h-4" />
+            </div>
+            <div className="flex items-center justify-between text-[15px] font-medium text-gray-700">
+              User <ChevronDown className="w-4 h-4" />
+            </div>
+            <a href="#contact" className="text-[15px] font-medium text-gray-700 hover:text-[#1a73e8]">
+              Contact Us
             </a>
-          ))}
-          <a href="#" className="text-gray-600 font-medium py-2 flex justify-between">Organization <ChevronDown className="w-4 h-4" /></a>
-          <a href="#" className="text-gray-600 font-medium py-2 flex justify-between">User <ChevronDown className="w-4 h-4" /></a>
-          <a href="#" className="text-center font-semibold text-white bg-blue-600 py-3 rounded-lg">Contact Us</a>
+          </div>
         </div>
       )}
     </header>
