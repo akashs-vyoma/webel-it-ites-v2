@@ -1,11 +1,15 @@
+"use client"
 import Image from 'next/image';
-import React from 'react';
+import React, { useState } from 'react';
 import bgNetworkNodes from '@/components/images/background-image.jpg';
 import footerPanorama from '@/components/images/footer-image.png';
 import CommonFooter from './common-footer';
 import OrganisationRegByGSTIN from './OrganisationRegByGSTIN';
+import OrganisationRegByDSC from './OrganisationRegByDSC';
+import Link from 'next/link';
 
 const OrganisationRegistration = () => {
+  const [activeTab, setActiveTab] = useState('gstn');
   return (
     <div className="min-h-screen flex flex-col relative font-sans text-gray-700 overflow-x-hidden">
 
@@ -37,7 +41,7 @@ const OrganisationRegistration = () => {
         </div>
 
         <div className="text-sm font-medium text-gray-800 cursor-pointer hover:text-[#2d5aa8]">
-          Home
+          <Link href="/">Home</Link>
         </div>
       </nav>
 
@@ -55,16 +59,31 @@ const OrganisationRegistration = () => {
           <div className="p-6 pb-2">
             {/* Tab Buttons */}
             <div className="flex gap-4 mb-6">
-              <button className="bg-white hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 hover:shadow-sm cursor-pointer border border-gray-300 text-gray-700 px-6 py-2 text-xs font-bold shadow-sm rounded-xl">
+              {/* GSTN Button */}
+              <button
+                onClick={() => setActiveTab('gstn')}
+                className={`px-6 py-2 text-xs rounded-xl border cursor-pointer transition-colors ${activeTab === 'gstn'
+                  ? 'bg-white border-gray-300 text-gray-700 font-bold shadow-sm'
+                  : 'bg-gray-50 border-gray-200 text-gray-500 font-medium hover:bg-gray-100'
+                  }`}
+              >
                 Sign Up By GSTN
               </button>
-              <button className="bg-white hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 hover:shadow-sm cursor-pointer bg-gray-50 border border-gray-200 text-gray-500 px-6 py-2 text-xs font-medium rounded-xl hover:bg-gray-100 transition-colors">
+
+              {/* DSC Button */}
+              <button
+                onClick={() => setActiveTab('dsc')}
+                className={`px-6 py-2 text-xs rounded-xl border cursor-pointer transition-colors ${activeTab === 'dsc'
+                  ? 'bg-white border-gray-300 text-gray-700 font-bold shadow-sm'
+                  : 'bg-gray-50 border-gray-200 text-gray-500 font-medium hover:bg-gray-100'
+                  }`}
+              >
                 Sign Up By DSC
               </button>
             </div>
 
             {/* Input Container */}
-            <OrganisationRegByGSTIN />
+            {activeTab === 'gstn' ? <OrganisationRegByGSTIN /> : <OrganisationRegByDSC />}
 
             {/* Sign In Link */}
             <div className="text-[11px] text-gray-600 mb-4">
