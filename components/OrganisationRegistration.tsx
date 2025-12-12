@@ -1,111 +1,61 @@
 "use client"
-import Image from 'next/image';
 import React, { useState } from 'react';
-import bgNetworkNodes from '@/components/images/background-image.jpg';
-import footerPanorama from '@/components/images/footer-image.png';
-import CommonFooter from './common-footer';
 import OrganisationRegByGSTIN from './OrganisationRegByGSTIN';
 import OrganisationRegByDSC from './OrganisationRegByDSC';
-import Link from 'next/link';
 
 const OrganisationRegistration = () => {
   const [activeTab, setActiveTab] = useState('gstn');
   return (
-    <div className="min-h-screen flex flex-col relative font-sans text-gray-700 overflow-x-hidden">
+    <main className="relative z-10 flex-grow flex justify-center pt-12 px-4 pb-32">
+      <div className="w-full max-w-[40%] bg-white shadow-xl rounded-lg overflow-hidden">
 
-      {/* -------------------------------------------------------------
-          BACKGROUND IMAGE LAYER (Screenshot 3)
-          Replace 'bg-network-nodes.jpg' with your actual background image path
-      ----------------------------------------------------------------- */}
-      <div className="absolute inset-0 z-0 bg-blue-50">
-        <Image
-          width={1920}
-          height={1080}
-          src={bgNetworkNodes}
-          alt="Background Pattern"
-          className="w-full h-full object-cover opacity-60 mix-blend-multiply"
-        />
+        {/* Card Header */}
+        <div className="bg-[#5b5fa3] px-4 py-3">
+          <h2 className="text-white text-base font-medium">Organisation Registration</h2>
+        </div>
 
-        {/* Overlay gradient to match the fade effect */}
-        <div className="absolute inset-0 bg-gradient-to-b from-white/40 to-transparent"></div>
+        <div className="p-6 pb-2">
+          {/* Tab Buttons */}
+          <div className="flex gap-4 mb-6">
+            {/* GSTN Button */}
+            <button
+              onClick={() => setActiveTab('gstn')}
+              className={`px-6 py-2 text-xs rounded-xl border cursor-pointer transition-colors ${activeTab === 'gstn'
+                ? 'bg-white border-gray-300 text-gray-700 font-bold shadow-sm'
+                : 'bg-gray-50 border-gray-200 text-gray-500 font-medium hover:bg-gray-100'
+                }`}
+            >
+              Sign Up By GSTN
+            </button>
+
+            {/* DSC Button */}
+            <button
+              onClick={() => setActiveTab('dsc')}
+              className={`px-6 py-2 text-xs rounded-xl border cursor-pointer transition-colors ${activeTab === 'dsc'
+                ? 'bg-white border-gray-300 text-gray-700 font-bold shadow-sm'
+                : 'bg-gray-50 border-gray-200 text-gray-500 font-medium hover:bg-gray-100'
+                }`}
+            >
+              Sign Up By DSC
+            </button>
+          </div>
+
+          {/* Input Container */}
+          {activeTab === 'gstn' ? <OrganisationRegByGSTIN /> : <OrganisationRegByDSC />}
+
+          {/* Sign In Link */}
+          <div className="text-[11px] text-gray-600 mb-4">
+            Already have an Organisation account? <a href="#" className="text-blue-600 hover:underline">Sign In</a>
+          </div>
+        </div>
+
+        {/* Yellow Instruction Box */}
+        <div className="bg-[#fcf8e3] border-t border-gray-200 p-4 text-[11px] leading-5 text-gray-800 text-justify">
+          <span className="font-bold">Instruction: For Register as a Organization</span> please enter Organization's PAN number and click on "<u>Verify PAN</u>" button, it will verify PAN number After PAN Verification <b>Company Name</b> will show in the text box. Enter <b>PAN Number</b> of The Director/Management Person. Enter DSC In USB And Click On "<b>Verify DSC</b>" Button Software automatically verify PAN with DSC and After Successfully verification Account will Create
+        </div>
+
       </div>
-
-      {/* -------------------------------------------------------------
-          HEADER / NAVBAR
-      ----------------------------------------------------------------- */}
-      <nav className="relative z-10 w-full bg-white shadow-sm border-b border-gray-200 px-6 py-3 flex justify-between items-center h-16">
-        <div className="flex flex-col leading-none">
-          {/* Webel Logo Text Recreation */}
-          <h1 className="text-3xl font-bold text-[#2d5aa8] tracking-tighter">Webel</h1>
-          <span className="text-[10px] text-gray-500 tracking-wide">opportunities infinite</span>
-        </div>
-
-        <div className="text-sm font-medium text-gray-800 cursor-pointer hover:text-[#2d5aa8]">
-          <Link href="/">Home</Link>
-        </div>
-      </nav>
-
-      {/* -------------------------------------------------------------
-          MAIN CONTENT AREA
-      ----------------------------------------------------------------- */}
-      <main className="relative z-10 flex-grow flex justify-center pt-12 px-4 pb-32">
-        <div className="w-full max-w-[40%] bg-white shadow-xl rounded-lg overflow-hidden">
-
-          {/* Card Header */}
-          <div className="bg-[#5b5fa3] px-4 py-3">
-            <h2 className="text-white text-base font-medium">Organisation Registration</h2>
-          </div>
-
-          <div className="p-6 pb-2">
-            {/* Tab Buttons */}
-            <div className="flex gap-4 mb-6">
-              {/* GSTN Button */}
-              <button
-                onClick={() => setActiveTab('gstn')}
-                className={`px-6 py-2 text-xs rounded-xl border cursor-pointer transition-colors ${activeTab === 'gstn'
-                  ? 'bg-white border-gray-300 text-gray-700 font-bold shadow-sm'
-                  : 'bg-gray-50 border-gray-200 text-gray-500 font-medium hover:bg-gray-100'
-                  }`}
-              >
-                Sign Up By GSTN
-              </button>
-
-              {/* DSC Button */}
-              <button
-                onClick={() => setActiveTab('dsc')}
-                className={`px-6 py-2 text-xs rounded-xl border cursor-pointer transition-colors ${activeTab === 'dsc'
-                  ? 'bg-white border-gray-300 text-gray-700 font-bold shadow-sm'
-                  : 'bg-gray-50 border-gray-200 text-gray-500 font-medium hover:bg-gray-100'
-                  }`}
-              >
-                Sign Up By DSC
-              </button>
-            </div>
-
-            {/* Input Container */}
-            {activeTab === 'gstn' ? <OrganisationRegByGSTIN /> : <OrganisationRegByDSC />}
-
-            {/* Sign In Link */}
-            <div className="text-[11px] text-gray-600 mb-4">
-              Already have an Organisation account? <a href="#" className="text-blue-600 hover:underline">Sign In</a>
-            </div>
-          </div>
-
-          {/* Yellow Instruction Box */}
-          <div className="bg-[#fcf8e3] border-t border-gray-200 p-4 text-[11px] leading-5 text-gray-800 text-justify">
-            <span className="font-bold">Instruction: For Register as a Organization</span> please enter Organization's PAN number and click on "<u>Verify PAN</u>" button, it will verify PAN number After PAN Verification <b>Company Name</b> will show in the text box. Enter <b>PAN Number</b> of The Director/Management Person. Enter DSC In USB And Click On "<b>Verify DSC</b>" Button Software automatically verify PAN with DSC and After Successfully verification Account will Create
-          </div>
-
-        </div>
-      </main>
-
-      {/* -------------------------------------------------------------
-          FOOTER GRAPHICS (Screenshot 2)
-          Replace 'footer-panorama.png' with your actual footer image path
-      ----------------------------------------------------------------- */}
-      <CommonFooter />
-
-    </div>
+    </main>
   );
 };
 
