@@ -2,11 +2,12 @@
 import React, { useState } from 'react';
 import OrganisationRegByGSTIN from './OrganisationRegByGSTIN';
 import OrganisationRegByDSC from './OrganisationRegByDSC';
+import Link from 'next/link';
 
 const OrganisationRegistration = () => {
   const [activeTab, setActiveTab] = useState('gstn');
   return (
-    <main className="relative z-10 flex-grow flex justify-center pt-12 px-4 pb-32">
+    <main className="relative z-10 flex-grow flex justify-start pt-2 px-16 pb-2">
       <div className="w-full max-w-[40%] bg-white shadow-xl rounded-lg overflow-hidden">
 
         {/* Card Header */}
@@ -16,27 +17,27 @@ const OrganisationRegistration = () => {
 
         <div className="p-6 pb-2">
           {/* Tab Buttons */}
-          <div className="flex gap-4 mb-6">
+          <div className="flex gap-0 -mb-[1px]">
             {/* GSTN Button */}
             <button
               onClick={() => setActiveTab('gstn')}
-              className={`px-6 py-2 text-xs rounded-xl border cursor-pointer transition-colors ${activeTab === 'gstn'
-                ? 'bg-white border-gray-300 text-gray-700 font-bold shadow-sm'
-                : 'bg-gray-50 border-gray-200 text-gray-500 font-medium hover:bg-gray-100'
+              className={`px-6 py-2 text-xs cursor-pointer transition-colors ${activeTab === 'gstn'
+                ? 'bg-white text-gray-700 font-bold border-b-none border-r-1 border-l-1 border-t-1'
+                : 'bg-gray-50 text-gray-500 font-medium hover:bg-gray-100 border'
                 }`}
             >
-              Sign Up By GSTN
+              Sign In By GSTN
             </button>
 
             {/* DSC Button */}
             <button
               onClick={() => setActiveTab('dsc')}
-              className={`px-6 py-2 text-xs rounded-xl border cursor-pointer transition-colors ${activeTab === 'dsc'
-                ? 'bg-white border-gray-300 text-gray-700 font-bold shadow-sm'
-                : 'bg-gray-50 border-gray-200 text-gray-500 font-medium hover:bg-gray-100'
+              className={`px-6 py-2 text-xs cursor-pointer transition-colors ${activeTab === 'dsc'
+                ? 'bg-white text-gray-700 font-bold border-b-none border-r-1 border-l-1 border-t-1'
+                : 'bg-gray-50 text-gray-500 font-medium hover:bg-gray-100 border'
                 }`}
             >
-              Sign Up By DSC
+              Sign In By DSC
             </button>
           </div>
 
@@ -45,7 +46,7 @@ const OrganisationRegistration = () => {
 
           {/* Sign In Link */}
           <div className="text-[11px] text-gray-600 mb-4">
-            Already have an Organisation account? <a href="#" className="text-blue-600 hover:underline">Sign In</a>
+            Already have an Organisation account? <Link href="/comany-login" className="text-blue-600 hover:underline">Sign In</Link>
           </div>
         </div>
 

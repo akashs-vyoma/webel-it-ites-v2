@@ -69,7 +69,7 @@ const Header: React.FC = () => {
                   <Link href="/company-sign-up" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
                     Registration
                   </Link>
-                  <Link href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
+                  <Link href="/comany-login" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
                     Login
                   </Link>
                 </div>
