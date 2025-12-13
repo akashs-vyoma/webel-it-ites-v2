@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowRight, FileText } from 'lucide-react';
+import Link from 'next/link';
 
 const Hero: React.FC = () => {
   return (
@@ -29,14 +30,15 @@ const Hero: React.FC = () => {
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <a
-                href="#register"
+              <Link
+                href="company-sign-up"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-white text-blue-700 rounded-full font-bold text-lg shadow-lg hover:shadow-xl hover:bg-blue-50 transition-all transform hover:-translate-y-1"
               >
                 Register Now <ArrowRight className="w-5 h-5" />
-              </a>
+              </Link>
               <a
-                href="#manual"
+                download
+                href="./Webel_Online_Services_UserManual.pdf"
                 className="inline-flex items-center gap-2 px-8 py-4 bg-transparent border-2 border-white text-white rounded-full font-bold text-lg hover:bg-white/10 transition-all backdrop-blur-sm"
               >
                 <FileText className="w-5 h-5" />
