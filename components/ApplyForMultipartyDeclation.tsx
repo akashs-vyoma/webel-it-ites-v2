@@ -41,7 +41,7 @@ const FormInput: React.FC<FormInputProps> = ({
             <div className="flex h-9">
                 {/* Icon Box */}
                 <div className="w-9 bg-[#484595] flex items-center justify-center text-white shrink-0 rounded-l-sm">
-                    {React.cloneElement(icon as React.ReactElement, { size: 16 })}
+                    {React.cloneElement(icon as React.ReactElement, {})}
                 </div>
                 {/* Input Field */}
                 <input
