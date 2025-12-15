@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 
+import webelLogo from "./images/webel-logo.png";
+
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -19,26 +21,12 @@ const Header: React.FC = () => {
       <div className="max-w-[1400px] mx-auto px-4 lg:px-8">
         {/* Header container fixed height */}
         <div className="flex items-center justify-between h-20">
+           <img
+                  src="/webel-logo.png"
+                  alt="Webel Logo"
+                  className="w-[100px] h-auto"
+                />
 
-          {/* --- LOGO SECTION (Kept exactly as provided) --- */}
-          <a href="#" className="flex flex-col items-center justify-center leading-none select-none">
-            {/* 'Webel' Main Text */}
-            <div className="relative">
-              <span className="text-4xl font-semibold text-[#0052cc] tracking-tight" style={{ fontFamily: 'Arial, sans-serif' }}>
-                Webel
-              </span>
-            </div>
-
-            {/* 'opportunities infinite' Tagline */}
-            <span className="text-[0.55rem] text-black font-medium lowercase -mt-1 tracking-wide">
-              opportunities infinite
-            </span>
-
-            {/* 'SERVICES' Text */}
-            <span className="text-sm font-bold text-[#002855] uppercase tracking-[0.2em] mt-0.5">
-              SERVICES
-            </span>
-          </a>
 
           {/* --- DESKTOP NAVIGATION --- */}
           {/* Added h-full to nav so children can span full height */}

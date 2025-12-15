@@ -63,7 +63,7 @@ const IndividualLogin: React.FC = () => {
 
     return (
         <>
-            <div className="w-full max-w-md bg-white shadow-2xl rounded-lg overflow-hidden border border-gray-100 font-sans flex flex-col min-h-[500px]">
+            <div className="w-full max-w-md bg-white shadow-2xl rounded-lg overflow-hidden border border-gray-100 font-sans flex flex-col min-h-[200px]">
                 {/* Card Header */}
                 <div className="bg-[#4c4f95] px-4 py-3">
                     <h2 className="text-white text-lg font-medium">Sign In</h2>

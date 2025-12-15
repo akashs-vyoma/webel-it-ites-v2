@@ -22,7 +22,7 @@ const servicesData: ServiceItem[] = [
       "Balance Sheet"
     ],
     fees: "60,000 + GST *",
-    image: "https://picsum.photos/seed/audit/500/400"
+    image: "/Checklist.jpg"
   },
   {
     id: 2,
@@ -37,7 +37,7 @@ const servicesData: ServiceItem[] = [
     ],
     note: "You have to provide Tenant Name, Tenant GSTN No/PAN No & activity in the rented area(IT&ITes Activity or Commercial Activity), area in sq. ft. at the time of application *",
     fees: "3/sq.ft. + GST till the expiry of the Rental Agreement/Surrender of the space by the tenant",
-    image: "https://picsum.photos/seed/realestate/500/400"
+    image: "/real-estate.jpg"
   },
   {
     id: 3,
@@ -51,7 +51,7 @@ const servicesData: ServiceItem[] = [
     ],
     note: "You have to provide area in sq. ft. at the time of application *",
     fees: "5 per sq. ft. + GST *",
-    image: "https://picsum.photos/seed/tax/500/400"
+    image: "/tax.png"
   },
   {
     id: 4,
@@ -68,7 +68,7 @@ const servicesData: ServiceItem[] = [
     ],
     note: "You have to provide Tenant Name, Tenant GSTN No/PAN No & activity in the rented area *",
     fees: "3/sq.ft. + GST till the expiry of the Rental",
-    image: "https://picsum.photos/seed/contract/500/400"
+    image: "/2892186.jpg"
   }
 ];
 

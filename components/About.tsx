@@ -26,7 +26,7 @@ const About: React.FC = () => {
            </div>
            <div className="relative h-64 md:h-80 w-full rounded-2xl overflow-hidden shadow-xl group">
              <img 
-               src="https://picsum.photos/seed/tech_office/800/600" 
+               src="IT_infra.jpeg" 
                alt="WBEIDCL Office" 
                className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700"
              />

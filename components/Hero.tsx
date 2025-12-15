@@ -12,6 +12,7 @@ const Hero: React.FC = () => {
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-10 pointer-events-none">
         <div className="absolute -top-[20%] -right-[10%] w-[500px] h-[500px] rounded-full bg-white blur-3xl"></div>
         <div className="absolute top-[20%] -left-[10%] w-[400px] h-[400px] rounded-full bg-blue-300 blur-3xl"></div>
+     
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
@@ -28,6 +29,7 @@ const Hero: React.FC = () => {
             <p className="text-lg lg:text-xl text-blue-100 max-w-lg leading-relaxed">
               Streamlining government services and document verification for a digital West Bengal. Efficient, secure, and transparent.
             </p>
+            
 
             <div className="flex flex-wrap gap-4">
               <Link
