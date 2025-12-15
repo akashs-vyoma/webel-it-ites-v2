@@ -8,9 +8,9 @@ export function HeroSection() {
       <div className="container relative z-10 flex min-h-[calc(100vh-4rem)] items-center">
         <div className="grid gap-12 lg:grid-cols-2 items-center py-12">
           <div className="flex flex-col gap-8">
-            <div className="space-y-4">
+            <div className="space-y-4 flex flex-col items-center justify-center">
               <h1 className="text-5xl font-bold tracking-tight text-primary-foreground lg:text-6xl">Webel</h1>
-              <h2 className="text-4xl font-bold tracking-tight text-primary-foreground/90 lg:text-5xl border-b-4 border-primary-foreground/30 pb-2 inline-block">
+              <h2 className="text-4xl font-bold tracking-tight text-primary-foreground/90 lg:text-5xl border-b-4 border-primary-foreground/30 pb-2">
                 Services
               </h2>
             </div>

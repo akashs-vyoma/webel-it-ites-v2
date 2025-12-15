@@ -29,12 +29,12 @@ const layout = ({ children }: { children: React.ReactNode }) => {
             {/* -------------------------------------------------------------
           HEADER / NAVBAR
       ----------------------------------------------------------------- */}
-            <CommonNav /> 
+            <CommonNav />
 
             {/* -------------------------------------------------------------
           MAIN CONTENT AREA
       ----------------------------------------------------------------- */}
-            <main className="relative z-10 flex-grow flex justify-start py-6 px-16">
+            <main className="relative z-10 flex-grow flex justify-start py-6 px-4">
                 {children}
             </main>
 

@@ -1,6 +1,8 @@
+"use client";
 import React from 'react';
 import { ArrowRight, FileText } from 'lucide-react';
 import Link from 'next/link';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 const Hero: React.FC = () => {
   return (
@@ -13,10 +15,8 @@ const Hero: React.FC = () => {
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 items-center">
-
-          {/* Text Content */}
-          <div className="text-white space-y-8 animate-fade-in-up">
+        <div className="grid lg:grid-cols-2 gap-12 px-16 items-center">
+          <div className="text-white space-y-8 animate-fade-in-up order-2 lg:order-1">
             <div>
               <h1 className="text-5xl lg:text-7xl font-bold tracking-tight mb-2">Webel</h1>
               <div className="relative inline-block">
@@ -48,21 +48,15 @@ const Hero: React.FC = () => {
           </div>
 
           {/* Image Content */}
-          <div className="hidden lg:block relative">
-            <div className="relative z-10 bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-2xl transform rotate-1 hover:rotate-0 transition-transform duration-500">
-              <img
-                src="https://picsum.photos/seed/office_illustration/600/400"
-                alt="Digital Services Illustration"
-                className="w-full h-auto rounded-xl shadow-inner"
+          {/* Removed 'absolute', added flex centering, and responsive scaling */}
+          <div className="relative flex justify-center items-center order-1 lg:order-2">
+            <div className="w-full max-w-[1000px] lg:max-w-full lg:scale-150 transform transition-transform">
+              <DotLottieReact
+                src="Business.lottie"
+                loop
+                autoplay
+                className="w-full h-auto"
               />
-
-              {/* Floating elements decoration */}
-              <div className="absolute -top-6 -right-6 bg-white p-4 rounded-lg shadow-lg animate-bounce duration-[3000ms]">
-                <FileText className="w-8 h-8 text-blue-600" />
-              </div>
-              <div className="absolute -bottom-8 -left-8 bg-blue-500 p-4 rounded-full shadow-lg border-4 border-white">
-                <ArrowRight className="w-6 h-6 text-white" />
-              </div>
             </div>
           </div>
 

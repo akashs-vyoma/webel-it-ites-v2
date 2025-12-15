@@ -9,9 +9,9 @@ const Header: React.FC = () => {
   const navLinks = [
     { name: 'Home', href: '#' },
     { name: 'About', href: '#about' },
-    { name: 'Sign Agreement', href: '#' },
-    { name: 'Search By UDIN', href: '#' },
-    { name: 'Verify Auth Person', href: '#' },
+    { name: 'Sign Agreement', href: '/searchdocumentforsign' },
+    { name: 'Search By UDIN', href: '/searchbyudin' },
+    { name: 'Verify Auth Person', href: '/verifyauthorizeperson' },
   ];
 
   return (
@@ -19,7 +19,7 @@ const Header: React.FC = () => {
       <div className="max-w-[1400px] mx-auto px-4 lg:px-8">
         {/* Header container fixed height */}
         <div className="flex items-center justify-between h-20">
-          
+
           {/* --- LOGO SECTION (Kept exactly as provided) --- */}
           <a href="#" className="flex flex-col items-center justify-center leading-none select-none">
             {/* 'Webel' Main Text */}
@@ -28,12 +28,12 @@ const Header: React.FC = () => {
                 Webel
               </span>
             </div>
-            
+
             {/* 'opportunities infinite' Tagline */}
             <span className="text-[0.55rem] text-black font-medium lowercase -mt-1 tracking-wide">
               opportunities infinite
             </span>
-            
+
             {/* 'SERVICES' Text */}
             <span className="text-sm font-bold text-[#002855] uppercase tracking-[0.2em] mt-0.5">
               SERVICES
@@ -44,13 +44,13 @@ const Header: React.FC = () => {
           {/* Added h-full to nav so children can span full height */}
           <nav className="hidden lg:flex items-center gap-7 h-full">
             {navLinks.map((link) => (
-              <a
+              <Link
                 key={link.name}
                 href={link.href}
                 className="text-[15px] font-normal text-[#1a73e8] hover:text-[#0052cc] transition-colors whitespace-nowrap"
               >
                 {link.name}
-              </a>
+              </Link>
             ))}
 
             {/* Organization Dropdown */}
@@ -59,7 +59,7 @@ const Header: React.FC = () => {
               <button className="flex items-center gap-1 text-[15px] font-normal text-[#1a73e8] group-hover:text-[#0052cc] bg-transparent border-none outline-none h-full">
                 Organization <ChevronDown className="w-4 h-4 mt-0.5 transition-transform group-hover:rotate-180" />
               </button>
-              
+
               {/* Dropdown Menu */}
               {/* changed top-10 to top-full so it sits exactly on the bottom line, no gaps */}
               <div className="absolute top-full right-0 w-48 hidden group-hover:block z-50">
@@ -69,7 +69,7 @@ const Header: React.FC = () => {
                   <Link href="/company-sign-up" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
                     Registration
                   </Link>
-                  <Link href="/comany-login" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
+                  <Link href="/company-login" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
                     Login
                   </Link>
                 </div>
@@ -81,14 +81,14 @@ const Header: React.FC = () => {
               <button className="flex items-center gap-1 text-[15px] font-normal text-[#1a73e8] group-hover:text-[#0052cc] bg-transparent border-none outline-none h-full">
                 User <ChevronDown className="w-4 h-4 mt-0.5 transition-transform group-hover:rotate-180" />
               </button>
-              
+
               {/* Dropdown Menu */}
               <div className="absolute top-full right-0 w-48 hidden group-hover:block z-50">
                 <div className="bg-white rounded-b shadow-lg border-x border-b border-t-2 border-t-blue-600 border-gray-100 py-2 mt-[1px]">
-                  <Link href="/company-sign-up" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
+                  <Link href="/individual-sign-up" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
                     Registration
                   </Link>
-                  <Link href="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
+                  <Link href="/individual-sign-in" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
                     Login
                   </Link>
                 </div>

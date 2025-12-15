@@ -1,5 +1,6 @@
 import React from 'react';
 import { CheckCircle2, FileText, IndianRupee } from 'lucide-react';
+import Link from 'next/link';
 
 interface ServiceItem {
   id: number;
@@ -76,8 +77,8 @@ const ServicesList: React.FC = () => {
     <section className="py-16 bg-slate-50">
       <div className="container mx-auto px-4 space-y-24">
         {servicesData.map((service, index) => (
-          <div 
-            key={service.id} 
+          <div
+            key={service.id}
             className={`flex flex-col ${index % 2 === 1 ? 'lg:flex-row-reverse' : 'lg:flex-row'} gap-12 items-center`}
           >
             {/* Text Content */}
@@ -85,7 +86,7 @@ const ServicesList: React.FC = () => {
               <h3 className="text-2xl md:text-3xl font-bold text-blue-800 border-l-4 border-blue-500 pl-4">
                 {service.title}
               </h3>
-              
+
               <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
                 <h4 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
                   <FileText className="w-4 h-4" /> Required Documents
@@ -107,14 +108,14 @@ const ServicesList: React.FC = () => {
               )}
 
               <div className="flex items-center gap-2 text-lg font-semibold text-slate-700 bg-slate-200/50 inline-block px-4 py-2 rounded-lg">
-                <IndianRupee className="w-5 h-5 text-slate-900" />
+                <IndianRupee className="w-5 h-5 text-green-500" />
                 <span>Fees: <span className="text-blue-700">Rs. {service.fees}</span></span>
               </div>
-              
+
               <div className="pt-2">
-                 <button className="px-6 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition shadow-sm hover:shadow-md">
-                   Apply Now
-                 </button>
+                <Link href="company-sign-up" className="px-6 py-2 bg-blue-600 text-white rounded-md font-medium hover:bg-blue-700 transition shadow-sm hover:shadow-md">
+                  Apply Now
+                </Link>
               </div>
             </div>
 
@@ -125,10 +126,10 @@ const ServicesList: React.FC = () => {
                 <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] rounded-full opacity-20 filter blur-3xl -z-10
                   ${index % 2 === 0 ? 'bg-blue-300' : 'bg-indigo-300'}`}>
                 </div>
-                
-                <img 
-                  src={service.image} 
-                  alt={service.title} 
+
+                <img
+                  src={service.image}
+                  alt={service.title}
                   className="w-full h-auto rounded-2xl shadow-xl border-4 border-white transform hover:scale-[1.02] transition-transform duration-300"
                 />
               </div>

@@ -46,7 +46,7 @@ const OrganisationRegistration = () => {
 
           {/* Sign In Link */}
           <div className="text-[11px] text-gray-600 mb-4">
-            Already have an Organisation account? <Link href="/comany-login" className="text-blue-600 hover:underline">Sign In</Link>
+            Already have an Organisation account? <Link href="/company-login" className="text-blue-600 hover:underline">Sign In</Link>
           </div>
         </div>
 
