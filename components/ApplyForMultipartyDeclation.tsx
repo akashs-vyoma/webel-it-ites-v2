@@ -62,7 +62,7 @@ const FormInput: React.FC<FormInputProps> = ({
 // --- Reusable Section Header ---
 const SectionHeader: React.FC<{ title: string; icon?: React.ReactNode }> = ({ title, icon }) => (
     <div className="bg-[#484595] text-white py-2 px-4 text-sm font-medium flex items-center gap-2 rounded-t-sm">
-        {icon && React.cloneElement(icon as React.ReactElement, { size: 18 })}
+        {icon && React.cloneElement(icon as React.ReactElement, {})}
         {title}
     </div>
 );
