@@ -1,9 +1,9 @@
 
-import ApplicationForm from '@/components/ApplyNOC'
+import NOCForm from '@/components/Noc'
 
 export default function page() {
     return (
 
-        <ApplicationForm />
+        <NOCForm />
     )
 }

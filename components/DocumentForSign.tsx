@@ -6,7 +6,7 @@ const SignDocument: React.FC = () => {
     const [udin, setUdin] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
 
-    const handleGenerateOtp = () => {
+    const handleGenerateOtp = () => { 
         if (phoneNumber.length === 10) {
             alert(`OTP generated for ${phoneNumber}`);
         } else {
@@ -15,49 +15,76 @@ const SignDocument: React.FC = () => {
     };
 
     return (
+        /* Added 'h-fit' to stop vertical stretching and adjusted width to prevent button cutoff */
+        <div className="w-full max-w-3xl mx-auto mt-8 h-fit
+                        bg-white/90 backdrop-blur
+                        rounded-xl border border-slate-200
+                        shadow-[0_10px_30px_rgba(0,0,0,0.08)]">
 
-        <div className="w-full max-w-5xl bg-white shadow-xl rounded-2xl overflow-hidden border border-gray-200 mt-10">
+
             {/* Header */}
-            <div className="bg-[#4c4f95] px-6 py-4">
-                <h2 className="text-white text-lg font-medium">Sign Document</h2>
+            <div className="px-6 py-3 border-b border-slate-200
+                            bg-[#1F51FF] rounded-t-xl">
+                 <div className="absolute inset-0 gradient-shimmer pointer-events-none"></div>
+                <h2 className="text-white text-base font-semibold tracking-wide">
+                    Sign Document
+                </h2>
             </div>
 
-            {/* Form Content - Changed p-8 to specific padding to reduce bottom whitespace */}
-            <div className="px-8 pt-8 pb-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Content - Padding adjusted to be tight but readable */}
+            <div className="p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
 
-                    {/* UDIN Field */}
-                    <div className="flex flex-col">
-                        <label className="block text-sm font-bold text-gray-800 mb-2">
-                            UDIN*
+                    {/* UDIN */}
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-bold text-slate-800">
+                            UDIN<span className="text-red-500">*</span>
                         </label>
-                        <div className="flex w-full rounded border border-gray-300 overflow-hidden h-11">
-                            {/* Icon Prefix */}
-                            <div className="bg-[#4c4f95] w-12 flex items-center justify-center text-white shrink-0">
-                                <Folder size={20} fill="currentColor" />
+
+                        <div className="flex h-10 rounded-lg overflow-hidden
+                                        border border-slate-300
+                                        focus-within:border-[#1F51FF]
+                                        focus-within:shadow-[0_0_0_2px_rgba(31,81,255,0.15)]
+                                        transition">
+
+                            <div className="w-10 flex items-center justify-center
+                                            bg-slate-100 text-[#1F51FF]">
+                                <Folder size={16} />
                             </div>
-                            {/* Input */}
+
                             <input
                                 type="text"
                                 value={udin}
                                 onChange={(e) => setUdin(e.target.value)}
-                                className="flex-1 px-4 py-2 outline-none text-gray-700 placeholder-gray-400 font-medium"
-                                placeholder="UDIN Number"
+                                placeholder="Enter UDIN number"
+                                className="flex-1 px-3 text-slate-800
+                                           placeholder-slate-600
+                                           outline-none bg-transparent
+                                           text-sm font-medium"
                             />
                         </div>
                     </div>
 
-                    {/* Mobile Number Field */}
-                    <div className="flex flex-col">
-                        <label className="block text-sm font-bold text-gray-800 mb-2">
-                            Mobile Number on which the request was recieved*
+                    {/* Mobile Number */}
+                    <div className="flex flex-col gap-1.5">
+                        <label className="text-xs font-bold text-slate-800">
+                            Mobile Number (Request Received)
+                            <span className="text-red-500">*</span>
                         </label>
-                        <div className="flex w-full rounded rounded-r-xl border border-gray-300 overflow-hidden h-11">
-                            {/* Icon Prefix */}
-                            <div className="bg-[#4c4f95] w-12 flex items-center justify-center text-white shrink-0">
-                                <PhoneCall size={20} fill="currentColor" />
-                            </div>
-                            {/* Input */}
+
+                        <div className="flex h-10 rounded-lg overflow-hidden
+                                        border border-slate-300
+                                        focus-within:border-[#1F51FF]
+                                        focus-within:shadow-[0_0_0_2px_rgba(31,81,255,0.15)]
+                                        transition">
+
+                       <div className="px-3 py-2 flex items-center justify-center 
+                bg-slate-100 text-[#1F51FF] rounded-md">
+  <PhoneCall size={16} />
+</div>
+
+
+
                             <input
                                 type="text"
                                 value={phoneNumber}
@@ -65,23 +92,36 @@ const SignDocument: React.FC = () => {
                                     const val = e.target.value.replace(/\D/g, '');
                                     if (val.length <= 10) setPhoneNumber(val);
                                 }}
-                                className="flex-1 px-4 py-2 outline-none text-gray-700 placeholder-gray-400 font-medium"
-                                placeholder="Mobile Number"
+                                placeholder="10-digit mobile number"
+                                className="flex-1 px-3 text-slate-800
+                                           placeholder-slate-600
+                                           outline-none bg-transparent
+                                           text-sm font-medium"
                             />
-                            {/* Generate OTP Button */}
-                            <button
-                                onClick={handleGenerateOtp}
-                                className="bg-[#4c4f95] hover:bg-[#3b3e7a] text-white px-6 font-medium text-sm rounded-r-xl transition-colors whitespace-nowrap"
-                            >
-                                Generate OTP
-                            </button>
+<button
+  onClick={handleGenerateOtp}
+  className="
+    px-2 py-3
+    text-xs font-bold
+    bg-[#1F51FF] text-white
+    rounded-md
+    hover:opacity-90
+    active:scale-[0.98]
+    transition-all
+    cursor-pointer
+    whitespace-nowrap
+    flex= items-center justify-center
+  "
+>
+  Generate OTP
+</button>
+
+
                         </div>
                     </div>
 
                 </div>
             </div>
-
-            {/* Empty div for bottom spacing removed completely */}
         </div>
     );
 };

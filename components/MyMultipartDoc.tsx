@@ -1,12 +1,11 @@
 "use client";
 import React, { useState } from 'react';
-import { FileSignature } from 'lucide-react';
+import { FileSignature, ChevronDown } from 'lucide-react';
 
 const MultiPartyDeclaration: React.FC = () => {
     const [appType, setAppType] = useState("Select Application Type");
     const [appNumber, setAppNumber] = useState("Select Application Number");
 
-    // Options from your request
     const applicationTypeOptions = [
         "Select Application Type",
         "DPR of IT & ITeS - vetting - MULTIPARTY",
@@ -16,73 +15,99 @@ const MultiPartyDeclaration: React.FC = () => {
     ];
 
     return (
-        <div className="w-full max-w-7xl mx-auto p-4 font-sans">
+        <>
+            {/* Shimmer Animation Styles (From Reference) */}
+            <style jsx global>{`
+                @keyframes shimmer {
+                    0% { transform: translateX(-100%); }
+                    100% { transform: translateX(100%); }
+                }
+                .gradient-shimmer {
+                    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+                    animation: shimmer 3s infinite;
+                }
+            `}</style>
 
-            {/* Main Container with rounded corners and shadow */}
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="w-full max-w-7xl mx-auto font-sans h-fit">
 
-                {/* Purple Header Background */}
-                <div className="bg-[#484595] p-6 pb-8">
+                {/* Main Container - Matched Shadow & Border */}
+                <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-slate-100">
 
-                    {/* Title Section */}
-                    <div className="flex items-center justify-center gap-2 text-white mb-6">
-                        <FileSignature className="w-6 h-6" />
-                        <h1 className="text-2xl font-normal tracking-wide">
-                            Multi Party Declaration
-                        </h1>
-                    </div>
+                    {/* Header - Matched Compact Padding (py-3) & Gradient */}
+                    <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-500 px-6 py-3">
 
-                    {/* Dropdowns Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-2 md:px-6">
+                        {/* Shimmer Effect */}
+                        <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
 
-                        {/* 1. Application Type Dropdown */}
-                        <div className="relative">
-                            <select
-                                value={appType}
-                                onChange={(e) => setAppType(e.target.value)}
-                                className="w-full appearance-none bg-white text-black font-bold text-sm py-3 px-4 rounded-md outline-none focus:ring-2 focus:ring-blue-300 shadow-sm cursor-pointer"
-                            >
-                                {applicationTypeOptions.map((option, index) => (
-                                    <option key={index} value={option}>
-                                        {option}
-                                    </option>
-                                ))}
-                            </select>
+                        <div className="relative z-20">
+                            
+                            {/* Title - Matched Size (text-sm) & Alignment */}
+                          <div className="flex items-center justify-center gap-2 text-white mb-2 opacity-95 text-center">
+    <FileSignature className="w-4 h-4 text-white" />
+    <h1 className="text-sm font-bold tracking-wide">
+        Multi Party Declaration
+    </h1>
+</div>
 
-                            {/* Custom Chevron Arrow */}
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-black">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                                </svg>
+
+                            {/* Dropdowns Grid - Matched Gap & Input Height */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                                {/* 1. Application Type Dropdown */}
+                                <div className="flex flex-col gap-1 group">
+                                    <label className="text-blue-50 text-[11px] font-bold uppercase tracking-wider pl-1">
+                                        Application Type
+                                    </label>
+                                    <div className="relative">
+                                        {/* Height matched to h-9 (36px) */}
+                                        <select
+                                            value={appType}
+                                            onChange={(e) => setAppType(e.target.value)}
+                                            className="w-full h-9 px-3 pr-8 rounded-md bg-white text-slate-700 font-bold text-sm outline-none focus:ring-2 focus:ring-cyan-300 border border-transparent shadow-sm appearance-none cursor-pointer transition-shadow"
+                                        >
+                                            {applicationTypeOptions.map((option, index) => (
+                                                <option key={index} value={option}>
+                                                    {option}
+                                                </option>
+                                            ))}
+                                        </select>
+
+                                        {/* Custom Chevron Arrow */}
+                                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-500">
+                                            <ChevronDown className="w-4 h-4" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* 2. Application Number Dropdown */}
+                                <div className="flex flex-col gap-1 group">
+                                    <label className="text-blue-50 text-[11px] font-bold uppercase tracking-wider pl-1">
+                                        Application Number
+                                    </label>
+                                    <div className="relative">
+                                        {/* Height matched to h-9 (36px) */}
+                                        <select
+                                            value={appNumber}
+                                            onChange={(e) => setAppNumber(e.target.value)}
+                                            className="w-full h-9 px-3 pr-8 rounded-md bg-white text-slate-700 font-bold text-sm outline-none focus:ring-2 focus:ring-cyan-300 border border-transparent shadow-sm appearance-none cursor-pointer transition-shadow"
+                                        >
+                                            <option>Select Application Number</option>
+                                            {/* Add dynamic numbers here later */}
+                                        </select>
+
+                                        {/* Custom Chevron Arrow */}
+                                        <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-500">
+                                            <ChevronDown className="w-4 h-4" />
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
-
-                        {/* 2. Application Number Dropdown */}
-                        <div className="relative">
-                            <select
-                                value={appNumber}
-                                onChange={(e) => setAppNumber(e.target.value)}
-                                className="w-full appearance-none bg-white text-black font-bold text-sm py-3 px-4 rounded-md outline-none focus:ring-2 focus:ring-blue-300 shadow-sm cursor-pointer"
-                            >
-                                <option>Select Application Number</option>
-                                {/* Add dynamic numbers here later */}
-                            </select>
-
-                            {/* Custom Chevron Arrow */}
-                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-black">
-                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                                </svg>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
-
-                {/* Optional: White body area below to match the rounded shadow look */}
-                <div className="h-4 bg-white"></div>
             </div>
-        </div>
+        </>
     );
 };
 

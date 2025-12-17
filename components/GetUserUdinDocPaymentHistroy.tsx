@@ -4,7 +4,11 @@ import {
     Printer,
     FileText,
     FileSpreadsheet,
-    ArrowUpDown
+    ArrowUpDown,
+    History,
+    Search,
+    ChevronLeft,
+    ChevronRight
 } from 'lucide-react';
 
 // --- Types ---
@@ -21,7 +25,7 @@ interface ApplicationGroup {
     documents: DocumentEntry[];
 }
 
-// --- Mock Data (Matching Screenshot) ---
+// --- Mock Data ---
 const mockData: ApplicationGroup[] = [
     {
         id: 1,
@@ -58,41 +62,49 @@ const UdinPaymentHistory: React.FC = () => {
     const handlePrint = () => window.print();
 
     return (
-        <div className="min-h-screen w-full p-4 font-sans text-sm">
-            <div className="max-w-[1400px] mx-auto bg-white shadow-sm border border-gray-200">
+        <div className="min-h-screen w-full p-4 md:p-8 font-sans">
+            <div className="max-w-[1400px] mx-auto bg-white shadow-xl rounded-xl overflow-hidden border border-slate-100">
 
-                {/* --- Header --- */}
-                <div className="bg-[#484595] px-4 py-3">
-                    <h1 className="text-white font-bold text-lg">UDIN Doc Payment History</h1>
+               <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-500 px-6 py-5">
+
+    {/* SHIMMER LAYER */}
+    <div className="absolute inset-0 gradient-shimmer pointer-events-none"></div>
+                    <h1 className="text-white font-semibold text-lg flex items-center gap-2 tracking-wide">
+                        <History size={20} className="text-cyan-100" />
+                        UDIN Doc Payment History
+                    </h1>
                 </div>
 
                 {/* --- Controls Bar --- */}
-                <div className="p-4 flex flex-col md:flex-row justify-between items-center gap-4">
+                <div className="p-6 flex flex-col md:flex-row justify-between items-center gap-4 bg-white">
 
                     {/* Action Buttons */}
                     <div className="flex gap-2">
-                        <button className="flex items-center justify-center border border-gray-400 px-3 py-1 rounded-sm text-xs font-semibold hover:bg-gray-100 transition-colors bg-gray-50 text-gray-700 min-w-[60px]">
-                            Excel
+                        <button className="flex items-center gap-1.5 border border-slate-200 bg-white px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-green-50 hover:text-green-600 hover:border-green-200 transition-all shadow-sm">
+                            <FileSpreadsheet size={16} /> Excel
                         </button>
-                        <button className="flex items-center justify-center border border-gray-400 px-3 py-1 rounded-sm text-xs font-semibold hover:bg-gray-100 transition-colors bg-gray-50 text-gray-700 min-w-[60px]">
-                            PDF
+                        <button className="flex items-center gap-1.5 border border-slate-200 bg-white px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 transition-all shadow-sm">
+                            <FileText size={16} /> PDF
                         </button>
                         <button
                             onClick={handlePrint}
-                            className="flex items-center justify-center border border-gray-400 px-3 py-1 rounded-sm text-xs font-semibold hover:bg-gray-100 transition-colors bg-gray-50 text-gray-700 min-w-[60px]"
+                            className="flex items-center gap-1.5 border border-slate-200 bg-white px-4 py-2 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50 hover:text-slate-900 transition-all shadow-sm"
                         >
-                            Print
+                            <Printer size={16} /> Print
                         </button>
                     </div>
 
                     {/* Search Bar */}
-                    <div className="flex items-center gap-2 w-full md:w-auto">
-                        <label className="text-xs font-bold text-gray-700">Search:</label>
+                    <div className="relative w-full md:w-auto group">
+                        <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-cyan-500 transition-colors">
+                            <Search size={16} />
+                        </div>
                         <input
                             type="text"
+                            placeholder="Search..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="border border-gray-300 rounded-sm px-2 py-1 text-sm outline-none focus:border-[#484595] w-full md:w-64"
+                            className="w-full md:w-64 border border-slate-200 rounded-lg pl-10 pr-4 py-2 text-sm outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-100 bg-slate-50 text-slate-700 transition-all"
                         />
                     </div>
                 </div>
@@ -100,31 +112,31 @@ const UdinPaymentHistory: React.FC = () => {
                 {/* --- Table --- */}
                 <div className="w-full overflow-x-auto">
                     <table className="w-full text-sm text-left border-collapse">
-                        <thead className="bg-[#484595] text-white">
+                        <thead className="bg-slate-50 border-y border-slate-200">
                             <tr>
-                                <th className="p-3 border-r border-[#5c58a8] font-bold text-xs w-16 cursor-pointer">
+                                <th className="p-4 border-r border-slate-200 font-bold text-xs text-slate-500 uppercase tracking-wider w-16 cursor-pointer hover:bg-slate-100 transition-colors">
                                     <div className="flex justify-between items-center">
-                                        Sl No. <ArrowUpDown size={12} className="opacity-70" />
+                                        Sl No. <ArrowUpDown size={12} className="opacity-50" />
                                     </div>
                                 </th>
-                                <th className="p-3 border-r border-[#5c58a8] font-bold text-xs cursor-pointer">
+                                <th className="p-4 border-r border-slate-200 font-bold text-xs text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors">
                                     <div className="flex justify-between items-center">
-                                        Application# <ArrowUpDown size={12} className="opacity-70" />
+                                        Application# <ArrowUpDown size={12} className="opacity-50" />
                                     </div>
                                 </th>
-                                <th className="p-3 border-r border-[#5c58a8] font-bold text-xs cursor-pointer">
+                                <th className="p-4 border-r border-slate-200 font-bold text-xs text-slate-500 uppercase tracking-wider cursor-pointer hover:bg-slate-100 transition-colors">
                                     <div className="flex justify-between items-center">
-                                        Doc Type <ArrowUpDown size={12} className="opacity-70" />
+                                        Doc Type <ArrowUpDown size={12} className="opacity-50" />
                                     </div>
                                 </th>
-                                <th className="p-3 border-r border-[#5c58a8] font-bold text-xs cursor-pointer text-center">
-                                    <div className="flex justify-between items-center">
-                                        UDIN <ArrowUpDown size={12} className="opacity-70" />
+                                <th className="p-4 border-r border-slate-200 font-bold text-xs text-slate-500 uppercase tracking-wider text-center cursor-pointer hover:bg-slate-100 transition-colors">
+                                    <div className="flex justify-center items-center gap-1">
+                                        UDIN <ArrowUpDown size={12} className="opacity-50" />
                                     </div>
                                 </th>
-                                <th className="p-3 font-bold text-xs text-center cursor-pointer">
-                                    <div className="flex justify-between items-center">
-                                        UDIN Amount (₹) <ArrowUpDown size={12} className="opacity-70" />
+                                <th className="p-4 font-bold text-xs text-slate-500 uppercase tracking-wider text-center cursor-pointer hover:bg-slate-100 transition-colors">
+                                    <div className="flex justify-end items-center gap-1">
+                                        Amount (₹) <ArrowUpDown size={12} className="opacity-50" />
                                     </div>
                                 </th>
                             </tr>
@@ -133,13 +145,13 @@ const UdinPaymentHistory: React.FC = () => {
                             {mockData.map((group) => (
                                 <React.Fragment key={group.id}>
                                     {group.documents.map((doc, docIndex) => (
-                                        <tr key={`${group.id}-${docIndex}`} className="border-b border-gray-50 hover:bg-gray-50">
+                                        <tr key={`${group.id}-${docIndex}`} className="border-b border-slate-100 hover:bg-blue-50/50 transition-colors">
 
                                             {/* 1. Sl No (RowSpan logic) */}
                                             {docIndex === 0 && (
                                                 <td
                                                     rowSpan={group.documents.length}
-                                                    className="p-3 text-xs font-bold text-gray-800 align-top border-r border-gray-100"
+                                                    className="p-4 text-xs font-bold text-slate-500 align-top border-r border-slate-100 bg-white"
                                                 >
                                                     {group.slNo}
                                                 </td>
@@ -149,33 +161,34 @@ const UdinPaymentHistory: React.FC = () => {
                                             {docIndex === 0 && (
                                                 <td
                                                     rowSpan={group.documents.length}
-                                                    className="p-3 text-xs align-top border-r border-gray-100"
+                                                    className="p-4 text-xs align-top border-r border-slate-100 bg-white"
                                                 >
-                                                    <span className="bg-[#5CB85C] text-white font-bold px-3 py-1 rounded-full text-[11px] inline-block">
+                                                    {/* Green Badge for Application No */}
+                                                    <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 font-bold px-3 py-1 rounded-md text-[11px] inline-block shadow-sm">
                                                         {group.applicationNo}
                                                     </span>
                                                 </td>
                                             )}
 
                                             {/* 3. Doc Type */}
-                                            <td className="p-3 text-xs font-bold text-gray-800 border-r border-gray-100">
+                                            <td className="p-4 text-xs font-semibold text-slate-700 border-r border-slate-100">
                                                 {doc.docType}
                                             </td>
 
                                             {/* 4. UDIN */}
-                                            <td className="p-3 text-center border-r border-gray-100">
-                                                <span className="bg-[#FBC02D] text-black font-bold px-3 py-1 rounded-full text-[11px] inline-block">
+                                            <td className="p-4 text-center border-r border-slate-100">
+                                                {/* Yellow Badge for UDIN */}
+                                                <span className="bg-amber-50 text-amber-700 border border-amber-200 font-bold px-3 py-1 rounded-md text-[11px] inline-block shadow-sm">
                                                     {doc.udin}
                                                 </span>
                                             </td>
 
                                             {/* 5. Amount */}
-                                            <td className="p-3 text-xs font-bold text-gray-800 text-center">
-                                                {doc.amount}
+                                            <td className="p-4 text-xs font-bold text-slate-800 text-right pr-8">
+                                                {doc.amount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                                             </td>
                                         </tr>
                                     ))}
-                                    {/* Spacer Row for visual separation between groups if needed, though border handles it */}
                                 </React.Fragment>
                             ))}
                         </tbody>
@@ -183,27 +196,27 @@ const UdinPaymentHistory: React.FC = () => {
                 </div>
 
                 {/* --- Footer & Pagination --- */}
-                <div className="p-4 flex flex-col md:flex-row justify-between items-center gap-4 mt-4">
+                <div className="p-6 flex flex-col md:flex-row justify-between items-center bg-white border-t border-slate-100 gap-4">
 
-                    <div className="text-xs text-gray-600 font-medium">
-                        Showing 1 to {totalEntries} of {totalEntries} entries
+                    <div className="text-xs font-medium text-slate-500">
+                        Showing <span className="font-bold text-slate-800">1</span> to <span className="font-bold text-slate-800">{totalEntries}</span> of <span className="font-bold text-slate-800">{totalEntries}</span> entries
                     </div>
 
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
                         <button
-                            className="px-3 py-1 border border-gray-300 rounded-l-md text-xs font-bold hover:bg-gray-100 bg-white text-gray-800"
+                            className="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-medium hover:bg-slate-50 bg-white text-slate-600 transition-colors flex items-center"
                         >
-                            Previous
+                            <ChevronLeft size={14} className="mr-1" /> Previous
                         </button>
 
-                        <button className="w-8 py-1 border border-[#484595] text-xs font-medium bg-[#484595] text-white">
+                        <button className="w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold bg-gradient-to-r from-blue-600 to-cyan-500 text-white shadow-md shadow-cyan-500/30">
                             1
                         </button>
 
                         <button
-                            className="px-3 py-1 border border-gray-300 rounded-r-md text-xs font-bold hover:bg-gray-100 bg-white text-gray-800"
+                            className="px-3 py-1.5 border border-slate-200 rounded-lg text-xs font-medium hover:bg-slate-50 bg-white text-slate-600 transition-colors flex items-center"
                         >
-                            Next
+                            Next <ChevronRight size={14} className="ml-1" />
                         </button>
                     </div>
                 </div>

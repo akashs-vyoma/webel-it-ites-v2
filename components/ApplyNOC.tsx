@@ -1,177 +1,282 @@
-"use client"
-import React, { useState, useEffect } from 'react';
-import { Eye, X } from 'lucide-react';
+"use client";
+import React, { useState } from 'react';
+import {
+    ChevronDown,
+    Calendar,
+    CreditCard,
+    Mail,
+    MapPin,
+    Phone,
+    User,
+    FileText,
+    ArrowLeft,
+    ArrowRight,
+    PlusCircle,
+    Info,
+    Hash,
+    Send
+} from 'lucide-react';
 
-// --- OPTIONS DATA ---
-const applicationTypes = [
-    "Select Application Type",
-    "DPR of IT & ITeS - Vetting - SINGLE PARTY",
-    "NOC for Renting Out Leased property - SINGLE PARTY",
-    "Certificate for Tax Exemption - SINGLE PARTY",
-    "DPR of IT & ITeS - vetting - MULTIPARTY",
-    "NOC for Renting Out Leased property - MULTIPARTY",
-    "Certificate for Tax Exemption - MULTIPARTY",
-    "Renewal of NOC Renting out Leased Property - SINGLE PARTY",
-    "Renewal of NOC Renting out Leased Property - MULTI PARTY"
-];
-
-const ApplicationForm: React.FC = () => {
-    // FIX 1: Set initial state to true so it opens immediately, 
-    // or use useEffect to trigger it on mount.
-    const [showModal, setShowModal] = useState(true);
-    const [selectedType, setSelectedType] = useState(applicationTypes[0]);
-
-
-    useEffect(() => {
-        setShowModal(true);
-    }, []);
+const CreateApplicationForm: React.FC = () => {
+    // Mock state for dropdown
+    const [appType, setAppType] = useState("");
 
     return (
-        // FIX 2: Added h-fit to prevent it from taking up extra height
-        <div className="w-full font-sans shadow-md bg-white h-fit">
+        <div className="w-full min-h-screen  p-4 md:p-6 font-sans">
+            <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-            {/* --- 1. PURPLE HEADER SECTION --- */}
-            {/* FIX 2: Reduced padding from p-6 to p-4 to remove excess space */}
-            <div className="bg-[#484595] p-4 rounded-t-sm">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-7xl mx-auto">
+        
+                <div className="lg:col-span-8 bg-white rounded-xl shadow-xl overflow-hidden border border-slate-100 h-fit">
 
-                    {/* Dropdown 1: Application Type */}
-                    <div className="w-full">
-                        <label className="text-white text-sm font-semibold mb-1 block pl-1">Application Type</label>
+                    <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-500 p-6">
+    
+    {/* SHIMMER LAYER */}
+    <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
+                        <h2 className="text-white text-lg font-semibold mb-4 tracking-wide">Create New Application</h2>
+                        
+                        {/* Application Type Dropdown */}
                         <div className="relative">
-                            <select
-                                value={selectedType}
-                                onChange={(e) => setSelectedType(e.target.value)}
-                                className="w-full h-10 px-3 rounded-md bg-white text-black font-bold text-sm outline-none focus:ring-2 focus:ring-blue-300 appearance-none shadow-sm cursor-pointer"
+                            <select 
+                                value={appType}
+                                onChange={(e) => setAppType(e.target.value)}
+                                className="w-full h-11 pl-4 pr-10 rounded-lg bg-white text-slate-700 font-bold text-sm outline-none focus:ring-4 focus:ring-cyan-500/30 transition-shadow appearance-none cursor-pointer"
                             >
-                                {applicationTypes.map((type, index) => (
-                                    <option key={index} value={type} className="py-1">
-                                        {type}
-                                    </option>
-                                ))}
+                                <option value="">Select Application Type</option>
+                                <option value="1">NOC for Renting Out Leased property</option>
+                                <option value="2">DPR of IT & ITeS - Vetting</option>
                             </select>
-                            {/* Custom Arrow */}
-                            <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                                <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+                                <ChevronDown className="w-5 h-5 text-slate-500" />
                             </div>
                         </div>
                     </div>
 
-                    {/* Dropdown 2: Application Number */}
-                    <div className="w-full">
-                        <label className="text-white text-sm font-semibold mb-1 block pl-1">Application No</label>
-                        <div className="relative">
-                            <select className="w-full h-10 px-3 rounded-md bg-white text-black font-bold text-sm outline-none focus:ring-2 focus:ring-blue-300 appearance-none shadow-sm cursor-pointer">
-                                <option>Select Application Number</option>
-                                {/* Add dynamic numbers here if needed */}
-                            </select>
-                            {/* Custom Arrow */}
-                            <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                                <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
-                        </div>
+                    {/* Info Strip (Dark Blue instead of Purple) */}
+                    <div className="bg-blue-700 px-6 py-2">
+                        <p className="text-xs text-white font-medium flex items-center gap-2">
+                            <Info size={14} className="text-cyan-300" />
+                            Information: Select Application Type, will enable other fields
+                        </p>
                     </div>
 
-                </div>
-            </div>
+                    {/* --- Form Body --- */}
+                    <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
 
-            {/* --- 2. YELLOW INSTRUCTION SECTION --- */}
-            {/* FIX 2: Reduced padding to make it tighter */}
-            <div className="bg-[#F8EABB] py-3 px-4 rounded-b-sm border-t border-white/10">
-                <p className="text-xs text-[#333] leading-relaxed">
-                    <span className="font-bold">Instruction:</span> To Generate Declaration Letter please select <span className="font-bold">Application Type</span> from the drop down, then select Application Number. all documents with UDIN Number will show with pre defined format. Check the letter and click on
-                    {/* LINK TO OPEN MODAL */}
-                    <button
-                        onClick={() => setShowModal(true)}
-                        className="font-bold underline text-black hover:text-blue-700 ml-1 cursor-pointer outline-none"
-                    >
-                        "Generate & Upload"
-                    </button> button
-                </p>
-            </div>
-
-            {/* --- 3. MODAL --- */}
-            {showModal && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-                    <div className="bg-white rounded-lg shadow-xl w-full max-w-lg overflow-hidden animate-in fade-in zoom-in duration-200">
-
-                        {/* Modal Header */}
-                        <div className="bg-[#4c4f95] p-5 flex justify-between items-center">
-                            <h2 className="text-white text-lg font-normal">Verify your Aadhaar Number</h2>
-                            <button onClick={() => setShowModal(false)} className="text-white/80 hover:text-white">
-                                <X size={20} />
-                            </button>
-                        </div>
-
-                        {/* Modal Body */}
-                        <div className="p-6 space-y-6">
-
-                            {/* Aadhaar Input Group */}
-                            <div>
-                                <label className="block text-sm font-bold text-gray-800 mb-2">
-                                    Aadhaar Number <span className="text-red-500">*</span>
-                                </label>
-
-                                <div className="flex h-10 rounded-md overflow-hidden shadow-sm border border-gray-300">
-                                    {/* Left Label */}
-                                    <div className="bg-[#4c4f95] text-white px-4 flex items-center justify-center text-sm font-medium shrink-0">
-                                        Aadhaar
-                                    </div>
-
-                                    {/* Input Field with Eye Icon */}
-                                    <div className="relative flex-1 bg-[#e9ecef]">
-                                        <input
-                                            type="text"
-                                            placeholder="Aadhaar Number"
-                                            className="w-full h-full bg-[#e9ecef] px-3 pr-10 text-sm outline-none text-gray-700 placeholder-gray-400"
-                                        />
-                                        <button className="absolute right-2 top-1/2 -translate-y-1/2 text-[#4c4f95] hover:text-blue-800">
-                                            <Eye size={18} />
-                                        </button>
-                                    </div>
-
-                                    {/* Send OTP Button */}
-                                    <button className="bg-[#4c4f95] hover:bg-[#3b3d73] text-white px-5 text-sm font-medium shrink-0 transition-colors">
-                                        Send OTP
+                        {/* GST Number (Editable) */}
+                        <div className="md:col-span-1">
+                            <InputGroup 
+                                label="GST Number" 
+                                icon={<Hash size={18} />} 
+                                placeholder="GST Number" 
+                                required
+                                actionButton={
+                                    <button className="bg-[#eec643] hover:bg-[#dcb538] text-slate-900 text-xs font-bold px-4 h-full transition-colors border-l border-yellow-600/20">
+                                        Proceed
                                     </button>
-                                </div>
-                            </div>
-
-                            {/* Consent Checkbox */}
-                            <div className="flex items-start gap-3">
-                                <input
-                                    type="checkbox"
-                                    id="aadhaar-consent"
-                                    className="mt-1 h-4 w-4 rounded border-gray-400 text-[#4c4f95] focus:ring-[#4c4f95] cursor-pointer"
-                                />
-                                <div className="text-xs text-gray-600 text-justify leading-relaxed">
-                                    <label htmlFor="aadhaar-consent" className="cursor-pointer">
-                                        I hereby state that I have no objection in authenticating myself on Unique Document Identification Number (UDIN) portal * with Aadhaar based authentication system and *give my consent to providing my Aadhaar number, Biometric and/or One-Time Password (OTP) data for
-                                    </label>
-                                    <a href="#" className="text-blue-500 hover:underline text-xs block mt-1 font-medium">
-                                        Read More
-                                    </a>
-                                </div>
-                            </div>
-
+                                }
+                            />
                         </div>
 
-                        {/* Modal Footer */}
-                        <div className="p-6 border-t border-gray-200 flex justify-center bg-gray-50">
-                            <button
-                                className="bg-[#4c4f95] hover:bg-[#3b3d73] text-white px-12 py-2 rounded-lg font-medium transition-colors text-sm shadow-sm"
-                                onClick={() => setShowModal(false)}
-                            >
-                                Cancel
+                        {/* PAN Number (Editable) */}
+                        <div className="md:col-span-1">
+                            <InputGroup label="PAN Number" icon={<CreditCard size={18} />} placeholder="PAN Number" required />
+                        </div>
+
+                        {/* Name (Read Only) */}
+                        <div className="md:col-span-1">
+                            <InputGroup 
+                                label="Name" 
+                                icon={<User size={18} />} 
+                                value="VYOMA INNOVUS GLOBAL PRIVATE LIMITED" 
+                                readOnly 
+                                required 
+                            />
+                        </div>
+
+                        {/* Phone Number (Read Only) */}
+                        <div className="md:col-span-1">
+                            <InputGroup 
+                                label="Phone Number" 
+                                icon={<Phone size={18} />} 
+                                value="7667956617" 
+                                readOnly 
+                                required 
+                            />
+                        </div>
+
+                        {/* Email (Editable) */}
+                        <div className="md:col-span-1">
+                            <InputGroup label="Email" icon={<Mail size={18} />} placeholder="Email" />
+                        </div>
+
+                        {/* Registered Address (Editable) */}
+                        <div className="md:col-span-1">
+                            <InputGroup label="Registered Address" icon={<MapPin size={18} />} placeholder="Registered Address" required />
+                        </div>
+
+                        <div className="col-span-full border-t border-slate-100 my-2"></div>
+
+                        {/* Old NOC No (Editable) */}
+                        <div className="md:col-span-1">
+                            <InputGroup label="Old NOC No. / Application No. (If Anumati Portal)" icon={<FileText size={18} />} placeholder="Old NOC No. / Application No." required />
+                        </div>
+
+                        {/* Old NOC Date (Editable) */}
+                        <div className="md:col-span-1">
+                            <InputGroup label="Old NOC Date / Application Date (If Anumati Portal)" icon={<Calendar size={18} />} defaultValue="2025-12-16" type="date" required />
+                        </div>
+
+                        {/* Old Agreement Tenure (Editable) */}
+                        <div className="md:col-span-1">
+                            <InputGroup label="Old Agreement Tenure (Effective From)" icon={<Calendar size={18} />} defaultValue="2025-12-16" type="date" required />
+                        </div>
+
+                        {/* Old Agreement End Date (Editable) */}
+                        <div className="md:col-span-1">
+                            <InputGroup label="Old Agreement End Date" icon={<Calendar size={18} />} defaultValue="2025-12-16" type="date" required />
+                        </div>
+
+                        <div className="col-span-full border-t border-slate-100 my-2"></div>
+
+                        {/* Amount Paid till (Editable) */}
+                        <div className="md:col-span-1">
+                            <InputGroup label="Amount Paid till (Rs.)" icon={<span className="font-bold text-lg">₹</span>} placeholder="Amount Paid till..." required />
+                        </div>
+
+                        {/* Last payment made on (Editable) */}
+                        <div className="md:col-span-1">
+                            <InputGroup label="Last payment made on" icon={<Calendar size={18} />} defaultValue="2025-12-16" type="date" required />
+                        </div>
+
+                         {/* Total Payment (Editable) */}
+                         <div className="col-span-full">
+                            <InputGroup label="Total Payment made till date against sqft from the Renewal Start Date (with GST) (Rs.)" icon={<span className="font-bold text-lg">₹</span>} placeholder="Total Payment" required />
+                        </div>
+
+                        {/* Submit Button */}
+                        <div className="col-span-full flex justify-end mt-4">
+                            <button className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white px-8 py-3 rounded-lg font-bold shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2 active:scale-95">
+                                <Send size={18} />
+                                Submit Application
                             </button>
                         </div>
+                    </div>
 
+                    {/* Footer Instruction (Left Column) */}
+                    <div className="bg-[#eec643] px-6 py-3 border-t border-yellow-200">
+                        <p className="text-[11px] text-slate-900 leading-snug">
+                            <span className="font-bold">Instruction:</span> Please select <span className="font-bold">Application Type</span> from the dropdown, will show the required document for this application on the right side window. Enter <span className="font-bold">"CIN Number"</span> of your company & click on <span className="font-bold underline">Proceed Button</span>. Fill The other Details and Submit Application, Will generate <span className="font-bold">Application Number</span>.
+                        </p>
                     </div>
                 </div>
-            )}
 
+                {/* ================= RIGHT COLUMN: REQUIRED DOCUMENT (4 Columns) ================= */}
+                <div className="lg:col-span-4 h-fit bg-white rounded-xl shadow-xl overflow-hidden border border-slate-100">
+                    
+                    {/* Header (Neon Blue Gradient) */}
+                    <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-4">
+                        <h3 className="text-white text-sm font-semibold tracking-wide">Required Document</h3>
+                    </div>
+
+                    <div className="p-4 bg-slate-50 min-h-[300px] flex flex-col gap-4">
+                        
+                        {/* Carousel Controls */}
+                        <div className="bg-white rounded-lg p-3 shadow-sm border border-slate-200 flex justify-between items-center h-16">
+                             <button className="p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors">
+                                <ArrowLeft size={20} />
+                             </button>
+                             <span className="text-xs text-slate-400 italic">No document selected</span>
+                             <button className="p-1 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-full transition-colors">
+                                <ArrowRight size={20} />
+                             </button>
+                        </div>
+
+                        {/* Upload Missing Document Bar */}
+                        <div className="bg-[#eec643] p-3 rounded-lg shadow-sm border border-yellow-400/30 group cursor-pointer hover:bg-[#dcb538] transition-colors">
+                            <div className="flex justify-between items-center">
+                                <div className="text-slate-900 text-xs font-bold">
+                                    Upload Missing document click on the <PlusCircle size={14} className="inline mx-1" /> Sign
+                                </div>
+                                <div className="bg-white rounded-full p-0.5 text-blue-600 shadow-sm group-hover:scale-110 transition-transform">
+                                    <PlusCircle size={18} />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Right Column Instructions */}
+                        <div className="bg-[#fcf8e3] p-3 rounded-lg border border-yellow-100">
+                             <p className="text-[10px] text-slate-700 leading-relaxed">
+                                <span className="font-bold text-slate-900">Instruction:</span> Please select <span className="font-bold">Application Type</span> from the dropdown, will show the required document for this application on the above selection. If the Document is not uploaded, click on the <span className="font-bold">Upload Document Link</span>.
+                             </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     );
 };
 
-export default ApplicationForm;
+// --- Helper Component for Inputs ---
+interface InputGroupProps {
+    label: string;
+    icon: React.ReactNode;
+    placeholder?: string;
+    value?: string;
+    defaultValue?: string; // Added defaultValue
+    readOnly?: boolean;
+    required?: boolean;
+    type?: string;
+    actionButton?: React.ReactNode;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; // Added onChange type
+}
+
+const InputGroup: React.FC<InputGroupProps> = ({ 
+    label, 
+    icon, 
+    placeholder, 
+    value, 
+    defaultValue, 
+    readOnly, 
+    required, 
+    type = "text", 
+    actionButton,
+    onChange 
+}) => {
+    return (
+        <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-700 uppercase tracking-wide flex gap-0.5">
+                {label} {required && <span className="text-red-500">*</span>}
+            </label>
+            <div className={`flex items-center rounded-lg border border-slate-300 overflow-hidden h-10 transition-all focus-within:ring-2 focus-within:ring-cyan-400 focus-within:border-cyan-400 ${readOnly ? 'bg-slate-100' : 'bg-white'}`}>
+                
+                {/* Icon Box */}
+                <div className="w-10 h-full bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500">
+                    {icon}
+                </div>
+
+                {/* Input Field */}
+                <input
+                    type={type}
+                    // LOGIC FIX: If readOnly is true, use 'value'. If not, use 'defaultValue' (unless controlled explicitly)
+                    // This prevents the "value without onChange" warning for editable fields
+                    value={readOnly ? value : undefined}
+                    defaultValue={!readOnly ? (defaultValue || value) : undefined}
+                    readOnly={readOnly}
+                    onChange={onChange}
+                    placeholder={placeholder}
+                    className={`flex-1 px-3 text-sm font-medium outline-none text-slate-700 placeholder:text-slate-400 h-full ${readOnly ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : 'bg-white'}`}
+                />
+
+                {/* Optional Action Button (like Proceed) */}
+                {actionButton && (
+                    <div className="h-full">
+                        {actionButton}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+export default CreateApplicationForm;

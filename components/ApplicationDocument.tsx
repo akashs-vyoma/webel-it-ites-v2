@@ -1,66 +1,62 @@
 "use client";
 import React, { useRef, useState } from 'react';
-
-import { PlusCircle, FileText, CheckCircle2 } from 'lucide-react';
+import { PlusCircle, CheckCircle2, ChevronDown, Upload, Info } from 'lucide-react';
 
 const DocumentUploadHeader: React.FC = () => {
-    // State to manage selected file
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
-    // Ref for the hidden file input
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // Function to trigger file dialog
     const handleUploadClick = () => {
         fileInputRef.current?.click();
     };
 
-    // Function to handle file selection
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
             setSelectedFile(file);
-            // Optional: Logic to send file to server would go here
             console.log("File ready for upload:", file.name);
         }
     };
 
     return (
-        <div className="w-full font-sans">
-            {/* --- Top Purple Section --- */}
-            <div className="bg-[#484595] p-5 rounded-t-sm">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-7xl mx-auto">
+        <div className="w-full font-sans h-fit shadow-lg rounded-xl overflow-hidden bg-white border border-slate-100">
+
+            {/* --- Top Neon Blue Section (WITH SHIMMER) --- */}
+            <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-500 px-6 py-3">
+
+                {/* Shimmer Effect */}
+                <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
+
+                <div className="relative z-20 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-7xl mx-auto">
 
                     {/* Application Type */}
-                    <div className="flex flex-col gap-2">
-                        <label className="text-white text-lg font-normal">
+                    <div className="flex flex-col gap-1 group">
+                        <label className="text-blue-50 text-[11px] font-bold uppercase tracking-wider pl-1">
                             Application Type
                         </label>
                         <div className="relative">
-                            <select className="w-full p-3 rounded-md bg-white text-black font-bold text-sm outline-none focus:ring-2 focus:ring-blue-300 appearance-none">
+                            <select className="w-full h-9 px-3 rounded-md bg-white text-slate-700 font-bold text-sm outline-none focus:ring-2 focus:ring-cyan-300 border border-transparent shadow-sm appearance-none cursor-pointer transition-shadow">
                                 <option>Select Application Type</option>
                                 <option>New License</option>
                                 <option>Renewal</option>
                             </select>
-                            {/* Custom Dropdown Arrow (CSS generic arrow replacement) */}
-                            <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                                <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                <ChevronDown className="w-4 h-4 text-slate-500" />
                             </div>
                         </div>
                     </div>
 
                     {/* Application No */}
-                    <div className="flex flex-col gap-2">
-                        <label className="text-white text-lg font-normal">
+                    <div className="flex flex-col gap-1 group">
+                        <label className="text-blue-50 text-[11px] font-bold uppercase tracking-wider pl-1">
                             Application No
                         </label>
                         <div className="relative">
-                            <select className="w-full p-3 rounded-md bg-white text-black font-bold text-sm outline-none focus:ring-2 focus:ring-blue-300 appearance-none">
+                            <select className="w-full h-9 px-3 rounded-md bg-white text-slate-700 font-bold text-sm outline-none focus:ring-2 focus:ring-cyan-300 border border-transparent shadow-sm appearance-none cursor-pointer transition-shadow">
                                 <option>Select Application Number</option>
-                                {/* Add options dynamically here */}
                             </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                                <svg className="w-4 h-4 text-black" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
+                                <ChevronDown className="w-4 h-4 text-slate-500" />
                             </div>
                         </div>
                     </div>
@@ -68,40 +64,37 @@ const DocumentUploadHeader: React.FC = () => {
                 </div>
             </div>
 
-            {/* --- Bottom Yellow Section --- */}
-            <div className="bg-[#F2E4C3] p-5 rounded-b-sm border-t border-white/20">
+            {/* --- Bottom Light Yellow Section --- */}
+            <div className="bg-[#fcf8e3] px-6 py-3 border-t border-yellow-100">
 
                 {/* Upload Action Bar */}
                 <div
                     onClick={handleUploadClick}
-                    className="bg-[#D6BC70] p-4 flex justify-between items-center cursor-pointer hover:bg-[#c9af66] transition-colors rounded-sm group"
+                    className="bg-[#eec643] py-2 px-4 rounded-lg shadow-sm flex justify-between items-center cursor-pointer hover:bg-[#dcb538] transition-all group"
                 >
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 text-black/80">
                         {selectedFile ? (
-                            // Show this if file is selected
                             <>
-                                <CheckCircle2 className="text-green-700" size={24} />
-                                <span className="text-[#333] font-bold text-lg truncate">
+                                <CheckCircle2 className="text-green-800" size={18} />
+                                <span className="font-bold text-sm truncate">
                                     File Selected: {selectedFile.name}
                                 </span>
                             </>
                         ) : (
-                            // Show this normally
                             <>
-                                <span className="text-[#333] font-bold text-lg">
+                                <span className="font-bold text-sm">
                                     Upload new document click on the
                                 </span>
-                                <PlusCircle className="text-black inline mx-1" size={20} />
-                                <span className="text-[#333] font-bold text-lg">
+                                <PlusCircle className="inline" size={16} />
+                                <span className="font-bold text-sm">
                                     Sign
                                 </span>
                             </>
                         )}
                     </div>
 
-                    {/* The Blue Plus Button on the right */}
-                    <div className="bg-white rounded-full p-0.5 shadow-sm group-hover:scale-110 transition-transform">
-                        <PlusCircle className="text-[#007bff]" size={32} strokeWidth={1.5} />
+                    <div className="bg-white rounded-full p-0.5 shadow-sm group-hover:scale-105 transition-transform duration-200">
+                        <PlusCircle className="text-[#007bff]" size={20} />
                     </div>
                 </div>
 
@@ -111,12 +104,17 @@ const DocumentUploadHeader: React.FC = () => {
                     ref={fileInputRef}
                     onChange={handleFileChange}
                     className="hidden"
-                    accept=".pdf,.jpg,.png,.doc,.docx" // Optional: restrict file types
+                    accept=".pdf,.jpg,.png,.doc,.docx"
                 />
 
-                {/* Instructions Text */}
-                <div className="mt-3 text-xs text-[#333] leading-relaxed">
-                    <span className="font-bold">Instruction:</span> Add Document with Application please select <span className="font-bold">Application Type</span> from the drop down, then select <span className="font-bold">Application Number</span>. all documents which is uploaded in UDIN for this type of application show on table . Add any documen click on <span className="inline-flex items-center justify-center bg-gray-700 text-white w-4 h-4 text-[10px] rounded-[2px] mx-0.5"><PlusCircle size={10} className="text-white" /></span> button, will add the document in the application, will show bellow table
+                {/* Instructions */}
+                <div className="mt-2 flex gap-2 items-start text-[11px] text-slate-700 leading-tight">
+                    <div className="shrink-0 mt-0.5">
+                        <Info size={14} className="text-[#4c4f95]" />
+                    </div>
+                    <p>
+                        <span className="font-bold text-black">Instruction:</span> Add Document with Application please select <span className="font-bold">Application Type</span> from the drop down, then select <span className="font-bold">Application Number</span>. All documents uploaded in UDIN for this type show on table. Add any document click on <span className="inline-flex items-center justify-center bg-[#4c4f95] text-white w-4 h-4 rounded-[2px] mx-0.5 align-middle"><PlusCircle size={10} /></span> button.
+                    </p>
                 </div>
             </div>
         </div>
