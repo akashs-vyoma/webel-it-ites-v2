@@ -1,12 +1,11 @@
 
 
-import WebelReportFilterSection from '@/components/GetWebelReport'
-
+import UdinDocpayment from '@/components/GetUdinDocpaymentHistoryReport'
 
 export default function page() {
     return (
 
-        <WebelReportFilterSection/> 
+        <UdinDocpayment/> 
 
 
 

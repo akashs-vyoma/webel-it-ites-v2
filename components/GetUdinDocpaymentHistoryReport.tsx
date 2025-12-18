@@ -4,7 +4,7 @@ import ReportFilterSection from './GetProvisionalReport';
 const UdinDocpayment= () => {
     return (
         <div>
-            <ReportFilterSection title="Report Details of Webel Declaration Letter" />
+            <ReportFilterSection title="Report of UDIN DOC Payment History" />
             
         </div>
     );  
