@@ -116,7 +116,7 @@ const IndividualLogin: React.FC = () => {
                                     Mobile Number
                                 </label>
                                 <div className="input-modern relative group">
-                                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-2xl opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity duration-500"></div>
+                                    <div className="absolute inset-0 bg-gradient-to-r  rounded-2xl opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity duration-500"></div>
                                     <div className="relative flex items-center bg-white border-2 border-slate-200 rounded-2xl overflow-hidden shadow-sm group-focus-within:border-indigo-500 group-focus-within:shadow-xl transition-all duration-300">
                                         <div className="pl-5 pr-3 text-slate-400 group-focus-within:text-indigo-600 transition-colors duration-300">
                                             <Smartphone size={20} strokeWidth={2.5} />
@@ -150,7 +150,7 @@ const IndividualLogin: React.FC = () => {
                                         Verification Code
                                     </label>
                                     <div className="input-modern relative group">
-                                        <div className="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-500 rounded-2xl opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity duration-500"></div>
+                                        <div className="absolute inset-0 bg-gradient-to-r  rounded-2xl opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity duration-500"></div>
                                         <div className="relative flex items-center bg-white border-2 border-slate-200 rounded-2xl overflow-hidden shadow-sm group-focus-within:border-amber-500 group-focus-within:shadow-xl transition-all duration-300">
                                             <div className="pl-5 pr-3 text-slate-400 group-focus-within:text-amber-600 transition-colors duration-300">
                                                 <Key size={20} strokeWidth={2.5} />
