@@ -34,6 +34,7 @@ const NonIndividualUploadDoc: React.FC = () => {
     const handleUploadClick = () => {
         fileInputRef.current?.click();
     };
+    const [showMore, setShowMore] = useState(false);
 
     const handleRemoveFile = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -279,13 +280,29 @@ const NonIndividualUploadDoc: React.FC = () => {
                                     className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-0 cursor-pointer accent-blue-600"
                                 />
                                 <div className="text-xs text-gray-600 text-justify leading-relaxed">
-                                    <label htmlFor="aadhaar-consent" className="cursor-pointer">
-                                        I hereby state that I have no objection in authenticating myself on Unique Document Identification Number (UDIN) portal with Aadhaar based authentication system and give my consent to providing my Aadhaar number.
-                                    </label>
-                                    <a href="#" className="text-blue-600 hover:underline block mt-1 font-semibold">
-                                        Read More
-                                    </a>
-                                </div>
+    <label htmlFor="aadhaar-consent" className="cursor-pointer">
+        I hereby state that I have no objection in authenticating myself on
+        Unique Document Identification Number (UDIN) portal with Aadhaar based
+        authentication system and give my consent to providing my Aadhaar
+        number.
+    </label>
+
+    {showMore && (
+        <p className="mt-2 text-gray-500">
+            Aadhaar based authentication is used only for identity verification
+            through UIDAI. Your Aadhaar number will not be stored or shared and
+            will be processed as per UIDAI guidelines.
+        </p>
+    )}
+
+    <span
+        onClick={() => setShowMore(!showMore)}
+        className="text-blue-600 hover:underline block mt-1 font-semibold cursor-pointer"
+    >
+        {showMore ? "Read Less" : "Read More"}
+    </span>
+</div>
+
                             </div>
                         </div>
 
