@@ -43,7 +43,7 @@ const FormInput: React.FC<FormInputProps> = ({
             <div className={`flex h-10 items-center rounded-lg border border-slate-300 overflow-hidden transition-all focus-within:ring-2 focus-within:ring-cyan-400 focus-within:border-cyan-400 ${readOnly ? 'bg-slate-50' : 'bg-white'}`}>
                 {/* Icon Box */}
                 <div className="w-10 h-full bg-slate-50 border-r border-slate-200 flex items-center justify-center text-slate-500 shrink-0">
-                    {React.cloneElement(icon as React.ReactElement, { size: 18 })}
+                    {React.cloneElement(icon as React.ReactElement, { })}
                 </div>
                 {/* Input Field */}
                 <input
@@ -63,7 +63,7 @@ const FormInput: React.FC<FormInputProps> = ({
 // --- Reusable Section Header ---
 const SectionHeader: React.FC<{ title: string; icon?: React.ReactNode }> = ({ title, icon }) => (
     <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white py-3 px-5 text-sm font-semibold flex items-center gap-2 rounded-t-lg shadow-sm">
-        {icon && React.cloneElement(icon as React.ReactElement, { size: 18 })}
+        {icon && React.cloneElement(icon as React.ReactElement, {  })}
         {title}
     </div>
 );

@@ -15,7 +15,7 @@ const CommonCard = ({ children }: { children: React.ReactNode }) => {
                     backgroundSize: '32px 32px'
                 }}></div>
 
-                {/* Shimmer Effect */}
+            x
                 <div className="absolute inset-0 gradient-shimmer"></div>
 
                 {/* Content */}
