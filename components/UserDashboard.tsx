@@ -1,3 +1,4 @@
+"use client"
 import React from 'react';
 import {
     Home,
@@ -53,14 +54,14 @@ const UserDashboard: React.FC = () => {
                             </div>
 
                           <div className="relative z-10 h-full flex items-center justify-center p-8 lg:p-10">
-    <div className="w-full max-w-md rounded-2xl overflow-hidden">
-        <img
-            src="/7127980.jpg"
-            alt="Dashboard Illustration"
-            className="w-full h-auto object-contain drop-shadow-xl transition-all duration-700 group-hover:scale-105 group-hover:drop-shadow-[0_20px_60px_rgba(6,182,212,0.25)]"
-        />
-    </div>
-</div>
+                            <div className="w-full max-w-md rounded-2xl overflow-hidden">
+                                <img
+                                    src="/7127980.jpg"
+                                    alt="Dashboard Illustration"
+                                    className="w-full h-auto object-contain drop-shadow-xl transition-all duration-700 group-hover:scale-105 group-hover:drop-shadow-[0_20px_60px_rgba(6,182,212,0.25)]"
+                                />
+                            </div>
+                        </div>
 
                         </div>
                     </div>
@@ -68,18 +69,16 @@ const UserDashboard: React.FC = () => {
                     {/* Right Column: Dashboard Cards */}
                     <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
 
-                        {/* Card 1: Total Uploaded Document - Neon Blue Gradient */}
+                        {/* Card 1: Total Uploaded Document */}
                         <div className="group relative overflow-hidden rounded-[2rem] min-h-[220px] cursor-default shadow-xl shadow-blue-200/50 hover:shadow-2xl hover:shadow-cyan-400/20 transition-all duration-500">
-                            {/* Gradient background */}
                             <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500"></div>
                             
-                            {/* Animated sheen */}
-                            <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                            {/* Shimmer Effect */}
+                            <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                             
-                            {/* Glass effect border */}
+                            <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                             <div className="absolute inset-0 border border-white/20 rounded-[2rem]"></div>
 
-                            {/* Content */}
                             <div className="relative z-10 p-6 lg:p-8 h-full flex flex-col justify-between text-white">
                                 <div className="flex items-start justify-between">
                                     <div className="flex-1">
@@ -95,23 +94,22 @@ const UserDashboard: React.FC = () => {
                                         <TrendingUp size={22} className="text-white" />
                                     </div>
                                 </div>
-
                                 <div>
                                     <p className="text-xl font-medium leading-snug opacity-90">
                                         Total Uploaded <br /> Document
                                     </p>
                                 </div>
                             </div>
-
-                            {/* Decorative Elements */}
                             <div className="absolute -bottom-16 -right-16 w-48 h-48 bg-cyan-400/30 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-700"></div>
                         </div>
 
-                        {/* Card 2: Multi Party Declaration - Deep Blue & Neon */}
+                        {/* Card 2: Multi Party Declaration */}
                         <div className="group relative overflow-hidden rounded-[2rem] min-h-[220px] cursor-default shadow-xl shadow-blue-200/50 hover:shadow-2xl hover:shadow-cyan-400/20 transition-all duration-500">
-                             {/* Slightly darker gradient for contrast */}
                              <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-blue-900"></div>
                             
+                            {/* Shimmer Effect */}
+                            <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
                             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-500/40 via-transparent to-transparent opacity-60"></div>
                             <div className="absolute inset-0 border border-white/10 rounded-[2rem]"></div>
 
@@ -130,7 +128,6 @@ const UserDashboard: React.FC = () => {
                                         <TrendingUp size={22} className="text-cyan-300" />
                                     </div>
                                 </div>
-
                                 <div>
                                     <p className="text-xl font-medium leading-snug text-slate-200">
                                         Multi Party <br /> Declaration
@@ -139,43 +136,41 @@ const UserDashboard: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Card 3: Upload Document (Action) - White with Neon Borders */}
+                        {/* Card 3: Upload Document (Action) */}
                         <div className="group relative overflow-hidden rounded-[2rem] min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 hover:border-cyan-400 transition-colors duration-300">
                             
-                            {/* Hover Gradient Background (Subtle) */}
+                            {/* Shimmer Effect */}
+                            <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
                             <div className="absolute inset-0 bg-gradient-to-br from-cyan-50 via-white to-white opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                             <div className="absolute inset-0 gradient-shimmer 
-                    pointer-events-none z-10"></div>
-                            {/* Shine effect */}
+                            
                             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
                                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-200/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
                             </div>
 
-                            {/* Content */}
                             <div className="relative z-10 p-6 lg:p-8 h-full flex flex-col justify-center gap-5">
-                                {/* Icon container with neon glow */}
                                 <div className="relative w-fit">
                                     <div className="absolute inset-0 bg-cyan-400/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
                                     <div className="relative bg-white w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 border border-slate-100 shadow-sm">
                                         <CloudUpload size={28} className="text-cyan-600" strokeWidth={2} />
                                     </div>
                                 </div>
-
                                 <div>
                                     <p className="text-2xl lg:text-3xl font-bold leading-tight text-slate-800 group-hover:text-cyan-700 transition-colors">Upload Document</p>
                                     <p className="text-sm text-slate-400 mt-2 font-medium">Click to add new files</p>
                                 </div>
-
-                                {/* Arrow indicator */}
                                 <div className="absolute bottom-6 right-6 w-10 h-10 rounded-full bg-cyan-50 text-cyan-600 flex items-center justify-center opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300">
                                     <ChevronDown size={20} className="rotate-[-90deg]" />
                                 </div>
                             </div>
                         </div>
 
-                        {/* Card 4: Create Application (Action) - White with Blue Borders */}
+                        {/* Card 4: Create Application (Action) */}
                         <div className="group relative overflow-hidden rounded-[2rem] min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 hover:border-blue-500 transition-colors duration-300">
                             
+                            {/* Shimmer Effect */}
+                            <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
                             <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-white opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                             
                             <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
@@ -189,12 +184,10 @@ const UserDashboard: React.FC = () => {
                                         <Plus size={28} className="text-blue-600" strokeWidth={2.5} />
                                     </div>
                                 </div>
-
                                 <div>
                                     <p className="text-2xl lg:text-3xl font-bold leading-tight text-slate-800 group-hover:text-blue-700 transition-colors">Create Application</p>
                                     <p className="text-sm text-slate-400 mt-2 font-medium">Start a new submission</p>
                                 </div>
-
                                 <div className="absolute bottom-6 right-6 w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center opacity-0 group-hover:opacity-100 translate-x-2 group-hover:translate-x-0 transition-all duration-300">
                                     <ChevronDown size={20} className="rotate-[-90deg]" />
                                 </div>
@@ -204,6 +197,8 @@ const UserDashboard: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+        
         </main>
     );
 };
