@@ -1,7 +1,7 @@
 
 import ReportFilterSection from './GetProvisionalReport'; 
 
-const WebelReportFilterSection = () => {
+const UdinDocpayment= () => {
     return (
         <div>
             <ReportFilterSection title="Report Details of Webel Declaration Letter" />
@@ -10,4 +10,4 @@ const WebelReportFilterSection = () => {
     );  
 };
 
-export default WebelReportFilterSection;
+export default UdinDocpayment;

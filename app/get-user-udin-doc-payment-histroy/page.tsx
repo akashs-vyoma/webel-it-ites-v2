@@ -1,9 +1,9 @@
 
-import UdinPaymentHistory from '@/components/GetUserUdinDocPaymentHistroy'
+import UdinDocpayment from '@/components/GetUserUdinDocPaymentHistroy'
 
 export default function page() {
     return (
 
-        <UdinPaymentHistory />
+        <UdinDocpayment/>
     )
 }

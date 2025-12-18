@@ -2,8 +2,15 @@
 import React, { useState } from 'react';
 import { Calendar, Search, ChevronDown } from 'lucide-react';
 
-const ReportFilterSection = () => {
+interface ReportFilterProps {
+    title: string;
+    onSearch?: (data: { service: string, fromDate: string, toDate: string }) => void;
+}
+
+const ReportFilterSection = ({ title, onSearch }: ReportFilterProps) => {
     const [service, setService] = useState("");
+    const [fromDate, setFromDate] = useState("2025-12-18");
+    const [toDate, setToDate] = useState("2025-12-18");
 
     const services = [
         "All",
@@ -17,18 +24,23 @@ const ReportFilterSection = () => {
         "Renewal of NOC Renting out Leased Property - MULTI PARTY"
     ];
 
+    const handleSearch = () => {
+        if (onSearch) {
+            onSearch({ service, fromDate, toDate });
+        }
+    };
+
     return (
         <div className="max-w-[1600px] mx-auto p-4 lg:p-6">
             <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100 overflow-hidden">
                 
-                {/* 1. HEADER: Neon Blue Gradient with Shimmer Effect */}
+                {/* 1. REUSABLE HEADER: Text is passed as a prop */}
                 <div className="relative bg-gradient-to-r from-blue-700 to-cyan-600 px-6 py-4">
-                    {/* The Shimmer Div requested */}
                     <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
                     
                     <h2 className="relative z-20 text-white font-bold tracking-wide flex items-center gap-2">
                         <span className="w-2 h-2 bg-cyan-300 rounded-full animate-pulse shadow-[0_0_10px_cyan]"></span>
-                        Report Details Of Provisional NOC
+                        {title}
                     </h2>
                 </div>
 
@@ -63,7 +75,8 @@ const ReportFilterSection = () => {
                                 </div>
                                 <input 
                                     type="date" 
-                                    defaultValue="2025-12-18"
+                                    value={fromDate}
+                                    onChange={(e) => setFromDate(e.target.value)}
                                     className="w-full px-3 text-sm font-medium focus:outline-none text-slate-700 cursor-pointer" 
                                 />
                             </div>
@@ -78,7 +91,8 @@ const ReportFilterSection = () => {
                                 </div>
                                 <input 
                                     type="date" 
-                                    defaultValue="2025-12-18"
+                                    value={toDate}
+                                    onChange={(e) => setToDate(e.target.value)}
                                     className="w-full px-3 text-sm font-medium focus:outline-none text-slate-700 cursor-pointer" 
                                 />
                             </div>
@@ -86,7 +100,10 @@ const ReportFilterSection = () => {
 
                         {/* Search Button */}
                         <div className="md:col-span-2">
-                            <button className="w-full h-11 bg-[#4338ca] hover:bg-[#3730a3] text-white rounded-xl flex items-center justify-center gap-2 font-bold text-sm transition-all shadow-md active:scale-95 group">
+                            <button 
+                                onClick={handleSearch}
+                                className="w-full h-11 bg-[#4338ca] hover:bg-[#3730a3] text-white rounded-xl flex items-center justify-center gap-2 font-bold text-sm transition-all shadow-md active:scale-95 group"
+                            >
                                 <Search size={18} className="group-hover:scale-110 transition-transform" />
                                 Search
                             </button>
