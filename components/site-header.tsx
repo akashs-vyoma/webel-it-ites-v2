@@ -8,7 +8,7 @@ import { ChevronDown, Menu, X } from "lucide-react"
 
 export function SiteHeader() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  // Logic for mobile sub-menus
+  
   const [mobileOrgOpen, setMobileOrgOpen] = useState(false)
   const [mobileUserOpen, setMobileUserOpen] = useState(false)
 

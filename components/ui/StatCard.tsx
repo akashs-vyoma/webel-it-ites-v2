@@ -4,7 +4,7 @@ interface StatCardProps {
     title: string;
     value: string | number;
     icon: React.ReactNode;
-    color: string; // Tailwind class like 'bg-[#f87171]'
+    color: string;
 }
 
 const StatCard = ({ title, value, icon, color }: StatCardProps) => {
@@ -33,7 +33,7 @@ const StatCard = ({ title, value, icon, color }: StatCardProps) => {
             {/* Ghost Icon Decoration */}
             <div className="absolute -right-4 -bottom-4 opacity-10 text-white rotate-12 pointer-events-none">
                 {React.isValidElement(icon) 
-                    ? React.cloneElement(icon as React.ReactElement, { size: 80 }) 
+                    ? React.cloneElement(icon as React.ReactElement, { }) 
                     : null
                 }
             </div>
