@@ -132,12 +132,12 @@ const CommonNav = () => {
                                     </div>
                                 </div>
 
-                                {/* My Multi-Party Declaration Dropdown */}
+                                {/* My Multi-Owner Declaration Dropdown */}
                                 <div className="relative group">
                                     <button className="relative flex items-center gap-2 px-4 xl:px-5 py-2.5 rounded-full text-sm font-bold text-slate-500 hover:text-cyan-600 transition-all duration-300 cursor-pointer">
                                         <div className="absolute inset-0 bg-gradient-to-br from-cyan-50/0 to-blue-50/0 group-hover:from-cyan-50 group-hover:to-blue-50 rounded-full transition-all duration-300"></div>
                                         <Users size={18} className="relative z-10 transition-transform duration-300 group-hover:scale-110 group-hover:text-cyan-500" />
-                                        <span className="relative z-10 whitespace-nowrap">Multi-Party Declaration</span>
+                                        <span className="relative z-10 whitespace-nowrap">Multi-Owner Declaration</span>
                                         <ChevronDown size={16} className="relative z-10 transition-transform duration-300 group-hover:rotate-180" />
                                         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-cyan-500 shadow-[0_0_10px_cyan] group-hover:w-3/4 transition-all duration-300 rounded-full"></div>
                                     </button>
@@ -145,11 +145,11 @@ const CommonNav = () => {
                                         <div className="bg-white/95 backdrop-blur-2xl border border-cyan-100 shadow-2xl shadow-cyan-500/10 rounded-2xl p-2 space-y-1">
                                             <Link href="/apply-for-multiparty-declation" className="relative flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:text-cyan-600 hover:bg-cyan-50/50 transition-all duration-200 group/item cursor-pointer">
                                                 <FileSignature size={18} className="text-slate-400 transition-transform duration-200 group-hover/item:scale-110 group-hover/item:text-cyan-500" />
-                                                <span>Generate Multi-Party Declaration</span>
+                                                <span>Generate Multi-Owner Declaration</span>
                                             </Link>
                                             <Link href="/my-multiparty-documents" className="relative flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 hover:text-cyan-600 hover:bg-cyan-50/50 transition-all duration-200 group/item cursor-pointer">
                                                 <FileText size={18} className="text-slate-400 transition-transform duration-200 group-hover/item:scale-110 group-hover/item:text-cyan-500" />
-                                                <span>View Multi-Party Declaration</span>
+                                                <span>View Multi-Owner Declaration</span>
                                             </Link>
                                         </div>
                                     </div>

@@ -43,7 +43,7 @@ const FormInput: React.FC<FormInputProps> = ({
             <div className={`flex h-10 items-center rounded-lg border border-slate-300 overflow-hidden transition-all focus-within:ring-2 focus-within:ring-cyan-400 focus-within:border-cyan-400 ${readOnly ? 'bg-slate-50' : 'bg-white'}`}>
                 {/* Icon Box */}
                 <div className="w-10 h-full bg-slate-50 border-r border-slate-200 flex items-center justify-center text-slate-500 shrink-0">
-                    {React.cloneElement(icon as React.ReactElement, { })}
+                    {React.cloneElement(icon as React.ReactElement, {})}
                 </div>
                 {/* Input Field */}
                 <input
@@ -63,20 +63,20 @@ const FormInput: React.FC<FormInputProps> = ({
 // --- Reusable Section Header ---
 const SectionHeader: React.FC<{ title: string; icon?: React.ReactNode }> = ({ title, icon }) => (
     <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white py-3 px-5 text-sm font-semibold flex items-center gap-2 rounded-t-lg shadow-sm">
-        {icon && React.cloneElement(icon as React.ReactElement, {  })}
+        {icon && React.cloneElement(icon as React.ReactElement, {})}
         {title}
     </div>
 );
- 
+
 const MultiOwnPropertyForm: React.FC = () => {
     return (
         <div className="min-h-screen  p-4 md:p-6 font-sans">
             <div className="w-full mx-auto bg-white shadow-xl rounded-xl border border-slate-100 overflow-hidden">
 
-        <div className="relative overflow-hidden bg-gradient-to-r from-blue-700 to-blue-600 text-white py-4 px-6 text-lg font-semibold flex items-center gap-3 shadow-md">
-    
-    {/* SHIMMER OVERLAY */}
-    <div className="absolute inset-0 gradient-shimmer pointer-events-none"></div>
+                <div className="relative overflow-hidden bg-gradient-to-r from-blue-700 to-blue-600 text-white py-4 px-6 text-lg font-semibold flex items-center gap-3 shadow-md">
+
+                    {/* SHIMMER OVERLAY */}
+                    <div className="absolute inset-0 gradient-shimmer pointer-events-none"></div>
                     <FileText size={24} className="text-cyan-300" />
                     Generate Multi-Own Property Declaration
                 </div>
@@ -178,10 +178,10 @@ const MultiOwnPropertyForm: React.FC = () => {
                                     <h4 className="text-sm font-bold text-slate-700 flex items-center gap-2">
                                         <FileText size={16} className="text-blue-600" /> Applicants List
                                     </h4>
-                                    
+
                                     {/* Table Controls */}
                                     <div className="flex items-center gap-4">
-                                         <div className="text-xs text-slate-500 flex items-center gap-2">
+                                        <div className="text-xs text-slate-500 flex items-center gap-2">
                                             Show
                                             <select className="border border-slate-300 rounded bg-white px-1 py-0.5 text-xs outline-none cursor-pointer">
                                                 <option>10</option>
@@ -195,7 +195,7 @@ const MultiOwnPropertyForm: React.FC = () => {
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div className="p-0 bg-white">
                                     {/* Table */}
                                     <div className="overflow-x-auto">
@@ -279,7 +279,7 @@ const MultiOwnPropertyForm: React.FC = () => {
                             <div className="bg-white/20 p-1 rounded-full">
                                 <Search size={14} className="text-white" />
                             </div>
-                            Preview Multi-Party Declaration Letter
+                            Preview Multi-Owner Declaration Letter
                         </button>
                     </div>
 

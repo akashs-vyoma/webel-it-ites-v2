@@ -36,7 +36,7 @@ const IndividualLogin: React.FC = () => {
             alert("Please enter the OTP");
         }
     };
- const router = useRouter();
+    const router = useRouter();
 
     const handleSubmit = () => {
         if (typeof window !== 'undefined') {
@@ -292,7 +292,7 @@ const IndividualLogin: React.FC = () => {
                                     <div className="flex-1 min-w-0">
                                         <div className={`text-[10px] font-bold tracking-widest uppercase mb-1.5 ${selectedRole === 'company' ? 'text-indigo-600' : 'text-slate-400'
                                             }`}>
-                                            Organization
+                                            Company Authorized Person
                                         </div>
                                         <h3 className="font-bold text-slate-900 text-sm leading-tight">
                                             VYOMA INNOVUS GLOBAL PRIVATE LIMITED

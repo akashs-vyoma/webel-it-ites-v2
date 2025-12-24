@@ -1,21 +1,35 @@
 "use client";
-import React from 'react';
-import { ArrowRight, FileText } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { ArrowRight, ChevronDown, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 
 const Hero: React.FC = () => {
+
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLButtonElement>(null);
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
   return (
-    <section className="relative bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 pt-32 pb-20 lg:pt-40 lg:pb-32 overflow-hidden">
+    <section className="relative bg-gradient-to-br from-blue-700 via-blue-600 to-blue-800 pt-32 pb-32 lg:pt-40 lg:pb-32 overflow-hidden">
 
       {/* Background patterns */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden opacity-10 pointer-events-none">
         <div className="absolute -top-[20%] -right-[10%] w-[500px] h-[500px] rounded-full bg-white blur-3xl"></div>
         <div className="absolute top-[20%] -left-[10%] w-[400px] h-[400px] rounded-full bg-blue-300 blur-3xl"></div>
-     
+
       </div>
 
-      <div className="container mx-auto px-4 relative z-10">
+      <div className="container mx-auto px-4 pb-32 relative z-10">
         <div className="grid lg:grid-cols-2 gap-12 px-16 items-center">
           <div className="text-white space-y-8 animate-fade-in-up order-2 lg:order-1">
             <div>
@@ -29,15 +43,60 @@ const Hero: React.FC = () => {
             <p className="text-lg lg:text-xl text-blue-100 max-w-lg leading-relaxed">
               Streamlining government services and document verification for a digital West Bengal. Efficient, secure, and transparent.
             </p>
-            
+
 
             <div className="flex flex-wrap gap-4">
-              <Link
-                href="company-sign-up"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white text-blue-700 rounded-full font-bold text-lg shadow-lg hover:shadow-xl hover:bg-blue-50 transition-all transform hover:-translate-y-1"
-              >
-                Register Now <ArrowRight className="w-5 h-5" />
-              </Link>
+              <div className="relative inline-block" ref={ref}>
+                {/* Main Button */}
+                <button
+                  onClick={() => setOpen(!open)}
+                  className={`inline-flex items-center gap-2 px-8 py-4 bg-white text-blue-700 rounded-full font-bold text-lg shadow-lg hover:shadow-xl transition-all transform ${open ? "rounded-br-none rounded-bl-lg" : ""}`}
+                >
+                  Register Now
+                  <ChevronDown
+                    className={`w-5 h-5 transition-transform ${open ? "rotate-180" : ""
+                      }`}
+                  />
+                </button>
+
+                {/* Dropdown */}
+                {open && (
+                  <div className="absolute -right-0 mt-0 w-90 rounded-xl rounded-tr-none bg-white shadow-xl border border-gray-100 border-t-0 overflow-hidden z-[999]">
+                    <Link
+                      href="/company-sign-up"
+                      className="flex items-center justify-between px-5 py-2 hover:bg-blue-50 transition"
+                      onClick={() => setOpen(false)}
+                    >
+                      <span className="font-medium text-gray-800">
+                        Company / Proprietorship Registration By GSTIN
+                      </span>
+                      <ArrowRight className="w-4 h-4 text-blue-600" />
+                    </Link>
+
+                    <Link
+                      href="/company-sign-up"
+                      className="flex items-center justify-between px-5 py-2 hover:bg-blue-50 transition"
+                      onClick={() => setOpen(false)}
+                    >
+                      <span className="font-medium text-gray-800">
+                        Company / Proprietorship Registration By DSC
+                      </span>
+                      <ArrowRight className="w-4 h-4 text-blue-600" />
+                    </Link>
+
+                    <Link
+                      href="/individual-sign-up"
+                      className="flex items-center justify-between px-5 py-2 hover:bg-blue-50 transition"
+                      onClick={() => setOpen(false)}
+                    >
+                      <span className="font-medium text-gray-800">
+                        Individual / HUF Registration
+                      </span>
+                      <ArrowRight className="w-4 h-4 text-blue-600" />
+                    </Link>
+                  </div>
+                )}
+              </div>
               <a
                 download
                 href="./Webel_Online_Services_UserManual.pdf"

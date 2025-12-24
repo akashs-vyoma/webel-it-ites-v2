@@ -20,7 +20,21 @@ import {
 
 const NonIndividualUploadDoc: React.FC = () => {
     const [showModal, setShowModal] = useState(true);
-    
+
+    const [formData, setFormData] = useState({
+        DocumentOwnership: '',
+        DocValidity: '50',
+        ApplicationID: '0',
+        DocTypeID: '0',
+        DocFileSize: '',
+        fileToUpload: null,
+        UDINNumber: '',
+        UploadType: '',
+        DocName: '',
+        DocDesc: '',
+        DocRemarks: '',
+    });
+
     // --- Upload Logic Implementation ---
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -28,6 +42,7 @@ const NonIndividualUploadDoc: React.FC = () => {
     const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files && event.target.files[0]) {
             setSelectedFile(event.target.files[0]);
+            setFormData({ ...formData, fileToUpload: event.target.files[0] || null });
         }
     };
 
@@ -41,6 +56,7 @@ const NonIndividualUploadDoc: React.FC = () => {
         setSelectedFile(null);
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
+            setFormData({ ...formData, fileToUpload: null });
         }
     };
     // -----------------------------------
@@ -48,21 +64,21 @@ const NonIndividualUploadDoc: React.FC = () => {
     return (
         // Centered Layout Container
         <div className="min-h-screen flex items-center justify-center p-4 font-sans">
-            
+
             {/* Main Card - No Border, just Shadow */}
             <div className="w-full max-w-4xl bg-white shadow-2xl rounded-xl overflow-hidden">
 
                 {/* Header - Solid Background Color */}
-<div className="relative bg-gradient-to-r from-blue-600 to-cyan-500 px-8 py-5 overflow-hidden">
-    
-    {/* Shimmer Effect – Always On */}
-    <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
+                <div className="relative bg-gradient-to-r from-blue-600 to-cyan-500 px-8 py-5 overflow-hidden">
 
-    <h2 className="relative z-20 text-white text-xl font-semibold tracking-wide flex items-center gap-2">
-        <Upload className="w-5 h-5 text-white/80" />
-        Upload Document
-    </h2>
-</div>
+                    {/* Shimmer Effect – Always On */}
+                    <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
+
+                    <h2 className="relative z-20 text-white text-xl font-semibold tracking-wide flex items-center gap-2">
+                        <Upload className="w-5 h-5 text-white/80" />
+                        Upload Document
+                    </h2>
+                </div>
 
                 {/* Form Content */}
                 <div className="p-8">
@@ -71,12 +87,17 @@ const NonIndividualUploadDoc: React.FC = () => {
                         {/* 1. Do Want to Upload Document? */}
                         <div>
                             <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
-                                Do Want to Upload Document?
+                                Do Want to Upload Document? <span className="text-red-500 text-lg">*</span>
                             </label>
                             <div className="relative">
                                 {/* Changed Dropdown Colors: Text is now Slate-700, Focus turns slightly blue */}
-                                <select className="w-full border border-gray-300 rounded-lg text-sm px-4 py-3 outline-none focus:border-blue-500 focus:text-blue-700 bg-white text-slate-700 font-medium appearance-none transition-colors cursor-pointer">
-                                    <option>Upload Document</option>
+                                <select
+                                    value={formData.UploadType}
+                                    onChange={(e) => setFormData({ ...formData, UploadType: e.target.value })}
+                                    className="w-full border border-gray-300 rounded-lg text-sm px-4 py-3 outline-none focus:border-blue-500 focus:text-blue-700 bg-white text-slate-700 font-medium appearance-none transition-colors cursor-pointer">
+                                    <option value="1">Upload New Document</option>
+                                    <option value="2">Already Uploaded in this portal</option>
+                                    <option value="3">Already Uploaded in other udin based portal</option>
                                 </select>
                                 <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                                     <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -84,13 +105,28 @@ const NonIndividualUploadDoc: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* 2. Document Name */}
-                        <div>
+                        {/* 7. UDIN Number Of the Document */}
+                        {formData.UploadType !== "1" && <div>
                             <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
-                                Document Name
+                                UDIN Number Of the Document <span className="text-red-500 text-lg">*</span>
                             </label>
                             <input
                                 type="text"
+                                value={formData.UDINNumber}
+                                onChange={(e) => setFormData({ ...formData, UDINNumber: e.target.value })}
+                                className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-blue-500 h-[46px] text-sm text-gray-700 transition-colors"
+                            />
+                        </div>}
+
+                        {/* 2. Document Name */}
+                        <div>
+                            <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
+                                Document Name <span className="text-red-500 text-lg">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={formData.DocName}
+                                onChange={(e) => setFormData({ ...formData, DocName: e.target.value })}
                                 className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-blue-500 h-[46px] text-sm text-gray-700 transition-colors"
                             />
                         </div>
@@ -98,13 +134,30 @@ const NonIndividualUploadDoc: React.FC = () => {
                         {/* 3. Select Document Type */}
                         <div>
                             <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
-                                Select Document Type
+                                Select Document Type <span className="text-red-500 text-lg">*</span>
                             </label>
                             <div className="relative">
-                                <select className="w-full border border-gray-300 rounded-lg text-sm px-4 py-3 outline-none focus:border-blue-500 focus:text-blue-700 bg-white text-slate-700 font-medium appearance-none transition-colors cursor-pointer">
-                                    <option>Project Report</option>
-                                    <option>NOC</option>
-                                    <option>Declaration</option>
+                                <select
+                                    value={formData.DocTypeID}
+                                    onChange={(e) => setFormData({ ...formData, DocTypeID: e.target.value })}
+                                    className="w-full border border-gray-300 rounded-lg text-sm px-4 py-3 outline-none focus:border-blue-500 focus:text-blue-700 bg-white text-slate-700 font-medium appearance-none transition-colors cursor-pointer">
+                                    <option value="1">Project Report</option>
+                                    <option value="2">MOA (Memorandum of Association)</option>
+                                    <option value="3">IT Return</option>
+                                    <option value="4">Balance Sheet</option>
+                                    <option value="5">Mother Deed with Webel</option>
+                                    <option value="6">Agreement with Tenant</option>
+                                    <option value="7">Trade License</option>
+                                    <option value="8">Letter from NDITA</option>
+                                    <option value="9">AADHAAR Card</option>
+                                    <option value="10">PAN Card</option>
+                                    <option value="11">Authorization Letter</option>
+                                    <option value="12">Original Deed</option>
+                                    <option value="13">Renewal Deed</option>
+                                    <option value="14">Old NOC</option>
+                                    <option value="15">Last Invoice Issued By Webel</option>
+                                    <option value="16">Occupency Status</option>
+                                    <option value="17">Other Document</option>
                                 </select>
                                 <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
                                     <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -115,10 +168,12 @@ const NonIndividualUploadDoc: React.FC = () => {
                         {/* 4. Document Description */}
                         <div>
                             <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
-                                Document Description
+                                Document Description <span className="text-red-500 text-lg">*</span>
                             </label>
                             <input
                                 type="text"
+                                value={formData.DocDesc}
+                                onChange={(e) => setFormData({ ...formData, DocDesc: e.target.value })}
                                 className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-blue-500 h-[46px] text-sm text-gray-700 transition-colors"
                             />
                         </div>
@@ -126,12 +181,12 @@ const NonIndividualUploadDoc: React.FC = () => {
                         {/* 5. Document Validity (Read only) */}
                         <div>
                             <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
-                                Document Validity
+                                Document Validity <span className="text-red-500 text-lg">*</span>
                             </label>
                             <input
                                 type="text"
-                                value="50"
                                 readOnly
+                                value={formData.DocValidity}
                                 className="w-full border border-gray-200 bg-gray-50 rounded-lg px-4 py-3 outline-none text-gray-500 font-medium h-[46px]"
                             />
                         </div>
@@ -139,32 +194,34 @@ const NonIndividualUploadDoc: React.FC = () => {
                         {/* 6. Document Remarks */}
                         <div>
                             <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
-                                Document Remarks
+                                Document Remarks <span className="text-gray-500 text-xs">(Optional)</span>
                             </label>
                             <input
                                 type="text"
+                                value={formData.DocRemarks}
+                                onChange={(e) => setFormData({ ...formData, DocRemarks: e.target.value })}
                                 className="w-full border border-gray-300 rounded-lg px-4 py-3 outline-none focus:border-blue-500 h-[46px] text-sm text-gray-700 transition-colors"
                             />
                         </div>
 
                         {/* 7. Upload Area (Functional) */}
-                        <div className="mt-2 md:col-span-1">
+                        {formData.UploadType === "1" && <div className="mt-2 md:col-span-1">
                             <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
-                                Upload Document
+                                Upload Document <span className="text-red-500 text-lg">*</span>
                             </label>
-                            
-                            <input 
-                                type="file" 
+
+                            <input
+                                type="file"
                                 ref={fileInputRef}
                                 className="hidden"
                                 onChange={handleFileSelect}
                             />
 
-                            <div 
+                            <div
                                 onClick={handleUploadClick}
                                 className={`border border-dashed rounded-xl h-40 flex flex-col items-center justify-center cursor-pointer transition-colors group relative
-                                    ${selectedFile 
-                                        ? 'border-green-400 bg-green-50/30' 
+                                    ${selectedFile
+                                        ? 'border-green-400 bg-green-50/30'
                                         : 'border-blue-300 bg-blue-50/20 hover:bg-blue-50'
                                     }`}
                             >
@@ -179,7 +236,7 @@ const NonIndividualUploadDoc: React.FC = () => {
                                         <span className="text-xs text-green-600 mt-1 flex items-center gap-1">
                                             <CheckCircle2 size={12} /> Ready to upload
                                         </span>
-                                        <button 
+                                        <button
                                             onClick={handleRemoveFile}
                                             className="absolute top-2 right-2 p-1.5 bg-white rounded-full shadow-sm text-gray-400 hover:text-red-500 hover:bg-red-50 transition-all"
                                             title="Remove file"
@@ -197,7 +254,12 @@ const NonIndividualUploadDoc: React.FC = () => {
                                     </>
                                 )}
                             </div>
-                        </div>
+                            <p className="mt-2 text-xs text-gray-500">
+                                <span className="font-semibold text-gray-600">Note: </span>
+                                Only <span className="font-medium">PDF</span> documents are allowed.
+                                Maximum file size is <span className="font-medium">5 MB</span>.
+                            </p>
+                        </div>}
 
                     </div>
 
@@ -212,16 +274,16 @@ const NonIndividualUploadDoc: React.FC = () => {
 
                 {/* Footer Section - Light Yellow Background */}
                 <div className="bg-gray-50 p-6 border-t border-gray-100">
-                     <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex gap-4 items-start shadow-sm">
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex gap-4 items-start shadow-sm">
                         <div className="bg-yellow-100 p-2 rounded-full shrink-0 border border-yellow-200">
                             <Info className="w-5 h-5 text-yellow-700" />
                         </div>
                         <div className="text-xs leading-relaxed text-yellow-900/80">
-                             <p>
+                            <p>
                                 <span className="font-bold text-yellow-800">Instruction:</span> Upload new document <span className="font-bold text-yellow-900">Select Document Type</span> from the dropdown, click on the file upload icon, enter details. If you already uploaded in other UDIN portal select <span className="font-bold text-yellow-900">Already Document Uploaded</span>.
                             </p>
                         </div>
-                     </div>
+                    </div>
                 </div>
 
                 {/* Modal */}
@@ -233,7 +295,7 @@ const NonIndividualUploadDoc: React.FC = () => {
                             <div className="flex justify-between items-center">
                                 <DialogTitle className="text-white text-lg font-medium">Verify your Aadhaar Number</DialogTitle>
                                 <button onClick={() => setShowModal(false)} className="text-white/80 hover:text-white">
-                                    
+
                                 </button>
                             </div>
                         </DialogHeader>
@@ -280,28 +342,28 @@ const NonIndividualUploadDoc: React.FC = () => {
                                     className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-0 cursor-pointer accent-blue-600"
                                 />
                                 <div className="text-xs text-gray-600 text-justify leading-relaxed">
-    <label htmlFor="aadhaar-consent" className="cursor-pointer">
-        I hereby state that I have no objection in authenticating myself on
-        Unique Document Identification Number (UDIN) portal with Aadhaar based
-        authentication system and give my consent to providing my Aadhaar
-        number.
-    </label>
+                                    <label htmlFor="aadhaar-consent" className="cursor-pointer">
+                                        I hereby state that I have no objection in authenticating myself on
+                                        Unique Document Identification Number (UDIN) portal with Aadhaar based
+                                        authentication system and give my consent to providing my Aadhaar
+                                        number.
+                                    </label>
 
-    {showMore && (
-        <p className="mt-2 text-gray-500">
-            Aadhaar based authentication is used only for identity verification
-            through UIDAI. Your Aadhaar number will not be stored or shared and
-            will be processed as per UIDAI guidelines.
-        </p>
-    )}
+                                    {showMore && (
+                                        <p className="mt-2 text-gray-500">
+                                            Aadhaar based authentication is used only for identity verification
+                                            through UIDAI. Your Aadhaar number will not be stored or shared and
+                                            will be processed as per UIDAI guidelines.
+                                        </p>
+                                    )}
 
-    <span
-        onClick={() => setShowMore(!showMore)}
-        className="text-blue-600 hover:underline block mt-1 font-semibold cursor-pointer"
-    >
-        {showMore ? "Read Less" : "Read More"}
-    </span>
-</div>
+                                    <span
+                                        onClick={() => setShowMore(!showMore)}
+                                        className="text-blue-600 hover:underline block mt-1 font-semibold cursor-pointer"
+                                    >
+                                        {showMore ? "Read Less" : "Read More"}
+                                    </span>
+                                </div>
 
                             </div>
                         </div>

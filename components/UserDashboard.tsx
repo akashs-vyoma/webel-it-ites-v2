@@ -21,7 +21,7 @@ interface DashboardData {
 }
 
 const UserDashboard: React.FC = () => {
-    
+
     const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -62,7 +62,7 @@ const UserDashboard: React.FC = () => {
             <div className="absolute top-0 left-0 w-full h-96 to-transparent -z-10"></div>
             <div className="absolute top-0 right-0 w-1/3 h-96 bg-gradient-to-bl from-cyan-100/40 via-blue-50/20 to-transparent blur-3xl -z-10"></div>
 
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-0 py-8 lg:py-12">
 
                 {/* Welcome Message */}
                 <div className="mb-10 lg:mb-14">
@@ -129,7 +129,7 @@ const UserDashboard: React.FC = () => {
                                 </div>
                                 <div>
                                     <p className="text-xl font-medium leading-snug opacity-90">
-                                        Total Uploaded <br /> Document
+                                        Total Upload <br /> Document
                                     </p>
                                 </div>
                             </div>
@@ -137,7 +137,7 @@ const UserDashboard: React.FC = () => {
 
                         {/* Card 2: Multi Party Declaration (DYNAMIC) */}
                         <div className="group relative overflow-hidden rounded-[2rem] min-h-[220px] cursor-default shadow-xl shadow-blue-200/50 hover:shadow-2xl hover:shadow-cyan-400/20 transition-all duration-500">
-                             <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-blue-900"></div>
+                            <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-blue-900"></div>
                             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-500/40 via-transparent to-transparent opacity-60"></div>
                             <div className="absolute inset-0 border border-white/10 rounded-[2rem]"></div>
 
