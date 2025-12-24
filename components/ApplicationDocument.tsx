@@ -1,6 +1,6 @@
 "use client";
 import React, { useRef, useState, useEffect } from 'react';
-import { PlusCircle, CheckCircle2, ChevronDown, Info, Eye, Trash2, Search, FileCheck } from 'lucide-react';
+import { PlusCircle, CheckCircle2, ChevronDown, Info, Eye, Trash2, Search, FileCheck, Plus } from 'lucide-react';
 
 // Interfaces
 interface Project {
@@ -13,7 +13,7 @@ interface ApplicationNumber {
     applicationNumber: string;
 }
 
-interface UploadedDocument {
+interface UDINDocument {
     docId: number;
     docType: string;
     docName: string;
@@ -21,11 +21,24 @@ interface UploadedDocument {
     uploadOn: number;
 }
 
+interface AppDoc {
+    applicationDocID: number;
+    documentName: string;
+    documentType: string;
+    docUploadOn: string;
+}
+
+interface AppDetailData {
+    applicationNumber: string;
+    companyName: string;
+    documents: AppDoc[];
+    udinNumber: string; 
+}
+
 const DocumentUploadHeader: React.FC = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
-    // Dropdown States
     const [projects, setProjects] = useState<Project[]>([]);
     const [selectedProjectID, setSelectedProjectID] = useState<string>("");
     const [selectedProjectName, setSelectedProjectName] = useState<string>("");
@@ -33,16 +46,19 @@ const DocumentUploadHeader: React.FC = () => {
     const [applications, setApplications] = useState<ApplicationNumber[]>([]);
     const [selectedAppID, setSelectedAppID] = useState<string>("");
     
-    // API loading states
     const [isProjectsLoading, setIsProjectsLoading] = useState(true);
     const [isAppsLoading, setIsAppsLoading] = useState(false);
-    const [isDocsLoading, setIsDocsLoading] = useState(false);
+    const [isTable1Loading, setIsTable1Loading] = useState(false);
+    const [isTable2Loading, setIsTable2Loading] = useState(false);
+    const [isLinking, setIsLinking] = useState(false); // New linking state
 
-    // Document Data
-    const [uploadedDocs, setUploadedDocs] = useState<UploadedDocument[]>([]);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [udinDocs, setUdinDocs] = useState<UDINDocument[]>([]); 
+    const [appDetail, setAppDetail] = useState<AppDetailData | null>(null); 
+    
+    const [searchTermUDIN, setSearchTermUDIN] = useState("");
+    const [searchTermApp, setSearchTermApp] = useState("");
 
-    // 1. Fetch Projects on Mount
+    // API: Get Application Types
     useEffect(() => {
         const fetchProjects = async () => {
             try {
@@ -59,7 +75,7 @@ const DocumentUploadHeader: React.FC = () => {
         fetchProjects();
     }, []);
 
-    
+    // API: Get Application Numbers
     useEffect(() => {
         if (!selectedProjectID) {
             setApplications([]);
@@ -85,45 +101,111 @@ const DocumentUploadHeader: React.FC = () => {
         fetchApps();
     }, [selectedProjectID, projects]);
 
-    // 3. Fetch Documents when App Number is Selected
+    const fetchApplicationDetails = async () => {
+        if (!selectedAppID) return;
+        setIsTable2Loading(true);
+        try {
+            const res = await fetch('http://115.187.62.16:8005/ITEWBRestAPI/api/application/GetApplicationDetailsByApplicationID', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ "applicationID": parseInt(selectedAppID) }), 
+            });
+            const result = await res.json();
+            if (result.status === 0) setAppDetail(result.data);
+        } catch (err) { console.error(err); }
+        finally { setIsTable2Loading(false); }
+    };
+
+    // Trigger tables on Application selection
     useEffect(() => {
         if (!selectedAppID) {
-            setUploadedDocs([]);
+            setUdinDocs([]);
+            setAppDetail(null);
             return;
         }
 
-        const fetchDocs = async () => {
-            setIsDocsLoading(true);
+        const fetchPoolData = async () => {
+            setIsTable1Loading(true);
             try {
-                const response = await fetch('http://115.187.62.16:8005/ITEWBRestAPI/api/application/GetUploadedDocumentDetailsByApplicationTypeID', {
+                const res = await fetch('http://115.187.62.16:8005/ITEWBRestAPI/api/application/GetUploadedDocumentDetailsByApplicationTypeID', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        "ownerID": 1,
-                        "applicationTypeID": parseInt(selectedProjectID),
-                        "userTypeID": 5
-                    }),
+                    body: JSON.stringify({ "ownerID": 1, "applicationTypeID":1, "userTypeID": 5 }),
                 });
-                const result = await response.json();
-                if (result.status === 0) setUploadedDocs(result.data);
+                const result = await res.json();
+                if (result.status === 0) setUdinDocs(result.data);
             } catch (err) { console.error(err); }
-            finally { setIsDocsLoading(false); }
+            finally { setIsTable1Loading(false); }
         };
-        fetchDocs();
+
+        fetchPoolData();
+        fetchApplicationDetails();
     }, [selectedAppID, selectedProjectID]);
 
-    const formatDate = (ts: number) => {
-        if (!ts) return "N/A";
+    const formatTimestamp = (ts: number) => {
         return new Date(ts).toLocaleString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     };
 
+    // --- NEW FUNCTIONAL API CALL: SET ASSIGN UPLOADED DOC ---
+    const handleAddFromUDIN = async (doc: UDINDocument) => {
+        if (!appDetail || !selectedAppID || isLinking) return;
+
+        if (appDetail.documents.some(d => d.documentName === doc.docName)) {
+            alert("This document is already assigned to the application.");
+            return;
+        }
+
+        setIsLinking(true);
+        try {
+            const response = await fetch('http://115.187.62.16:8005/ITEWBRestAPI/api/application/SetAssignUploadedDocByApplicationID', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    "application_id": parseInt(selectedAppID),
+                    "doc_id": doc.docId,
+                    "application_no": appDetail.applicationNumber,
+                    "quotation_id": "", 
+                    "udin_no": doc.udinNo,
+                    "application_amount": 0,
+                    "pay_mode": "ONLINE",
+                    "entry_user_id": 1
+                }),
+            });
+
+            const result = await response.json();
+            if (result.status === 0) {
+                await fetchApplicationDetails();
+            } else {
+                alert(result.message || "Failed to link document.");
+            }
+        } catch (err) {
+            console.error("Link error:", err);
+            alert("Error connecting to server.");
+        } finally {
+            setIsLinking(false);
+        }
+    };
+
+    const handleDelete = (id: number) => {
+        if (!appDetail) return;
+        setAppDetail({ ...appDetail, documents: appDetail.documents.filter(d => d.applicationDocID !== id) });
+    };
+
+    const filteredUdinDocs = udinDocs.filter(doc => 
+        doc.docName.toLowerCase().includes(searchTermUDIN.toLowerCase()) || 
+        doc.docType.toLowerCase().includes(searchTermUDIN.toLowerCase())
+    );
+
+    const filteredAppDocs = appDetail?.documents.filter(doc => 
+        doc.documentName.toLowerCase().includes(searchTermApp.toLowerCase()) || 
+        doc.documentType.toLowerCase().includes(searchTermApp.toLowerCase())
+    ) || [];
+
     return (
-        <div className="w-full max-w-7xl mx-auto p-4 flex flex-col gap-6 font-sans antialiased">
+        <div className="w-full max-w-7xl mx-auto p-4 flex flex-col font-sans antialiased">
             
-            {/* UNIFIED MAIN CARD */}
-            <div className="bg-white rounded-2xl shadow-xl shadow-blue-900/5 border border-slate-100 overflow-hidden">
-                
-                {/* Neon Blue Header Section */}
+            {/* SELECTION HEADER */}
+            <div className="bg-white rounded-t-2xl shadow-md border border-slate-100 overflow-hidden">
                 <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 p-6">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-1.5">
@@ -132,12 +214,12 @@ const DocumentUploadHeader: React.FC = () => {
                                 <select 
                                     value={selectedProjectID}
                                     onChange={(e) => { setSelectedProjectID(e.target.value); setSelectedAppID(""); }}
-                                    className="w-full h-11 px-4 rounded-xl bg-white/95 backdrop-blur-sm text-slate-800 font-bold text-sm outline-none appearance-none cursor-pointer transition-all hover:bg-white focus:ring-2 focus:ring-blue-400/50"
+                                    className="w-full h-11 px-4 rounded-xl bg-white/95 text-slate-800 font-bold text-sm outline-none appearance-none"
                                 >
                                     <option value="">{isProjectsLoading ? "Loading..." : "Select Application Type"}</option>
                                     {projects.map((p) => <option key={p.projectID} value={p.projectID}>{p.projectName}</option>)}
                                 </select>
-                                <ChevronDown className="absolute right-4 top-3.5 w-4 h-4 text-slate-400 group-hover:text-blue-500 transition-colors" />
+                                <ChevronDown className="absolute right-4 top-3.5 w-4 h-4 text-slate-400" />
                             </div>
                         </div>
 
@@ -148,126 +230,169 @@ const DocumentUploadHeader: React.FC = () => {
                                     value={selectedAppID}
                                     onChange={(e) => setSelectedAppID(e.target.value)}
                                     disabled={!selectedProjectID || isAppsLoading}
-                                    className="w-full h-11 px-4 rounded-xl bg-white/95 backdrop-blur-sm text-slate-800 font-bold text-sm outline-none appearance-none cursor-pointer disabled:bg-slate-200/50 disabled:text-slate-400 transition-all hover:bg-white focus:ring-2 focus:ring-blue-400/50"
+                                    className="w-full h-11 px-4 rounded-xl bg-white/95 text-slate-800 font-bold text-sm outline-none appearance-none disabled:bg-slate-200"
                                 >
                                     <option value="">{isAppsLoading ? "Fetching..." : "Select Application Number"}</option>
                                     {applications.map((app) => <option key={app.applicationId} value={app.applicationId}>{app.applicationNumber}</option>)}
                                 </select>
-                                <ChevronDown className="absolute right-4 top-3.5 w-4 h-4 text-slate-400 group-hover:text-blue-500 transition-colors" />
+                                <ChevronDown className="absolute right-4 top-3.5 w-4 h-4 text-slate-400" />
                             </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Upload Banner Section */}
-                <div className="bg-amber-50/50 p-5 border-b border-amber-100/50">
-                    <div 
-                        onClick={() => fileInputRef.current?.click()}
-                        className="bg-amber-400 hover:bg-amber-500 text-amber-950 px-6 py-3 rounded-xl shadow-sm flex items-center justify-between cursor-pointer transition-all active:scale-[0.99]"
-                    >
-                        <div className="flex items-center gap-3">
-                            {selectedFile ? (
-                                <><CheckCircle2 size={20} className="text-green-800" /><span className="font-bold text-sm">Selected: {selectedFile.name}</span></>
-                            ) : (
-                                <><span className="font-bold text-sm">Upload new document. Click on the sign</span><PlusCircle size={18} /></>
-                            )}
-                        </div>
-                        <div className="bg-white/90 p-1.5 rounded-full shadow-inner"><PlusCircle className="text-blue-600" size={20} /></div>
-                    </div>
-                    <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => setSelectedFile(e.target.files?.[0] || null)} />
-                    <div className="mt-3 flex gap-2 text-[11px] text-slate-600 items-start italic">
-                        <Info size={14} className="text-blue-600 shrink-0 mt-0.5" />
-                        <p>Select both Application Type and Number to view existing records.</p>
-                    </div>
-                </div>
-
-                {/* DATA TABLE SECTION - Hidden until App ID is selected */}
-                {selectedAppID ? (
-                    <div className="p-6 space-y-6 animate-in fade-in slide-in-from-top-4 duration-500">
-                        {/* Heading & View Requirements Link */}
-                        <div className="border-b border-slate-100 pb-4">
-                            <h2 className="text-blue-600 font-extrabold text-xl tracking-tight uppercase">
-                                Already Uploaded Documents In UDIN For {selectedProjectName}
-                            </h2>
-                            <button className="mt-1.5 text-xs text-slate-500 hover:text-blue-600 font-medium flex items-center gap-1 group">
-                                * View required documents for this application 
-                                <span className="text-blue-500 font-bold group-hover:underline">Click to View</span>
-                            </button>
-                        </div>
-
-                        {/* Search & Entry Count Row */}
-                        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-                            <div className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-lg border border-slate-100 text-sm font-semibold text-slate-700">
-                                <span>Show</span>
-                                <span className="text-blue-600 bg-blue-50 px-2 py-0.5 rounded">{uploadedDocs.length}</span>
-                                <span>entries found</span>
+                {/* TABLE 1: UDIN POOL */}
+                {selectedAppID && (
+                    <div className="p-6 bg-white border-b border-slate-100">
+                        <div className="flex justify-between items-start mb-4">
+                            <div>
+                                <h2 className="text-blue-600 font-extrabold text-lg uppercase">Already Uploaded Documents In UDIN For {selectedProjectName}</h2>
+                                <p className="text-[11px] text-slate-400 mt-1 italic">* View required documents <span className="text-blue-500 cursor-pointer font-bold underline">Click to View</span></p>
                             </div>
-
-                            <div className="relative w-full sm:w-72 group">
-                                <Search className="absolute left-3.5 top-3 w-4 h-4 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                            <div className="relative w-64">
+                                <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
                                 <input 
                                     type="text" 
-                                    placeholder="Search by document name..."
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                    className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-4 text-sm outline-none transition-all focus:bg-white focus:ring-2 focus:ring-blue-100 focus:border-blue-400"
+                                    placeholder="Search UDIN pool..."
+                                    value={searchTermUDIN}
+                                    onChange={(e) => setSearchTermUDIN(e.target.value)}
+                                    className="w-full border rounded-lg py-2 pl-10 pr-4 text-xs outline-none focus:border-blue-400"
                                 />
                             </div>
                         </div>
 
-                        {/* Table Area */}
-                        <div className="border border-slate-100 rounded-xl overflow-hidden">
-                            <table className="w-full border-collapse">
-                                <thead className="bg-blue-600 text-white">
-                                    <tr className="text-[11px] font-bold uppercase tracking-widest text-left">
-                                        <th className="px-5 py-4 w-16 text-center border-r border-white/10">Sl.</th>
-                                        <th className="px-5 py-4 border-r border-white/10">Doc Type</th>
-                                        <th className="px-5 py-4 border-r border-white/10">Doc Name</th>
-                                        <th className="px-5 py-4 border-r border-white/10">UDIN</th>
-                                        <th className="px-5 py-4 border-r border-white/10">Uploaded On</th>
-                                        <th className="px-5 py-4 text-center">Actions</th>
+                        <div className="overflow-x-auto border rounded-xl">
+                            <table className="w-full text-left">
+                                <thead className="bg-blue-600 text-white text-[10px] font-bold uppercase">
+                                    <tr>
+                                        <th className="px-4 py-3 text-center border-r border-white/10">Sl.no.</th>
+                                        <th className="px-4 py-3 border-r border-white/10">Type</th>
+                                        <th className="px-4 py-3 border-r border-white/10">Name</th>
+                                        <th className="px-4 py-3 border-r border-white/10">UDIN</th>
+                                        <th className="px-4 py-3 border-r border-white/10">Uploaded On</th>
+                                        <th className="px-4 py-3 text-center">View</th>
+                                        <th className="px-4 py-3 text-center">Add</th>
                                     </tr>
                                 </thead>
-                                <tbody className="bg-white text-[13px] text-slate-600">
-                                    {isDocsLoading ? (
-                                        <tr><td colSpan={6} className="py-20 text-center italic text-slate-400">Loading document database...</td></tr>
-                                    ) : uploadedDocs.length > 0 ? (
-                                        uploadedDocs.map((doc, idx) => (
-                                            <tr key={doc.docId} className="border-b border-slate-50 hover:bg-blue-50/40 transition-colors group">
-                                                <td className="px-5 py-4 text-center font-bold text-slate-400 group-hover:text-blue-600">{idx + 1}</td>
-                                                <td className="px-5 py-4 font-bold text-slate-800">{doc.docType || "—"}</td>
-                                                <td className="px-5 py-4">{doc.docName || "Unspecified"}</td>
-                                                <td className="px-5 py-4">
-                                                    {doc.udinNo ? (
-                                                        <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-[10px] font-black border border-green-200">
-                                                            {doc.udinNo}
-                                                        </span>
-                                                    ) : <span className="text-slate-300">N/A</span>}
-                                                </td>
-                                                <td className="px-5 py-4 font-mono text-[11px] text-slate-400">{formatDate(doc.uploadOn)}</td>
-                                                <td className="px-5 py-4">
-                                                    <div className="flex justify-center gap-2">
-                                                        <button className="p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-600 hover:text-white transition-all" title="View"><Eye size={16}/></button>
-                                                        <button className="p-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-600 hover:text-white transition-all" title="Delete"><Trash2 size={16}/></button>
-                                                    </div>
+                                <tbody className="text-[12px] text-slate-600">
+                                    {isTable1Loading ? (
+                                        <tr><td colSpan={7} className="py-8 text-center italic">Loading pool...</td></tr>
+                                    ) : filteredUdinDocs.length > 0 ? (
+                                        filteredUdinDocs.map((doc, idx) => (
+                                            <tr key={doc.docId} className="border-b hover:bg-slate-50">
+                                                <td className="px-4 py-3 text-center font-bold">{idx + 1}</td>
+                                                <td className="px-4 py-3 font-bold text-slate-800">{doc.docType}</td>
+                                                <td className="px-4 py-3">{doc.docName}</td>
+                                                <td className="px-4 py-3"><span className="bg-green-500 text-white px-2 py-0.5 rounded-full text-[9px]">{doc.udinNo}</span></td>
+                                                <td className="px-4 py-3 text-slate-400">{formatTimestamp(doc.uploadOn)}</td>
+                                                <td className="px-4 py-3 text-center"><button className="p-1.5 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition-all"><Eye size={14}/></button></td>
+                                                <td className="px-4 py-3 text-center">
+                                                    <button 
+                                                        onClick={() => handleAddFromUDIN(doc)} 
+                                                        disabled={isLinking}
+                                                        className="p-1.5 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition-all disabled:opacity-50"
+                                                    >
+                                                        <Plus size={14}/>
+                                                    </button>
                                                 </td>
                                             </tr>
                                         ))
                                     ) : (
-                                        <tr><td colSpan={6} className="py-20 text-center text-slate-400">No records found.</td></tr>
+                                        <tr><td colSpan={7} className="py-8 text-center text-slate-400">No matching pool documents.</td></tr>
                                     )}
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                ) : (
-                    /* Placeholder when nothing is selected */
-                    <div className="p-20 flex flex-col items-center justify-center text-slate-300 gap-4">
-                        <FileCheck size={48} className="opacity-20" />
-                        <p className="font-medium text-sm">Please select an Application Number to view existing documents.</p>
-                    </div>
                 )}
             </div>
+
+            
+            <div className="bg-[#FFF8E1] border-x border-slate-100 p-4">
+                <div 
+                    onClick={() => fileInputRef.current?.click()}
+                    className="bg-[#FFB800] hover:bg-[#FFA000] text-[#7B1D1D] px-6 py-3 rounded-lg flex items-center gap-3 cursor-pointer shadow-sm transition-all"
+                >
+                    <span className="font-bold text-sm">Upload new document. Click on the sign</span>
+                    <PlusCircle size={20} />
+                </div>
+                <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => setSelectedFile(e.target.files?.[0] || null)} />
+            </div>
+
+            {/* TABLE 2: APPLICATION SPECIFIC */}
+            {selectedAppID && (
+                <div className="bg-white rounded-b-2xl shadow-md border border-slate-100 overflow-hidden animate-in fade-in duration-300">
+                    <div className="bg-blue-700 p-4 flex justify-between items-center">
+                        <h2 className="text-white font-bold text-sm uppercase">Documents For Application Number {appDetail?.applicationNumber || "..."}</h2>
+                        <div className="relative w-56">
+                            <Search className="absolute left-3 top-2 w-3.5 h-3.5 text-slate-400" />
+                            <input 
+                                type="text" 
+                                placeholder="Search application docs..."
+                                value={searchTermApp}
+                                onChange={(e) => setSearchTermApp(e.target.value)}
+                                className="w-full bg-white/10 border border-white/20 text-white text-xs rounded-md py-1.5 pl-9 outline-none focus:bg-white/20"
+                            />
+                        </div>
+                    </div>
+
+                    <div className="p-6 space-y-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                                <label className="text-slate-400 text-[10px] font-bold uppercase">Application Number</label>
+                                <div className="flex items-center gap-3 h-11 px-4 rounded-lg bg-slate-50 border font-bold text-slate-700 text-sm italic">
+                                    <FileCheck size={16} className="text-blue-600" /> {appDetail?.applicationNumber}
+                                </div>
+                            </div>
+                            <div className="space-y-1">
+                                <label className="text-slate-400 text-[10px] font-bold uppercase">Company Name</label>
+                                <div className="flex items-center gap-3 h-11 px-4 rounded-lg bg-slate-50 border font-bold text-slate-700 text-sm">
+                                    <div className="p-1 bg-blue-600 rounded text-white"><Search size={12}/></div> {appDetail?.companyName}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="overflow-x-auto border rounded-xl">
+                            <table className="w-full text-left">
+                                <thead className="bg-blue-600 text-white text-[10px] font-bold uppercase">
+                                    <tr>
+                                        <th className="px-4 py-3 text-center border-r border-white/10">Sl.no.</th>
+                                        <th className="px-4 py-3 border-r border-white/10">Type</th>
+                                        <th className="px-4 py-3 border-r border-white/10">Name</th>
+                                        <th className="px-4 py-3 border-r border-white/10">UDIN</th>
+                                        <th className="px-4 py-3 border-r border-white/10">Uploaded On</th>
+                                        <th className="px-4 py-3 text-center">View</th>
+                                        <th className="px-4 py-3 text-center">Delete</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="text-[12px] text-slate-600">
+                                    {isTable2Loading ? (
+                                        <tr><td colSpan={7} className="py-8 text-center italic">Loading details...</td></tr>
+                                    ) : filteredAppDocs.length > 0 ? (
+                                        filteredAppDocs.map((doc, idx) => (
+                                            <tr key={doc.applicationDocID} className="border-b hover:bg-slate-50">
+                                                <td className="px-4 py-3 text-center font-bold">{idx + 1}</td>
+                                                <td className="px-4 py-3 font-bold text-slate-800">{doc.documentType}</td>
+                                                <td className="px-4 py-3">{doc.documentName}</td>
+                                                <td className="px-4 py-3"><span className="bg-green-500 text-white px-2 py-0.5 rounded-full text-[9px]">{appDetail?.udinNumber}</span></td>
+                                                <td className="px-4 py-3 text-slate-400">{doc.docUploadOn}</td>
+                                                <td className="px-4 py-3 text-center"><button className="p-1.5 bg-blue-100 text-blue-600 rounded-full"><Eye size={14}/></button></td>
+                                                <td className="px-4 py-3 text-center"><button onClick={() => handleDelete(doc.applicationDocID)} className="p-1.5 bg-blue-100 text-red-600 rounded-full hover:bg-red-600 hover:text-white transition-all"><Trash2 size={14}/></button></td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr><td colSpan={7} className="py-8 text-center text-slate-400">No application documents linked.</td></tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div className="flex justify-center pt-2">
+                            <button className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-3 px-12 rounded-lg shadow-lg text-xs uppercase tracking-widest transition-all">Generate Declaration</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
