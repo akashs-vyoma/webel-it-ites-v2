@@ -9,17 +9,18 @@ import {
     Phone,
     User,
     FileText,
-    ArrowLeft,
-    ArrowRight,
-    PlusCircle,
-    Info,
     Hash,
     Send,
-    X
+    X,
+    Building,
+    Layers,
+    Maximize,
+    Activity,
+    DollarSign,
+    Info
 } from 'lucide-react';
 
 // --- DOCUMENT LOOKUP TABLE ---
-// We keep this to map the "Required Documents" to the name fetched from the API
 const APPLICATION_DOCUMENTS: Record<string, string[]> = {
     "DPR of IT & ITeS - Vetting - SINGLE PARTY": ["Balance Sheet", "IT Return", "MOA", "Project Report"],
     "NOC for Renting Out Leased property - SINGLE PARTY": ["Trade License of Tenant", "MOA", "Agreement with Tenant", "Mother Deed with Webel"],
@@ -31,70 +32,73 @@ const APPLICATION_DOCUMENTS: Record<string, string[]> = {
     "Renewal of NOC Renting out Leased Property - MULTI PARTY": ["Last Invoice issued by Webel", "Old NOC", "Renewal Deed", "Original Deed", "Trade License of Tenant", "MOA", "Agreement with Tenant", "Mother Deed with Webel"]
 };
 
-// Define Interface for API Project
+// --- DROPDOWN OPTIONS ---
+const TENANT_ACTIVITY_OPTIONS = [
+    "IT&ITes Activity",
+    "Non IT&ITes Activity (Commercial-Resturant Activity Only)",
+    "Non IT&ITes Activity"
+];
+
 interface Project {
     projectID: number;
-    projectName: string; // Adjust this key based on your actual API response
+    projectName: string;
 }
 
 const CreateApplicationForm: React.FC = () => {
     const [appType, setAppType] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
-    
-    // API State
     const [projects, setProjects] = useState<Project[]>([]);
     const [isLoadingProjects, setIsLoadingProjects] = useState(true);
 
-    // --- API CALL ---
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const response = await fetch('http://192.168.0.126:9998/api/application/GetProjectDetailsByDeptID', {
+                const response = await fetch('http://115.187.62.16:8005/ITEWBRestAPI/api/application/GetProjectDetailsByDeptID', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        "departmentID": 1
-                    }),
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ "departmentID": 1 }),
                 });
                 const result = await response.json();
-                
-                // Assuming result.data is the array of projects. 
-                // Adjust "result.data" if your API returns the array directly as "result"
-                if (result && Array.isArray(result.data)) {
-                    setProjects(result.data);
-                } else if (Array.isArray(result)) {
-                    setProjects(result);
-                }
+                if (result && Array.isArray(result.data)) setProjects(result.data);
+                else if (Array.isArray(result)) setProjects(result);
             } catch (error) {
                 console.error("Error fetching projects:", error);
             } finally {
                 setIsLoadingProjects(false);
             }
         };
-
         fetchProjects();
     }, []);
 
     const requiredDocs = appType ? APPLICATION_DOCUMENTS[appType] || [] : [];
 
-    const handleInitialSubmit = () => {
-        setIsModalOpen(true);
-    };
+    const isVetting = appType.toLowerCase().includes("vetting");
+    const isRenting = appType.toLowerCase().includes("renting out") && !appType.toLowerCase().includes("renewal");
+    const isTax = appType.toLowerCase().includes("tax exemption");
+    const isRenewal = appType.toLowerCase().includes("renewal");
+
+    // REUSABLE SUBMIT BUTTON (Matches Header Gradient, No Neon Effect)
+    const SubmitButton = ({ onClick, label }: { onClick?: () => void, label: string }) => (
+        <button 
+            onClick={onClick}
+            className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2 active:scale-95"
+        >
+            <Send size={18} />
+            {label}
+        </button>
+    );
 
     return (
-        <div className="w-full min-h-screen p-4 md:p-6 font-sans relative">
+        <div className="w-full min-h-screen p-4 md:p-6 font-sans relative  text-slate-900">
             <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
 
                 {/* ================= LEFT COLUMN: FORM ================= */}
                 <div className="lg:col-span-8 bg-white rounded-xl shadow-xl overflow-hidden border border-slate-100 h-fit">
-
+                    
                     <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-500 p-6">
-                        <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
-                        <h2 className="text-white text-lg font-semibold mb-4 tracking-wide">Create New Application</h2>
-                        
-                        {/* Dynamic Application Type Dropdown */}
+                        <h2 className="text-white text-lg font-semibold mb-4 tracking-wide uppercase">
+                            {appType || "Create New Application"}
+                        </h2>
                         <div className="relative">
                             <select 
                                 value={appType}
@@ -104,9 +108,7 @@ const CreateApplicationForm: React.FC = () => {
                             >
                                 <option value="">{isLoadingProjects ? "Loading Projects..." : "Select Application Type"}</option>
                                 {projects.map((project, index) => (
-                                    <option key={index} value={project.projectName}>
-                                        {project.projectName}
-                                    </option>
+                                    <option key={index} value={project.projectName}>{project.projectName}</option>
                                 ))}
                             </select>
                             <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
@@ -122,60 +124,109 @@ const CreateApplicationForm: React.FC = () => {
                         </p>
                     </div>
 
-                    {/* --- Form Body --- */}
                     <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                        <div className="md:col-span-1">
-                            <InputGroup 
-                                label="GST Number" 
-                                icon={<Hash size={18} />} 
-                                placeholder="GST Number" 
-                                required
-                                actionButton={
-                                    <button className="bg-[#eec643] hover:bg-[#dcb538] text-slate-900 text-xs font-bold px-4 h-full transition-colors border-l border-yellow-600/20">
-                                        Proceed
-                                    </button>
-                                }
-                            />
-                        </div>
-
-                        <div className="md:col-span-1">
-                            <InputGroup label="PAN Number" icon={<CreditCard size={18} />} placeholder="PAN Number" required />
-                        </div>
-
-                        <div className="md:col-span-1">
-                            <InputGroup label="Name" icon={<User size={18} />} value="VYOMA INNOVUS GLOBAL PRIVATE LIMITED" readOnly required />
-                        </div>
-
-                        <div className="md:col-span-1">
-                            <InputGroup label="Phone Number" icon={<Phone size={18} />} value="7667956617" readOnly required />
-                        </div>
-
-                        <div className="md:col-span-1">
-                            <InputGroup label="Email" icon={<Mail size={18} />} placeholder="Email" />
-                        </div>
-
-                        <div className="md:col-span-1">
+                        
+                        <InputGroup label="PAN Number" icon={<CreditCard size={18} />} placeholder="PAN Number" required />
+                        <InputGroup label="Name" icon={<User size={18} />} placeholder="Name" required />
+                        <InputGroup label="Phone Number" icon={<Phone size={18} />} placeholder="Phone Number" required />
+                        <InputGroup label="Email" icon={<Mail size={18} />} placeholder="Email" />
+                        <div className="md:col-span-2">
                             <InputGroup label="Registered Address" icon={<MapPin size={18} />} placeholder="Registered Address" required />
                         </div>
 
-                        <div className="col-span-full border-t border-slate-100 my-2"></div>
+                        {isVetting && (
+                            <div className="md:col-span-2">
+                                <InputGroup label="Site Address" icon={<MapPin size={18} />} placeholder="Site Address" required />
+                            </div>
+                        )}
 
-                        <div className="md:col-span-1">
-                            <InputGroup label="Old NOC No. / Application No." icon={<FileText size={18} />} placeholder="Old NOC No." required />
-                        </div>
+                        {(isRenting || isRenewal) && (
+                            <>
+                                <InputGroup label="Rentable Area in Sqft (Super Built Up Area)" icon={<Maximize size={18} />} placeholder="Area (in Sqft)" required />
+                                <InputGroup label="Space Number" icon={<Layers size={18} />} placeholder="Space No." required />
+                                <InputGroup label="Floor No." icon={<Building size={18} />} placeholder="Floor No." required />
+                                <InputGroup label="Plot No." icon={<Hash size={18} />} placeholder="Plot No." required />
+                                <InputGroup label="Block No." icon={<Building size={18} />} placeholder="Block No." required />
+                            </>
+                        )}
 
-                        <div className="md:col-span-1">
-                            <InputGroup label="Old NOC Date" icon={<Calendar size={18} />} defaultValue="2025-12-16" type="date" required />
-                        </div>
+                        {isRenewal && (
+                            <>
+                                <InputGroup label="Old NOC No. / Application No." icon={<FileText size={18} />} placeholder="Old NOC No." required />
+                                <InputGroup label="Old NOC Date" icon={<Calendar size={18} />} type="date" required />
+                                <InputGroup label="Old Agreement Tenure (Effective From)" icon={<Calendar size={18} />} type="date" required />
+                                <InputGroup label="Old Agreement End Date" icon={<Calendar size={18} />} type="date" required />
+                                <InputGroup label="Amount Paid till (Rs.)" icon={<DollarSign size={18} />} placeholder="Amount Paid..." required />
+                                <InputGroup label="Renewal From Date" icon={<Calendar size={18} />} type="date" required />
+                                <InputGroup label="Renewal To Date" icon={<Calendar size={18} />} type="date" required />
+                                <InputGroup label="Total Payment made" icon={<DollarSign size={18} />} placeholder="Total Payment" required />
+                            </>
+                        )}
 
-                        <div className="col-span-full flex justify-end mt-4">
-                            <button 
-                                onClick={handleInitialSubmit}
-                                className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white px-8 py-3 rounded-lg font-bold shadow-lg shadow-blue-500/20 transition-all flex items-center gap-2 active:scale-95"
-                            >
-                                <Send size={18} />
-                                Submit Application
-                            </button>
+                        {(isRenting || isRenewal) && (
+                            <>
+                                <InputGroup label="Agreement Tenure (Effective From)" icon={<Calendar size={18} />} type="date" required />
+                                {isRenting && <InputGroup label="Agreement End Date" icon={<Calendar size={18} />} type="date" required />}
+                                <InputGroup label="Tenant Name" icon={<User size={18} />} placeholder="Tenant Name" required />
+                                <InputGroup label="Tenant GSTN No." icon={<Hash size={18} />} placeholder="Tenant GSTN No" required />
+                                <InputGroup label="Tenant PAN No." icon={<CreditCard size={18} />} placeholder="Tenant PAN No" required />
+                                
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+                                        Tenant Activity <span className="text-red-500">*</span>
+                                    </label>
+                                    <div className="relative">
+                                        <select className="w-full h-10 px-3 pr-10 rounded-lg border border-slate-300 text-sm font-bold outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-blue-400 bg-white">
+                                            <option value="">Select Tenant Activity</option>
+                                            {TENANT_ACTIVITY_OPTIONS.map((opt, i) => (
+                                                <option key={i} value={opt}>{opt}</option>
+                                            ))}
+                                        </select>
+                                        <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                                            <ChevronDown size={16} className="text-slate-500" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <InputGroup label="Building Area in Sqft" icon={<Maximize size={18} />} placeholder="Building Area In Sqft" required />
+                                <div className="md:col-span-2">
+                                    <InputGroup label="Commercial Area On Rent (Other than IT/ITeS Activity)" icon={<Maximize size={18} />} placeholder="Commercial Area On Rent In Sqft" />
+                                </div>
+                                <p className="md:col-span-2 text-[10px] text-slate-600 font-bold italic mt-[-10px]">
+                                    Permission fees will be charged @Rs.3/sqft. till the expiry of the Rental Agreement/Surrender of the space by the tenant
+                                </p>
+                            </>
+                        )}
+
+                        {isTax && (
+                            <>
+                                <InputGroup label="Rentable Area In Sqft (Super Built-Up Area)" icon={<Maximize size={18} />} placeholder="Area (In Sqft)" required />
+                                <div className="flex flex-col gap-1.5">
+                                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Tax Service Authority <span className="text-red-500">*</span></label>
+                                    <div className="relative">
+                                        <select className="w-full h-10 px-3 pr-10 rounded-lg border border-slate-300 text-sm font-bold outline-none appearance-none bg-white">
+                                            <option>Select Tax Service Authority</option>
+                                        </select>
+                                        <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                                            <ChevronDown size={16} />
+                                        </div>
+                                    </div>
+                                </div>
+                                <InputGroup label="Address of Premises/Building/Plot of Land" icon={<MapPin size={18} />} placeholder="Address" required />
+                                <InputGroup label="Total space used by the applicant/tenant" icon={<Maximize size={18} />} placeholder="Total space" required />
+                                <InputGroup label="Break up of built up space vis-à-vis number of occupant company" icon={<Layers size={18} />} placeholder="Break up details" required />
+                                <InputGroup label="Description of IT / ITES operation of the occupant" icon={<Activity size={18} />} placeholder="Description" required />
+                                <div className="md:col-span-2">
+                                    <InputGroup label="Total used for IT/ITeS activities" icon={<Building size={18} />} placeholder="Total used" required />
+                                </div>
+                            </>
+                        )}
+
+                        <div className="md:col-span-2 mt-4 pt-4 border-t border-slate-100 flex flex-col md:flex-row justify-between items-center gap-4">
+                            <p className="text-green-700 font-bold text-sm">
+                                Your Payable amount will be Rs.70800 <span className="text-xs font-normal">(*UDIN charges will be paid extra)</span>
+                            </p>
+                            <SubmitButton onClick={() => setIsModalOpen(true)} label="Submit Application" />
                         </div>
                     </div>
                 </div>
@@ -185,44 +236,39 @@ const CreateApplicationForm: React.FC = () => {
                     <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-4">
                         <h3 className="text-white text-sm font-semibold tracking-wide">Required Document</h3>
                     </div>
-
                     <div className="p-4 bg-slate-50 min-h-[300px] flex flex-col gap-4">
                         {!appType ? (
-                            <div className="bg-white rounded-lg p-3 shadow-sm border border-slate-200 flex justify-between items-center h-16">
-                                <span className="text-xs text-slate-400 italic">No document selected</span>
+                            <div className="bg-white rounded-lg p-3 shadow-sm border border-slate-200 flex justify-center items-center h-16">
+                                <span className="text-xs text-slate-400 italic">Select application type to see documents</span>
                             </div>
                         ) : (
-                            <div className="max-h-[400px] overflow-y-auto flex flex-col gap-3 pr-1 custom-scrollbar">
-                                {requiredDocs.length > 0 ? requiredDocs.map((doc, idx) => (
+                            <div className="max-h-[600px] overflow-y-auto flex flex-col gap-3 pr-1 custom-scrollbar">
+                                {requiredDocs.map((doc, idx) => (
                                     <div key={idx} className="bg-white rounded-lg p-4 shadow-sm border border-slate-200 flex items-center gap-3 animate-fadeIn">
-                                        <div className="bg-black text-white p-1.5 rounded text-xs">
+                                        <div className="bg-blue-600 text-white p-1.5 rounded text-xs">
                                             <FileText size={16} />
                                         </div>
                                         <span className="text-sm font-bold text-slate-800">{doc}</span>
                                     </div>
-                                )) : (
-                                    <div className="text-xs text-slate-500 p-4">No specific documents mapped for this project.</div>
-                                )}
+                                ))}
                             </div>
                         )}
                     </div>
                 </div>
             </div>
 
-            {/* Verifier Modal implementation remains the same... */}
+            {/* Modal for Verifier */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-fadeIn">
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
                     <div className="bg-white w-full max-w-[500px] rounded-xl shadow-2xl overflow-hidden">
                         <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-4 flex justify-between items-center">
-                            <h3 className="text-white font-bold text-lg">Verifier Details</h3>
-                            <button onClick={() => setIsModalOpen(false)} className="text-white/80 hover:text-white">
-                                <X size={20} />
-                            </button>
+                            <h3 className="text-white font-bold text-lg">Verification Details</h3>
+                            <button onClick={() => setIsModalOpen(false)} className="text-white/80 hover:text-white"><X size={20} /></button>
                         </div>
                         <div className="p-6 flex flex-col gap-5">
-                            <InputGroup label="Co-Signer Name" icon={<User size={18} />} placeholder="Co-Signer Name" required />
+                            <InputGroup label="Verifier Name" icon={<User size={18} />} placeholder="Enter Name" required />
                             <div className="flex justify-end">
-                                <button className="bg-blue-600 text-white px-8 py-2.5 rounded-lg font-bold">Submit</button>
+                                <SubmitButton label="Confirm Submission" />
                             </div>
                         </div>
                     </div>
@@ -237,31 +283,25 @@ interface InputGroupProps {
     label: string;
     icon: React.ReactNode;
     placeholder?: string;
-    value?: string;
-    defaultValue?: string;
-    readOnly?: boolean;
     required?: boolean;
     type?: string;
-    actionButton?: React.ReactNode;
 }
 
-const InputGroup: React.FC<InputGroupProps> = ({ label, icon, placeholder, value, defaultValue, readOnly, required, type = "text", actionButton }) => {
+const InputGroup: React.FC<InputGroupProps> = ({ label, icon, placeholder, required, type = "text" }) => {
     return (
         <div className="flex flex-col gap-1.5">
             <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
                 {label} {required && <span className="text-red-500">*</span>}
             </label>
-            <div className={`flex items-center rounded-lg border border-slate-300 overflow-hidden h-10 transition-all focus-within:ring-2 focus-within:ring-cyan-400 ${readOnly ? 'bg-slate-100' : 'bg-white'}`}>
-                <div className="w-10 h-full bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500">{icon}</div>
+            <div className="flex items-center rounded-lg border border-slate-300 overflow-hidden h-10 transition-all focus-within:ring-2 focus-within:ring-blue-400 bg-white shadow-sm">
+                <div className="w-10 h-full bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500">
+                    {icon}
+                </div>
                 <input
                     type={type}
-                    value={readOnly ? value : undefined}
-                    defaultValue={!readOnly ? (defaultValue || value) : undefined}
-                    readOnly={readOnly}
                     placeholder={placeholder}
-                    className={`flex-1 px-3 text-sm font-medium outline-none h-full ${readOnly ? 'bg-slate-100 text-slate-500' : 'bg-white'}`}
+                    className="flex-1 px-3 text-sm font-bold outline-none h-full bg-white text-slate-800 placeholder:text-slate-400"
                 />
-                {actionButton && <div className="h-full">{actionButton}</div>}
             </div>
         </div>
     );
