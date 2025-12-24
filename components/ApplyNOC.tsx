@@ -17,7 +17,9 @@ import {
     Maximize,
     Activity,
     DollarSign,
-    Info
+    Info,
+    Plus,
+    Trash2
 } from 'lucide-react';
 
 // --- DOCUMENT LOOKUP TABLE ---
@@ -49,6 +51,31 @@ const CreateApplicationForm: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [projects, setProjects] = useState<Project[]>([]);
     const [isLoadingProjects, setIsLoadingProjects] = useState(true);
+    const [role, setRole] = useState("");
+
+    const [tenantList, setTenantList] = useState<any[]>([]);
+    const [tenantForm, setTenantForm] = useState({
+        tenantName: '',
+        tenantGstn: '',
+        tenantPan: '',
+        tenantActivity: ''
+    });
+
+    const handleAddTenant = () => {
+        // Basic Validation: Ensure fields aren't empty
+        if (!tenantForm.tenantName || !tenantForm.tenantGstn || !tenantForm.tenantPan || !tenantForm.tenantActivity) {
+            alert("Please fill all tenant details before adding.");
+            return;
+        }
+
+        // Add to list and reset form
+        setTenantList([...tenantList, { ...tenantForm, id: Date.now() }]);
+        setTenantForm({ tenantName: '', tenantGstn: '', tenantPan: '', tenantActivity: '' });
+    };
+
+    const removeTenant = (id: any) => {
+        setTenantList(tenantList.filter(t => t.id !== id));
+    };
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -68,6 +95,8 @@ const CreateApplicationForm: React.FC = () => {
             }
         };
         fetchProjects();
+        const loginType = localStorage.getItem("role");
+        if (loginType) setRole(loginType);
     }, []);
 
     const requiredDocs = appType ? APPLICATION_DOCUMENTS[appType] || [] : [];
@@ -79,7 +108,7 @@ const CreateApplicationForm: React.FC = () => {
 
     // REUSABLE SUBMIT BUTTON (Matches Header Gradient, No Neon Effect)
     const SubmitButton = ({ onClick, label }: { onClick?: () => void, label: string }) => (
-        <button 
+        <button
             onClick={onClick}
             className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2 active:scale-95"
         >
@@ -94,13 +123,13 @@ const CreateApplicationForm: React.FC = () => {
 
                 {/* ================= LEFT COLUMN: FORM ================= */}
                 <div className="lg:col-span-8 bg-white rounded-xl shadow-xl overflow-hidden border border-slate-100 h-fit">
-                    
+
                     <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-500 p-6">
                         <h2 className="text-white text-lg font-semibold mb-4 tracking-wide uppercase">
                             {appType || "Create New Application"}
                         </h2>
                         <div className="relative">
-                            <select 
+                            <select
                                 value={appType}
                                 onChange={(e) => setAppType(e.target.value)}
                                 disabled={isLoadingProjects}
@@ -125,13 +154,14 @@ const CreateApplicationForm: React.FC = () => {
                     </div>
 
                     <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                        
-                        <InputGroup label="PAN Number" icon={<CreditCard size={18} />} placeholder="PAN Number" required />
-                        <InputGroup label="Name" icon={<User size={18} />} placeholder="Name" required />
-                        <InputGroup label="Phone Number" icon={<Phone size={18} />} placeholder="Phone Number" required />
-                        <InputGroup label="Email" icon={<Mail size={18} />} placeholder="Email" />
+
+                        {role === "company" && <InputGroupGSTIN label="GSTIN of the company" icon={<CreditCard size={18} />} placeholder="GST Number" required />}
+                        <InputGroup label={`PAN Number of the ${role}`} icon={<CreditCard size={18} />} placeholder="PAN Number" required />
+                        <InputGroup label={`Name of the ${role}`} icon={<User size={18} />} placeholder="Name" required />
+                        <InputGroup label={`Phone Number of the ${role}`} icon={<Phone size={18} />} placeholder="Phone Number" required />
+                        <InputGroup label={`Email of the ${role}`} icon={<Mail size={18} />} placeholder="Email" />
                         <div className="md:col-span-2">
-                            <InputGroup label="Registered Address" icon={<MapPin size={18} />} placeholder="Registered Address" required />
+                            <InputGroup label={`Registered Address of the ${role}`} icon={<MapPin size={18} />} placeholder="Registered Address" required />
                         </div>
 
                         {isVetting && (
@@ -146,7 +176,7 @@ const CreateApplicationForm: React.FC = () => {
                                 <InputGroup label="Space Number" icon={<Layers size={18} />} placeholder="Space No." required />
                                 <InputGroup label="Floor No." icon={<Building size={18} />} placeholder="Floor No." required />
                                 <InputGroup label="Plot No." icon={<Hash size={18} />} placeholder="Plot No." required />
-                                <InputGroup label="Block No." icon={<Building size={18} />} placeholder="Block No." required />
+                                <InputGroup label="Block No." icon={<Building size={18} />} placeholder="Block No." />
                             </>
                         )}
 
@@ -167,28 +197,8 @@ const CreateApplicationForm: React.FC = () => {
                             <>
                                 <InputGroup label="Agreement Tenure (Effective From)" icon={<Calendar size={18} />} type="date" required />
                                 {isRenting && <InputGroup label="Agreement End Date" icon={<Calendar size={18} />} type="date" required />}
-                                <InputGroup label="Tenant Name" icon={<User size={18} />} placeholder="Tenant Name" required />
-                                <InputGroup label="Tenant GSTN No." icon={<Hash size={18} />} placeholder="Tenant GSTN No" required />
-                                <InputGroup label="Tenant PAN No." icon={<CreditCard size={18} />} placeholder="Tenant PAN No" required />
-                                
-                                <div className="flex flex-col gap-1.5">
-                                    <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
-                                        Tenant Activity <span className="text-red-500">*</span>
-                                    </label>
-                                    <div className="relative">
-                                        <select className="w-full h-10 px-3 pr-10 rounded-lg border border-slate-300 text-sm font-bold outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-blue-400 bg-white">
-                                            <option value="">Select Tenant Activity</option>
-                                            {TENANT_ACTIVITY_OPTIONS.map((opt, i) => (
-                                                <option key={i} value={opt}>{opt}</option>
-                                            ))}
-                                        </select>
-                                        <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-                                            <ChevronDown size={16} className="text-slate-500" />
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <InputGroup label="Building Area in Sqft" icon={<Maximize size={18} />} placeholder="Building Area In Sqft" required />
+                                <InputGroup label="Building Area in Sqft (Super Built-Up Area)" icon={<Maximize size={18} />} placeholder="Building Area In Sqft" required />
                                 <div className="md:col-span-2">
                                     <InputGroup label="Commercial Area On Rent (Other than IT/ITeS Activity)" icon={<Maximize size={18} />} placeholder="Commercial Area On Rent In Sqft" />
                                 </div>
@@ -196,6 +206,104 @@ const CreateApplicationForm: React.FC = () => {
                                     Permission fees will be charged @Rs.3/sqft. till the expiry of the Rental Agreement/Surrender of the space by the tenant
                                 </p>
                             </>
+                        )}
+
+                        {(isRenting || isRenewal) && (
+                            <div className="space-y-6 md:col-span-2">
+                                {/* Tenant Input Form */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-xl bg-slate-50/50">
+                                    <InputGroup
+                                        label="Tenant Name" icon={<User size={18} />}
+                                        placeholder="Enter Name" required
+                                        value={tenantForm.tenantName}
+                                        onChange={(e) => setTenantForm({ ...tenantForm, tenantName: e.target.value })}
+                                    />
+                                    <InputGroup
+                                        label="Tenant GSTN No." icon={<Hash size={18} />}
+                                        placeholder="Enter GSTN" required
+                                        value={tenantForm.tenantGstn}
+                                        onChange={(e) => setTenantForm({ ...tenantForm, tenantGstn: e.target.value })}
+                                    />
+                                    <InputGroup
+                                        label="Tenant PAN No." icon={<CreditCard size={18} />}
+                                        placeholder="Enter PAN" required
+                                        value={tenantForm.tenantPan}
+                                        onChange={(e) => setTenantForm({ ...tenantForm, tenantPan: e.target.value })}
+                                    />
+
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+                                            Tenant Activity <span className="text-red-500">*</span>
+                                        </label>
+                                        <div className="relative">
+                                            <select
+                                                className="w-full h-10 px-3 pr-10 rounded-lg border border-slate-300 text-sm font-bold outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-blue-400 bg-white"
+                                                value={tenantForm.tenantActivity}
+                                                onChange={(e) => setTenantForm({ ...tenantForm, tenantActivity: e.target.value })}
+                                            >
+                                                <option value="">Select Tenant Activity</option>
+                                                {TENANT_ACTIVITY_OPTIONS.map((opt, i) => (
+                                                    <option key={i} value={opt}>{opt}</option>
+                                                ))}
+                                            </select>
+                                            <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                                                <ChevronDown size={16} className="text-slate-500" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="md:col-span-2 flex justify-end">
+                                        <button
+                                            type="button"
+                                            onClick={handleAddTenant}
+                                            className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg text-sm font-bold hover:bg-blue-700 transition-all shadow-md active:scale-95"
+                                        >
+                                            <Plus size={18} /> Add More Tenant
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Preview Table */}
+                                {tenantList.length > 0 && (
+                                    <div className="overflow-hidden border border-slate-200 rounded-xl shadow-sm">
+                                        <table className="w-full text-left border-collapse">
+                                            <thead className="bg-slate-100 border-b border-slate-200">
+                                                <tr>
+                                                    <th className="p-3 text-[10px] font-bold text-slate-500 uppercase">Tenant Name</th>
+                                                    <th className="p-3 text-[10px] font-bold text-slate-500 uppercase">GSTN</th>
+                                                    <th className="p-3 text-[10px] font-bold text-slate-500 uppercase">PAN</th>
+                                                    <th className="p-3 text-[10px] font-bold text-slate-500 uppercase">Activity</th>
+                                                    <th className="p-3 text-[10px] font-bold text-slate-500 uppercase text-center">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-slate-100 bg-white">
+                                                {tenantList.map((tenant) => (
+                                                    <tr key={tenant.id} className="hover:bg-slate-50 transition-colors">
+                                                        <td className="p-3 text-sm font-semibold text-slate-800">{tenant.tenantName}</td>
+                                                        <td className="p-3 text-sm text-slate-600 font-mono">{tenant.tenantGstn}</td>
+                                                        <td className="p-3 text-sm text-slate-600 font-mono">{tenant.tenantPan}</td>
+                                                        <td className="p-3 text-sm text-slate-600">
+                                                            <span className="px-2 py-1 bg-slate-100 rounded text-[11px] font-bold text-slate-700">
+                                                                {tenant.tenantActivity}
+                                                            </span>
+                                                        </td>
+                                                        <td className="p-3 text-center">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => removeTenant(tenant.id)}
+                                                                className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                                title="Remove Tenant"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                )}
+                            </div>
                         )}
 
                         {isTax && (
@@ -285,9 +393,31 @@ interface InputGroupProps {
     placeholder?: string;
     required?: boolean;
     type?: string;
+    value?: string;
+    onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-const InputGroup: React.FC<InputGroupProps> = ({ label, icon, placeholder, required, type = "text" }) => {
+const InputGroup: React.FC<InputGroupProps> = ({ label, icon, placeholder, required = false, type = "text", value, onChange }) => {
+    return (
+        <div className="flex flex-col gap-1.5">
+            <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+                {label} {required ? <span className="text-red-500">*</span> : <span className="text-slate-400">(optional)</span>}
+            </label>
+            <div className="flex items-center rounded-lg border border-slate-300 overflow-hidden h-10 transition-all focus-within:ring-2 focus-within:ring-blue-400 bg-white shadow-sm">
+                <div className="w-10 h-full bg-slate-100 border-r border-slate-200 flex items-center justify-center text-slate-500">
+                    {icon}
+                </div>
+                <input
+                    type={type}
+                    placeholder={placeholder}
+                    className="flex-1 px-3 text-sm font-bold outline-none h-full bg-white text-slate-800 placeholder:text-slate-400"
+                />
+            </div>
+        </div>
+    );
+};
+
+const InputGroupGSTIN: React.FC<InputGroupProps> = ({ label, icon, placeholder, required, type = "text" }) => {
     return (
         <div className="flex flex-col gap-1.5">
             <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
@@ -302,6 +432,9 @@ const InputGroup: React.FC<InputGroupProps> = ({ label, icon, placeholder, requi
                     placeholder={placeholder}
                     className="flex-1 px-3 text-sm font-bold outline-none h-full bg-white text-slate-800 placeholder:text-slate-400"
                 />
+                <button className="w-20 cursor-pointer h-full bg-amber-300 hover:bg-amber-400 text-slate-800 font-bold text-xs border-l border-slate-200 flex items-center justify-center text-slate-500">
+                    Proceed
+                </button>
             </div>
         </div>
     );
