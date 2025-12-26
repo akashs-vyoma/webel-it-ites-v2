@@ -19,8 +19,13 @@ import {
     DollarSign,
     Info,
     Plus,
-    Trash2
+    Trash2,
+    PhoneCall,
+    CheckCircle2,
+    AlertCircle,
+    ChevronRight
 } from 'lucide-react';
+import NonIndividualUploadDoc from './NonIndividualUploadDoc';
 
 // --- DOCUMENT LOOKUP TABLE ---
 const APPLICATION_DOCUMENTS: Record<string, string[]> = {
@@ -53,17 +58,41 @@ interface CreateApplicationFormProps {
 
 const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category, setCategory }) => {
     const [appType, setAppType] = useState("");
+    const [uploadedDocs, setUploadedDocs] = useState<any>({
+        "Balance Sheet": true,
+        "IT Return": true,
+        "MOA": true,
+        "Project Report": true,
+        "Trade License of Tenant": true,
+        "Agreement with Tenant": true,
+        "Mother Deed with Webel": false,
+        "Copy Agreement": true,
+        "Last Invoice issued by Webel": false,
+        "Old NOC": false,
+        "Renewal Deed": false,
+        "Original Deed": false,
+        "MultiParty Declaration Letter": false,
+        "Letter from NDITA": false,
+    }); // Example: { "Balance Sheet": true }
+    const [activeDoc, setActiveDoc] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleUploadClick = (docName: any) => {
+        setActiveDoc(docName);
+        setIsModalOpen(true);
+    };
     const [projects, setProjects] = useState<Project[]>([]);
     const [isLoadingProjects, setIsLoadingProjects] = useState(true);
     const [role, setRole] = useState("");
     const [applicationTypes, setApplicationTypes] = useState([]);
+    const [verifierRole, setVerifierRole] = useState("");
 
     const [tenantList, setTenantList] = useState<any[]>([]);
     const [tenantForm, setTenantForm] = useState({
         tenantName: '',
         tenantGstn: '',
         tenantPan: '',
+        tenantPhone: '',
         tenantActivity: ''
     });
 
@@ -78,7 +107,7 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
 
         // Add to list and reset form
         setTenantList([...tenantList, { ...tenantForm, id: Date.now() }]);
-        setTenantForm({ tenantName: '', tenantGstn: '', tenantPan: '', tenantActivity: '' });
+        setTenantForm({ tenantName: '', tenantGstn: '', tenantPan: '', tenantPhone: '', tenantActivity: '' });
     };
 
     const removeTenant = (id: any) => {
@@ -266,6 +295,12 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
                                         value={tenantForm.tenantPan}
                                         onChange={(e) => setTenantForm((prev) => ({ ...prev, tenantPan: e.target.value }))}
                                     />
+                                    <InputGroup
+                                        label="Tenant Phone No." icon={<PhoneCall size={18} />}
+                                        placeholder="Enter Phone" required
+                                        value={tenantForm.tenantPhone}
+                                        onChange={(e) => setTenantForm((prev) => ({ ...prev, tenantPhone: e.target.value }))}
+                                    />
 
                                     <div className="flex flex-col gap-1.5">
                                         <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
@@ -308,16 +343,18 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
                                                     <th className="p-3 text-[10px] font-bold text-slate-500 uppercase">Tenant Name</th>
                                                     <th className="p-3 text-[10px] font-bold text-slate-500 uppercase">GSTN</th>
                                                     <th className="p-3 text-[10px] font-bold text-slate-500 uppercase">PAN</th>
+                                                    <th className="p-3 text-[10px] font-bold text-slate-500 uppercase">Phone No.</th>
                                                     <th className="p-3 text-[10px] font-bold text-slate-500 uppercase">Activity</th>
                                                     <th className="p-3 text-[10px] font-bold text-slate-500 uppercase text-center">Action</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-slate-100 bg-white">
-                                                {tenantList.map((tenant) => (
+                                                {tenantList?.map((tenant) => (
                                                     <tr key={tenant.id} className="hover:bg-slate-50 transition-colors">
                                                         <td className="p-3 text-sm font-semibold text-slate-800">{tenant.tenantName}</td>
                                                         <td className="p-3 text-sm text-slate-600 font-mono">{tenant.tenantGstn}</td>
                                                         <td className="p-3 text-sm text-slate-600 font-mono">{tenant.tenantPan}</td>
+                                                        <td className="p-3 text-sm text-slate-600 font-mono">{tenant.tenantPhone}</td>
                                                         <td className="p-3 text-sm text-slate-600">
                                                             <span className="px-2 py-1 bg-slate-100 rounded text-[11px] font-bold text-slate-700">
                                                                 {tenant.tenantActivity}
@@ -339,6 +376,48 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
                                         </table>
                                     </div>
                                 )}
+                            </div>
+                        )}
+
+                        {(isRenting || isRenewal) && (
+                            <div className="space-y-6 md:col-span-2">
+                                {/* Tenant Input Form */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-xl bg-slate-50/50">
+
+                                    <div className="flex flex-col gap-1.5">
+                                        <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
+                                            Verifier Role <span className="text-red-500">*</span>
+                                        </label>
+                                        <div className="relative">
+                                            <select
+                                                className="w-full h-10 px-3 pr-10 rounded-lg border border-slate-300 text-sm font-bold outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-blue-400 bg-white"
+                                                value={verifierRole}
+                                                onChange={(e) => setVerifierRole(e.target.value)}
+                                            >
+                                                <option value="">Select Verifier Role</option>
+                                                <option value="CCA">CA</option>
+                                                <option value="CSA">CS</option>
+                                                <option value="POF">Proprietor of firm</option>
+                                                <option value="DIR">Director of Company</option>
+                                            </select>
+                                            <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                                                <ChevronDown size={16} className="text-slate-500" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <InputGroup
+                                        label="Verifier Name" icon={<User size={18} />}
+                                        placeholder="Enter Name" required
+                                    />
+                                    <InputGroup
+                                        label="Verifier Phone No." icon={<PhoneCall size={18} />}
+                                        placeholder="Enter Phone" required
+                                    />
+                                    <InputGroup
+                                        label="Registration No." icon={<Hash size={18} />}
+                                        placeholder="Enter Registration No."
+                                    />
+                                </div>
                             </div>
                         )}
 
@@ -387,14 +466,73 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
                             </div>
                         ) : (
                             <div className="max-h-[600px] overflow-y-auto flex flex-col gap-3 pr-1 custom-scrollbar">
-                                {requiredDocs.map((doc, idx) => (
-                                    <div key={idx} className="bg-white rounded-lg p-4 shadow-sm border border-slate-200 flex items-center gap-3 animate-fadeIn">
-                                        <div className="bg-blue-600 text-white p-1.5 rounded text-xs">
-                                            <FileText size={16} />
+                                {requiredDocs.map((doc, idx) => {
+                                    const isUploaded = uploadedDocs[doc];
+
+                                    return (
+                                        <div
+                                            key={idx}
+                                            className={`
+                    group relative bg-white rounded-xl p-4 border transition-all duration-200
+                    ${isUploaded
+                                                    ? 'border-green-100 bg-green-50/30'
+                                                    : 'border-slate-200 hover:border-blue-300 hover:shadow-md cursor-pointer'
+                                                }
+                `}
+                                            onClick={() => !isUploaded && handleUploadClick(doc)}
+                                        >
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-4">
+                                                    {/* Icon Container */}
+                                                    <div className={`
+                            p-2.5 rounded-lg transition-colors
+                            ${isUploaded
+                                                            ? 'bg-green-100 text-green-600'
+                                                            : 'bg-slate-100 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600'
+                                                        }
+                        `}>
+                                                        <FileText size={20} />
+                                                    </div>
+
+                                                    {/* Text Details */}
+                                                    <div>
+                                                        <p className={`text-sm font-semibold ${isUploaded ? 'text-green-800' : 'text-slate-800'}`}>
+                                                            {doc}
+                                                        </p>
+                                                        <p className="text-xs text-slate-500 mt-0.5">
+                                                            {isUploaded ? 'Document verified and uploaded' : 'Required format: PDF'}
+                                                        </p>
+                                                    </div>
+                                                </div>
+
+                                                {/* Status Action Area */}
+                                                <div className="flex items-center gap-3">
+                                                    {isUploaded ? (
+                                                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-xs font-bold animate-in fade-in zoom-in">
+                                                            <CheckCircle2 size={14} />
+                                                            Uploaded
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex items-center gap-2">
+                                                            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-600 rounded-full text-xs font-bold border border-amber-100">
+                                                                <AlertCircle size={14} />
+                                                                Pending
+                                                            </div>
+                                                            <div className="p-1 text-slate-300 group-hover:text-blue-500 transition-colors">
+                                                                <ChevronRight size={18} />
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Hover Progress Bar (Visual Polish) */}
+                                            {!isUploaded && (
+                                                <div className="absolute bottom-0 left-0 h-0.5 bg-blue-500 rounded-full transition-all duration-300 w-0 group-hover:w-full" />
+                                            )}
                                         </div>
-                                        <span className="text-sm font-bold text-slate-800">{doc}</span>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
@@ -404,18 +542,7 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
             {/* Modal for Verifier */}
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-                    <div className="bg-white w-full max-w-[500px] rounded-xl shadow-2xl overflow-hidden">
-                        <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-4 flex justify-between items-center">
-                            <h3 className="text-white font-bold text-lg">Verification Details</h3>
-                            <button onClick={() => setIsModalOpen(false)} className="text-white/80 hover:text-white"><X size={20} /></button>
-                        </div>
-                        <div className="p-6 flex flex-col gap-5">
-                            <InputGroup label="Verifier Name" icon={<User size={18} />} placeholder="Enter Name" required />
-                            <div className="flex justify-end">
-                                <SubmitButton label="Confirm Submission" />
-                            </div>
-                        </div>
-                    </div>
+                    <NonIndividualUploadDoc isWizard={true} onClose={() => setIsModalOpen(false)} />
                 </div>
             )}
         </div>

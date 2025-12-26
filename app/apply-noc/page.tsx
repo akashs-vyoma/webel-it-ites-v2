@@ -6,6 +6,7 @@ import { Check, ClipboardEdit, CreditCard, FileCheck, FileUp, ListChecks, Send, 
 import DocumentUploadHeader from '@/components/ApplicationDocument';
 import NOCForm from '@/components/Noc';
 import MultiOwnPropertyForm from '@/components/ApplyForMultipartyDeclaration';
+import PaymentCard from '@/components/init_payment';
 
 export default function WizardPage() {
     const [currentStep, setCurrentStep] = useState(1);
@@ -23,12 +24,12 @@ export default function WizardPage() {
     ];
 
     const nextStep = () => {
-        if (currentStep === 4 && category === "SINGLE") setCurrentStep(5);
+        if (currentStep === 2 && category === "SINGLE") setCurrentStep(4);
         else setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
     };
 
     const prevStep = () => {
-        if (currentStep === 4 && category === "SINGLE") setCurrentStep(4);
+        if (currentStep === 4 && category === "SINGLE") setCurrentStep(2);
         else setCurrentStep((prev) => Math.max(prev - 1, 1));
     };
 
@@ -55,7 +56,7 @@ export default function WizardPage() {
             case 5:
                 return <div className="p-10 border-2 border-dashed rounded">Step 5: Payment Module Placeholder</div>;
             case 6:
-                return <div className="p-10 border-2 border-dashed rounded">Step 6: Payment Module Placeholder</div>;
+                return <PaymentCard />;
             default:
                 return null;
         }
@@ -65,31 +66,71 @@ export default function WizardPage() {
         <div className="w-screen max-w-screen bg-slate-50/40 border border-slate-100 mx-auto p-6 rounded-lg">
             {/* Progress Indicator */}
             <div className="flex justify-between mb-10">
-                {steps.map((step) => {
-                    // Skip rendering Step 4 if category is SINGLE
+                {steps.map((step, index) => {
                     if (step.hideIfSingle && category === "SINGLE") return null;
 
                     const Icon = step.icon;
                     const isActive = currentStep === step.id;
-                    const isCompleted = currentStep > step.id || (currentStep === 6 && step.id === 6);
+                    const isCompleted = currentStep > step.id;
+
+                    // Logic to calculate if the line to the right should be colored
+                    // This looks ahead to see if the next visible step is completed or active
+                    const isNextStepReached = currentStep > step.id;
 
                     return (
-                        <div key={step.id} className="flex flex-col items-center flex-1 relative">
-                            {/* The Icon Circle */}
-                            <div className={`w-12 h-12 rounded-full flex items-center justify-center mb-2 transition-all duration-300 border-2 z-10 ${isActive
-                                ? 'bg-blue-600 border-blue-600 text-white shadow-lg scale-110'
-                                : isCompleted
-                                    ? 'bg-green-500 border-green-500 text-white'
-                                    : 'bg-white border-gray-200 text-gray-400'
-                                }`}>
-                                {isCompleted ? <Check size={20} strokeWidth={isActive ? 2.5 : 2} /> : <Icon className={`${isActive ? 'animate-pulse' : ''}`} size={20} strokeWidth={isActive ? 2.5 : 2} />}
-                            </div>
+                        <div key={step.id} className="flex-1 relative group">
+                            {/* Connecting Line */}
+                            {index < steps.length - 1 && (
+                                <div
+                                    className="absolute top-6 left-[50%] w-full h-[2px] bg-gray-100 -z-0"
+                                    aria-hidden="true"
+                                >
+                                    <div
+                                        className={`h-full bg-blue-600 transition-all duration-500 ease-in-out ${isNextStepReached ? 'w-full' : 'w-0'
+                                            }`}
+                                    />
+                                </div>
+                            )}
 
-                            {/* Label */}
-                            <span className={`text-xs text-center px-2 transition-colors ${isActive ? 'font-bold text-blue-600' : 'text-gray-500'
-                                }`}>
-                                {step.label}
-                            </span>
+                            <div className="flex flex-col items-center relative z-10">
+                                {/* The Icon Circle */}
+                                <div className={`
+                    w-12 h-12 rounded-full flex items-center justify-center 
+                    transition-all duration-500 border-2 
+                    ${isActive
+                                        ? 'bg-white border-blue-600 text-blue-600 ring-4 ring-blue-50 shadow-sm'
+                                        : isCompleted
+                                            ? 'bg-blue-600 border-blue-600 text-white'
+                                            : 'bg-white border-gray-200 text-gray-400'
+                                    }
+                `}>
+                                    {isCompleted ? (
+                                        <Check size={22} strokeWidth={3} className="animate-in zoom-in duration-300" />
+                                    ) : (
+                                        <Icon
+                                            size={20}
+                                            strokeWidth={isActive ? 2.5 : 2}
+                                            className={`${isActive ? 'scale-110 transition-transform' : ''}`}
+                                        />
+                                    )}
+                                </div>
+
+                                {/* Label Container */}
+                                <div className="mt-3 flex flex-col items-center">
+                                    <span className={`
+                        text-[11px] uppercase tracking-wider font-bold transition-colors duration-300
+                        ${isActive ? 'text-blue-600' : isCompleted ? 'text-gray-900' : 'text-gray-400'}
+                    `}>
+                                        Step {step.id > 3 && category === "SINGLE" ? step.id - 1 : index + 1}
+                                    </span>
+                                    <span className={`
+                        text-sm font-medium transition-colors duration-300
+                        ${isActive ? 'text-gray-900' : 'text-gray-500'}
+                    `}>
+                                        {step.label}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
                     );
                 })}
@@ -111,7 +152,7 @@ export default function WizardPage() {
                 </button>
 
                 {currentStep < totalSteps ? (
-                    <SubmitButton onClick={() => nextStep()} label="Submit & Next" />
+                    <SubmitButton onClick={() => nextStep()} label="Submit & Continue" />
                 ) : (
                     <button
                         onClick={() => alert('Wizard Completed!')}

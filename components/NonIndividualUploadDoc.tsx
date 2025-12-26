@@ -18,7 +18,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 
-const NonIndividualUploadDoc: React.FC = () => {
+const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void }> = ({ isWizard, onClose }) => {
     const [showModal, setShowModal] = useState(true);
 
     const [formData, setFormData] = useState({
@@ -63,10 +63,10 @@ const NonIndividualUploadDoc: React.FC = () => {
 
     return (
         // Centered Layout Container
-        <div className="min-h-screen flex items-center justify-center p-4 font-sans">
+        <div className="min-h-screen flex items-center justify-center p-4 font-sans z-[9999]">
 
             {/* Main Card - No Border, just Shadow */}
-            <div className="w-full max-w-4xl bg-white shadow-2xl rounded-xl overflow-hidden">
+            <div className="w-full max-w-4xl bg-white shadow-2xl rounded-xl overflow-hidden z-[9999]">
 
                 {/* Header - Solid Background Color */}
                 <div className="relative bg-gradient-to-r from-blue-600 to-cyan-500 px-8 py-5 overflow-hidden">
@@ -78,6 +78,9 @@ const NonIndividualUploadDoc: React.FC = () => {
                         <Upload className="w-5 h-5 text-white/80" />
                         Upload Document
                     </h2>
+                    {isWizard && (
+                        <button onClick={onClose} className="absolute top-5 right-5 cursor-pointer flex items-center gap-2 text-white/80 hover:text-white"><X size={20} /></button>
+                    )}
                 </div>
 
                 {/* Form Content */}
@@ -264,11 +267,15 @@ const NonIndividualUploadDoc: React.FC = () => {
                     </div>
 
                     {/* Verify Button */}
-                    <div className="mt-10">
-                        <button className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white text-sm font-semibold px-8 py-3 rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-2">
+                    <div className="mt-10 flex gap-2">
+                        <button className="cursor-pointer bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white text-sm font-semibold px-8 py-3 rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-2">
                             <ShieldCheck size={18} />
                             Verify Aadhar
                         </button>
+                        {isWizard && <button onClick={onClose} className="cursor-pointer bg-gradient-to-r from-red-600 to-amber-500 hover:from-red-700 hover:to-amber-600 text-white text-sm font-semibold px-8 py-3 rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-2">
+                            <X size={18} />
+                            Close
+                        </button>}
                     </div>
                 </div>
 
