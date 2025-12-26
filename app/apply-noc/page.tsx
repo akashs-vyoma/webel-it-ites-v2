@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import CreateApplicationForm from '@/components/ApplyNOC';
-import { Check, ClipboardEdit, CreditCard, FileCheck, FileUp, ListChecks, Send, Users } from 'lucide-react';
+import { ArrowLeft, BadgeCheck, Check, ClipboardEdit, CreditCard, FileCheck, FileUp, ListChecks, Send, Users } from 'lucide-react';
 import DocumentUploadHeader from '@/components/ApplicationDocument';
 import NOCForm from '@/components/Noc';
 import MultiOwnPropertyForm from '@/components/ApplyForMultipartyDeclaration';
@@ -37,7 +37,7 @@ export default function WizardPage() {
     const SubmitButton = ({ onClick, label }: { onClick?: () => void, label: string }) => (
         <button
             onClick={onClick}
-            className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2 active:scale-95"
+            className="cursor-pointer bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2 active:scale-95"
         >
             <Send size={18} />
             {label}
@@ -49,15 +49,15 @@ export default function WizardPage() {
             case 1:
                 return <CreateApplicationForm category={category} setCategory={setCategory} />;
             case 2:
-                return <DocumentUploadHeader />;
+                return <DocumentUploadHeader isWizard={true} />;
             case 3:
-                return <MultiOwnPropertyForm />;
+                return <MultiOwnPropertyForm isWizard={true} />;
             case 4:
-                return <NOCForm />;
+                return <NOCForm isWizard={true} />;
             case 5:
                 return <CoSignerApplication />;
             case 6:
-                return <PaymentCard />;
+                return <PaymentCard isWizard={true} />;
             default:
                 return null;
         }
@@ -147,8 +147,9 @@ export default function WizardPage() {
                 <button
                     onClick={prevStep}
                     disabled={currentStep === 1}
-                    className="px-6 py-2 bg-white rounded disabled:opacity-50 hover:bg-gray-300 transition-colors"
+                    className="flex items-center gap-2 px-6 py-2 bg-white rounded-lg disabled:opacity-50 hover:bg-gray-100 transition-colors hover:shadow-md hover:shadow-gray-200 cursor-pointer"
                 >
+                    <ArrowLeft size={18} />
                     Previous
                 </button>
 
@@ -157,9 +158,10 @@ export default function WizardPage() {
                 ) : (
                     <button
                         onClick={() => alert('Wizard Completed!')}
-                        className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                        className="cursor-pointer bg-gradient-to-r from-emerald-600 to-cyan-500 hover:from-cyan-700 hover:to-emerald-600 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2 active:scale-95"
                     >
-                        Finish
+                        <BadgeCheck size={18} />
+                        Pay & Complete
                     </button>
                 )}
             </div>

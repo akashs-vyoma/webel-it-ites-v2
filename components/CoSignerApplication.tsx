@@ -1,4 +1,4 @@
-    "use client";
+"use client";
 import React, { useState } from 'react';
 import { RefreshCw, CheckCircle2, Clock } from 'lucide-react';
 
@@ -34,11 +34,11 @@ const CoSignerTable: React.FC = () => {
     };
 
     return (
-        <div className="w-full max-w-4xl mx-auto p-4 font-sans">
-            
+        <div className="w-full max-w-screen mx-auto p-4 font-sans">
+
             {/* Refresh Button Section - Placed on top as per image */}
             <div className="flex justify-end mb-3">
-                <button 
+                <button
                     onClick={handleRefresh}
                     disabled={isLoading}
                     className="flex items-center gap-2 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 px-4 py-1.5 rounded-full shadow-sm transition-all active:scale-95 disabled:opacity-50"
@@ -50,7 +50,7 @@ const CoSignerTable: React.FC = () => {
 
             {/* Table Container */}
             <div className="bg-white rounded-xl shadow-lg border border-slate-100 overflow-hidden">
-                
+
                 {/* Header with Blue Gradient and Shimmer */}
                 <div className="relative overflow-hidden bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 px-6 py-4">
                     <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>

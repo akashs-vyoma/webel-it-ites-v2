@@ -66,7 +66,7 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void 
         <div className="min-h-screen flex items-center justify-center p-4 font-sans z-[9999]">
 
             {/* Main Card - No Border, just Shadow */}
-            <div className="w-full max-w-4xl bg-white shadow-2xl rounded-xl overflow-hidden z-[9999]">
+            <div className="w-full max-w-4xl mx-auto bg-white shadow-2xl rounded-xl overflow-hidden z-[9999]">
 
                 {/* Header - Solid Background Color */}
                 <div className="relative bg-gradient-to-r from-blue-600 to-cyan-500 px-8 py-5 overflow-hidden">

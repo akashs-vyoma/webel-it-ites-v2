@@ -1,9 +1,10 @@
+'use client';
+import NonIndividualUploadDoc from "@/components/NonIndividualUploadDoc";
 
-import NonIndividualUploadDoc from '@/components/NonIndividualUploadDoc'
 
 export default function page() {
     return (
 
-        <NonIndividualUploadDoc />
+        <NonIndividualUploadDoc isWizard={false} onClose={() => { console.log("Closed") }} />
     )
 }

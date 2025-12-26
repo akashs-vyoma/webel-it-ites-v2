@@ -15,7 +15,7 @@ const applicationTypes = [
     "Renewal of NOC Renting out Leased Property - MULTI PARTY"
 ];
 
-const NOCForm: React.FC = () => {
+const NOCForm: React.FC<{ isWizard?: boolean }> = ({ isWizard = false }) => {
     const [showModal, setShowModal] = useState(false);
     const [selectedType, setSelectedType] = useState(applicationTypes[0]);
     const [selectedNumber, setSelectedNumber] = useState("Select Application Number");
@@ -84,7 +84,7 @@ const NOCForm: React.FC = () => {
                                     Application Number
                                 </label>
                                 <div className="relative">
-                                    <select 
+                                    <select
                                         value={selectedNumber}
                                         onChange={(e) => setSelectedNumber(e.target.value)}
                                         className="w-full h-9 px-3 pr-8 rounded-md bg-white text-slate-700 font-bold text-sm outline-none focus:ring-2 focus:ring-cyan-300 border border-transparent shadow-sm appearance-none cursor-pointer transition-shadow"
@@ -115,7 +115,7 @@ const NOCForm: React.FC = () => {
                 {isBothSelected && (
                     <div className="p-4 bg-slate-50 animate-in fade-in slide-in-from-top-2 duration-500">
                         <div className="bg-white border-2 border-blue-700 rounded-lg shadow-inner overflow-hidden">
-                            
+
                             {/* Letter Header - UPDATED COLOR TO MATCH SELECTION HEADER */}
                             <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 py-2 text-center relative overflow-hidden">
                                 <div className="absolute inset-0 gradient-shimmer pointer-events-none opacity-30"></div>
@@ -127,9 +127,9 @@ const NOCForm: React.FC = () => {
                                 <div className="space-y-6">
                                     <p className="font-semibold">Date: {new Date().toISOString().split('T')[0]} {new Date().toLocaleTimeString()}</p>
                                     <p><span className="font-bold">Subject:</span> <span className="underline italic">Declaration Letter for {selectedType}, Application Number: {selectedNumber}</span></p>
-                                    
+
                                     <p>Respected Sir,</p>
-                                    
+
                                     <p>I am authorized representative of Company <span className="font-bold uppercase">VYOMA INNOVUS GLOBAL PRIVATE LIMITED</span>, hereby submits the following documents (as indicated by UDIN numbers) for {selectedType}.</p>
 
                                     {/* Document Table */}
@@ -149,7 +149,7 @@ const NOCForm: React.FC = () => {
                                     </div>
 
                                     <p className="text-justify">On behalf as duly authorised & having competence to do so on behalf of <span className="font-bold">VYOMA INNOVUS GLOBAL PRIVATE LIMITED</span>, I declare that the Project Report as submitted above, is covered under IT & ITeS activities as notified by IT&E dept. vide notification 845-IT/O/117/2013 dated 12.7.2023 (UDIN: <span className="font-bold">23-GCA001177-O-1692009699994</span>). I shall indemnify and hold the state harmless, including all associated costs in case of any miss-representation.</p>
-                                    
+
                                     <p>I also understand that any kind of miss-representation will invite legal action as per law.</p>
 
                                     <div className="pt-4">
@@ -159,14 +159,14 @@ const NOCForm: React.FC = () => {
                             </div>
 
                             {/* Letter Footer Action - UPDATED COLOR */}
-                            <div className="bg-slate-50 p-3 border-t flex justify-end">
-                                <button 
+                            {!isWizard && <div className="bg-slate-50 p-3 border-t flex justify-end">
+                                <button
                                     onClick={() => setShowModal(true)}
                                     className="bg-blue-700 hover:bg-blue-800 text-white px-6 py-2 rounded text-xs font-bold transition-all shadow-md active:scale-95"
                                 >
                                     Verify Aadhaar
                                 </button>
-                            </div>
+                            </div>}
                         </div>
                     </div>
                 )}

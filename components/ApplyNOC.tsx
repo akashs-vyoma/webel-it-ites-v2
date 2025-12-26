@@ -476,7 +476,7 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
                     group relative bg-white rounded-xl p-4 border transition-all duration-200
                     ${isUploaded
                                                     ? 'border-green-100 bg-green-50/30'
-                                                    : 'border-slate-200 hover:border-blue-300 hover:shadow-md cursor-pointer'
+                                                    : 'border-slate-200 hover:border-blue-300 hover:shadow-md cursor-pointer hover:rounded-b-none'
                                                 }
                 `}
                                             onClick={() => !isUploaded && handleUploadClick(doc)}

@@ -1,12 +1,12 @@
 import React from 'react';
-import { CreditCard } from 'lucide-react'; 
+import { CreditCard } from 'lucide-react';
 
-const PaymentCard: React.FC = () => {
+const PaymentCard: React.FC<{ isWizard?: boolean }> = ({ isWizard = false }) => {
   return (
     <div className="flex justify-center items-center min-h-screen ">
       {/* Main Container */}
       <div className="w-full max-w-[600px] bg-white rounded-lg shadow-xl overflow-hidden border border-gray-200">
-        
+
         {/* Header Bar - Added relative, overflow-hidden and the shimmer div */}
         <div className="relative bg-blue-700 text-white py-3 px-6 text-lg font-medium overflow-hidden">
           <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
@@ -16,13 +16,13 @@ const PaymentCard: React.FC = () => {
         {/* Inner Card Content */}
         <div className="p-8">
           <div className="bg-white border border-gray-100 shadow-sm rounded-md p-6">
-            
+
             {/* Logo Section */}
             <div className="flex flex-col items-center mb-8">
-              <img 
-                src="webel-logo.png" 
-                alt="Company Logo" 
-                className="h-20 w-auto object-contain" 
+              <img
+                src="webel-logo.png"
+                alt="Company Logo"
+                className="h-20 w-auto object-contain"
               />
             </div>
 
@@ -52,9 +52,9 @@ const PaymentCard: React.FC = () => {
                   <span>GST @18%</span>
                   <span>₹ 139.35</span>
                 </div>
-                
+
                 <hr className="border-gray-300" />
-                
+
                 <div className="flex justify-between font-bold">
                   <span>Total</span>
                   <span>₹ 913.55</span>
@@ -83,12 +83,12 @@ const PaymentCard: React.FC = () => {
         </div>
 
         {/* Footer with Button */}
-        <div className="bg-gray-50 px-6 py-4 flex justify-end border-t border-gray-200">
+        {!isWizard && <div className="bg-gray-50 px-6 py-4 flex justify-end border-t border-gray-200">
           <button className="bg-blue-700 hover:bg-blue-800 text-white flex items-center gap-2 px-6 py-2 rounded-xl transition-all font-medium">
             <CreditCard size={18} />
             Pay
           </button>
-        </div>
+        </div>}
 
       </div>
     </div>

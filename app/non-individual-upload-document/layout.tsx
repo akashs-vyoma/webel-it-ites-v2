@@ -8,7 +8,7 @@ import CommonBg from '@/components/common-bg'
 
 const layout = ({ children }: { children: React.ReactNode }) => {
     return (
-        <div className="min-h-screen flex flex-col relative font-sans text-gray-700 overflow-x-hidden">
+        <div className="min-h-screen w-full flex flex-col relative font-sans text-gray-700 overflow-x-hidden">
 
             {/* -------------------------------------------------------------
           BACKGROUND IMAGE LAYER (Screenshot 3)
@@ -24,7 +24,7 @@ const layout = ({ children }: { children: React.ReactNode }) => {
             {/* -------------------------------------------------------------
           MAIN CONTENT AREA
       ----------------------------------------------------------------- */}
-            <main className="relative z-10 flex-grow flex justify-center py-6 px-16">
+            <main className="relative z-10 flex-grow flex justify-center py-6 px-16 mx-auto">
                 {children}
             </main>
 

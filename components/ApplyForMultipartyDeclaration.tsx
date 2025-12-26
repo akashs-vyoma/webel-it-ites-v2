@@ -62,13 +62,13 @@ const FormInput: React.FC<FormInputProps> = ({
 
 // --- Reusable Section Header ---
 const SectionHeader: React.FC<{ title: string; icon?: React.ReactNode }> = ({ title, icon }) => (
-    <div className="bg-gradient-to-r from-blue-600 to-cyan-500 text-white py-3 px-5 text-sm font-semibold flex items-center gap-2 rounded-t-lg shadow-sm">
+    <div className="bg-slate-100 text-slate-500 py-3 px-5 text-md font-semibold flex items-center gap-2 rounded-t-lg shadow-sm">
         {icon && React.cloneElement(icon as React.ReactElement, {})}
         {title}
     </div>
 );
 
-const MultiOwnPropertyForm: React.FC = () => {
+const MultiOwnPropertyForm: React.FC<{ isWizard?: boolean }> = ({ isWizard = false }) => {
     return (
         <div className="min-h-screen  p-4 md:p-6 font-sans">
             <div className="w-full mx-auto bg-white shadow-xl rounded-xl border border-slate-100 overflow-hidden">
@@ -274,7 +274,7 @@ const MultiOwnPropertyForm: React.FC = () => {
                     </div>
 
                     {/* FOOTER BUTTON */}
-                    <div className="flex justify-center py-4">
+                    {!isWizard && <div className="flex justify-center py-4">
                         <button className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white text-sm font-bold py-3 px-8 rounded-full shadow-lg shadow-cyan-500/30 flex items-center gap-2 transition-all transform active:scale-95">
                             <div className="bg-white/20 p-1 rounded-full">
                                 <Search size={14} className="text-white" />
@@ -282,6 +282,7 @@ const MultiOwnPropertyForm: React.FC = () => {
                             Preview Multi-Owner Declaration Letter
                         </button>
                     </div>
+                    }
 
                 </div>
 

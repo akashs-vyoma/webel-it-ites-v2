@@ -36,7 +36,7 @@ interface AppDetailData {
     udinNumber: string;
 }
 
-const DocumentUploadHeader: React.FC = () => {
+const DocumentUploadHeader: React.FC<{ isWizard?: boolean }> = ({ isWizard = false }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -178,7 +178,7 @@ const DocumentUploadHeader: React.FC = () => {
     ) || [];
 
     return (
-        <div className="w-full max-w-screen mx-auto p-4 flex flex-col font-sans antialiased">
+        <div className="w-full max-w-screen p-4 flex flex-col font-sans antialiased">
 
             <div className="bg-white rounded-t-2xl shadow-md border border-slate-100 overflow-hidden">
 
@@ -366,9 +366,9 @@ const DocumentUploadHeader: React.FC = () => {
                             </table>
                         </div>
 
-                        <div className="flex justify-center pt-2">
+                        {!isWizard && <div className="flex justify-center pt-2">
                             <button className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-12 rounded-lg shadow-lg text-xs uppercase tracking-widest transition-all">Generate Declaration</button>
-                        </div>
+                        </div>}
                     </div>
                 </div>
             )}
