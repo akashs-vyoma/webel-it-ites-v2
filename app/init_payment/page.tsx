@@ -1,5 +1,5 @@
 
-import PaymentCard from '@/components/init_payment'
+import PaymentCard from '@/components/InitPayment'
 
 export default function page() {
     return (
