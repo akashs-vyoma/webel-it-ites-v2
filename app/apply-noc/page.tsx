@@ -6,7 +6,7 @@ import { Check, ClipboardEdit, CreditCard, FileCheck, FileUp, ListChecks, Send, 
 import DocumentUploadHeader from '@/components/ApplicationDocument';
 import NOCForm from '@/components/Noc';
 import MultiOwnPropertyForm from '@/components/ApplyForMultipartyDeclaration';
-import PaymentCard from '@/components/init_payment';
+import PaymentCard from '@/components/InitPayment';
 
 export default function WizardPage() {
     const [currentStep, setCurrentStep] = useState(1);
