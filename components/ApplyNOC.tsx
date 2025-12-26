@@ -47,15 +47,17 @@ interface Project {
 }
 
 interface CreateApplicationFormProps {
-    onNext: () => void;
+    category: string;
+    setCategory: (category: string) => void;
 }
 
-const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ onNext }) => {
+const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category, setCategory }) => {
     const [appType, setAppType] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [projects, setProjects] = useState<Project[]>([]);
     const [isLoadingProjects, setIsLoadingProjects] = useState(true);
     const [role, setRole] = useState("");
+    const [applicationTypes, setApplicationTypes] = useState([]);
 
     const [tenantList, setTenantList] = useState<any[]>([]);
     const [tenantForm, setTenantForm] = useState({
@@ -92,8 +94,11 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ onNext })
                     body: JSON.stringify({ "departmentID": 1 }),
                 });
                 const result = await response.json();
-                if (result && Array.isArray(result.data)) setProjects(result.data);
-                else if (Array.isArray(result)) setProjects(result);
+                console.log("result", result);
+                setApplicationTypes(result?.data);
+                const filteredProjects = result?.data?.filter((project: any) => project?.projectName?.includes(category));
+                if (result && Array.isArray(result?.data)) setProjects(filteredProjects);
+                else setProjects([]);
             } catch (error) {
                 console.error("Error fetching projects:", error);
             } finally {
@@ -104,6 +109,15 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ onNext })
         const loginType = localStorage.getItem("role");
         if (loginType) setRole(loginType);
     }, []);
+
+    useEffect(() => {
+        const filteredProjects = applicationTypes?.filter((project: any) => project?.projectName?.includes(category));
+        if (category) {
+            setProjects(filteredProjects)
+            localStorage.setItem("category", category);
+        }
+        else setProjects([]);
+    }, [category]);
 
     const requiredDocs = appType ? APPLICATION_DOCUMENTS[appType] || [] : [];
 
@@ -134,20 +148,36 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ onNext })
                         <h2 className="text-white text-lg font-semibold mb-4 tracking-wide uppercase">
                             {appType || "Create New Application"}
                         </h2>
-                        <div className="relative">
-                            <select
-                                value={appType}
-                                onChange={(e) => setAppType(e.target.value)}
-                                disabled={isLoadingProjects}
-                                className="w-full h-11 pl-4 pr-10 rounded-lg bg-white text-slate-700 font-bold text-sm outline-none focus:ring-4 focus:ring-cyan-500/30 transition-shadow appearance-none cursor-pointer disabled:bg-slate-100"
-                            >
-                                <option value="">{isLoadingProjects ? "Loading Projects..." : "Select Application Type"}</option>
-                                {projects.map((project, index) => (
-                                    <option key={index} value={project.projectName}>{project.projectName}</option>
-                                ))}
-                            </select>
-                            <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
-                                <ChevronDown className="w-5 h-5 text-slate-500" />
+                        <div className="flex gap-4">
+                            <div className="relative flex items-center col-span-2 w-[50%]">
+                                <select
+                                    value={category}
+                                    onChange={(e) => setCategory(e.target.value)}
+                                    className="w-full h-11 pl-4 pr-10 rounded-lg bg-white text-slate-700 font-bold text-sm outline-none focus:ring-4 focus:ring-cyan-500/30 transition-shadow appearance-none cursor-pointer disabled:bg-slate-100"
+                                >
+                                    <option value="">Select Application Category</option>
+                                    <option value="SINGLE">Single Owner</option>
+                                    <option value="MULTIPARTY">Multi-Owner</option>
+                                </select>
+                                <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+                                    <ChevronDown className="w-5 h-5 text-slate-500" />
+                                </div>
+                            </div>
+                            <div className="relative flex items-center col-span-2 w-[50%]">
+                                <select
+                                    value={appType}
+                                    onChange={(e) => setAppType(e.target.value)}
+                                    disabled={isLoadingProjects}
+                                    className="w-full h-11 pl-4 pr-10 rounded-lg bg-white text-slate-700 font-bold text-sm outline-none focus:ring-4 focus:ring-cyan-500/30 transition-shadow appearance-none cursor-pointer disabled:bg-slate-100"
+                                >
+                                    <option value="">{isLoadingProjects ? "Loading Projects..." : "Select Application Type"}</option>
+                                    {projects.map((project, index) => (
+                                        <option key={index} value={project.projectName}>{project.projectName}</option>
+                                    ))}
+                                </select>
+                                <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+                                    <ChevronDown className="w-5 h-5 text-slate-500" />
+                                </div>
                             </div>
                         </div>
                     </div>
