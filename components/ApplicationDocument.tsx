@@ -203,11 +203,13 @@ const DocumentUploadHeader: React.FC = () => {
 
     return (
         <div className="w-full max-w-screen mx-auto p-4 flex flex-col font-sans antialiased">
-
-            {/* SELECTION HEADER */}
+           
             <div className="bg-white rounded-t-2xl shadow-md border border-slate-100 overflow-hidden">
-                <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 p-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                
+                {/* SELECTION HEADER */}
+                <div className="relative bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 p-6 overflow-hidden">
+                    <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-20">
                         <div className="space-y-1.5">
                             <label className="text-blue-100 text-[10px] font-bold uppercase tracking-widest ml-1">Application Type</label>
                             <div className="relative group">
@@ -322,9 +324,10 @@ const DocumentUploadHeader: React.FC = () => {
             {/* TABLE 2: APPLICATION SPECIFIC */}
             {selectedAppID && (
                 <div className="bg-white rounded-b-2xl shadow-md border border-slate-100 overflow-hidden animate-in fade-in duration-300">
-                    <div className="bg-blue-700 p-4 flex justify-between items-center">
-                        <h2 className="text-white font-bold text-sm uppercase">Documents For Application Number {appDetail?.applicationNumber || "..."}</h2>
-                        <div className="relative w-56">
+                    <div className="relative bg-blue-700 p-4 flex justify-between items-center overflow-hidden">
+                        <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
+                        <h2 className="text-white font-bold text-sm uppercase relative z-20">Documents For Application Number {appDetail?.applicationNumber || "..."}</h2>
+                        <div className="relative w-56 z-20">
                             <Search className="absolute left-3 top-2 w-3.5 h-3.5 text-slate-400" />
                             <input
                                 type="text"
@@ -388,7 +391,7 @@ const DocumentUploadHeader: React.FC = () => {
                         </div>
 
                         <div className="flex justify-center pt-2">
-                            <button className="bg-indigo-700 hover:bg-indigo-800 text-white font-bold py-3 px-12 rounded-lg shadow-lg text-xs uppercase tracking-widest transition-all">Generate Declaration</button>
+                            <button className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-12 rounded-lg shadow-lg text-xs uppercase tracking-widest transition-all">Generate Declaration</button>
                         </div>
                     </div>
                 </div>
