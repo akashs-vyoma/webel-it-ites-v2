@@ -7,6 +7,7 @@ import DocumentUploadHeader from '@/components/ApplicationDocument';
 import NOCForm from '@/components/Noc';
 import MultiOwnPropertyForm from '@/components/ApplyForMultipartyDeclaration';
 import PaymentCard from '@/components/InitPayment';
+import CoSignerApplication from '@/components/CoSignerApplication';
 
 export default function WizardPage() {
     const [currentStep, setCurrentStep] = useState(1);
@@ -54,7 +55,7 @@ export default function WizardPage() {
             case 4:
                 return <NOCForm />;
             case 5:
-                return <div className="p-10 border-2 border-dashed rounded">Step 5: Payment Module Placeholder</div>;
+                return <CoSignerApplication />;
             case 6:
                 return <PaymentCard />;
             default:

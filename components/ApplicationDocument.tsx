@@ -1,6 +1,7 @@
 "use client";
 import React, { useRef, useState, useEffect } from 'react';
 import { PlusCircle, CheckCircle2, ChevronDown, Info, Eye, Trash2, Search, FileCheck, Plus } from 'lucide-react';
+import { callAPI } from './apis/commonAPIs';
 
 // Interfaces
 interface Project {
@@ -62,12 +63,7 @@ const DocumentUploadHeader: React.FC = () => {
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const response = await fetch('http://115.187.62.16:8005/ITEWBRestAPI/api/application/GetProjectDetailsByDeptID', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ "departmentID": 1 }),
-                });
-                const result = await response.json();
+                const result = await callAPI("/application/GetProjectDetailsByDeptID", { "departmentID": 1 });
                 if (result.status === 0) setProjects(result.data);
             } catch (err) { console.error(err); }
             finally { setIsProjectsLoading(false); }
@@ -88,12 +84,7 @@ const DocumentUploadHeader: React.FC = () => {
         const fetchApps = async () => {
             setIsAppsLoading(true);
             try {
-                const response = await fetch('http://115.187.62.16:8005/ITEWBRestAPI/api/application/GetApplicationNumber', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ "entryUser": 1, "projectID": parseInt(selectedProjectID) }),
-                });
-                const result = await response.json();
+                const result = await callAPI("/application/GetApplicationNumber", { "entryUser": 1, "projectID": parseInt(selectedProjectID) });
                 if (result.status === 0) setApplications(result.data);
             } catch (err) { console.error(err); }
             finally { setIsAppsLoading(false); }
@@ -105,12 +96,7 @@ const DocumentUploadHeader: React.FC = () => {
         if (!selectedAppID) return;
         setIsTable2Loading(true);
         try {
-            const res = await fetch('http://115.187.62.16:8005/ITEWBRestAPI/api/application/GetApplicationDetailsByApplicationID', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ "applicationID": parseInt(selectedAppID) }),
-            });
-            const result = await res.json();
+            const result = await callAPI("/application/GetApplicationDetailsByApplicationID", { "applicationID": parseInt(selectedAppID) });
             if (result.status === 0) setAppDetail(result.data);
         } catch (err) { console.error(err); }
         finally { setIsTable2Loading(false); }
@@ -127,12 +113,7 @@ const DocumentUploadHeader: React.FC = () => {
         const fetchPoolData = async () => {
             setIsTable1Loading(true);
             try {
-                const res = await fetch('http://115.187.62.16:8005/ITEWBRestAPI/api/application/GetUploadedDocumentDetailsByApplicationTypeID', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ "ownerID": 1, "applicationTypeID": 1, "userTypeID": 5 }),
-                });
-                const result = await res.json();
+                const result = await callAPI("/application/GetUploadedDocumentDetailsByApplicationTypeID", { "ownerID": 1, "applicationTypeID": 1, "userTypeID": 5 });
                 if (result.status === 0) setUdinDocs(result.data);
             } catch (err) { console.error(err); }
             finally { setIsTable1Loading(false); }
@@ -157,22 +138,17 @@ const DocumentUploadHeader: React.FC = () => {
 
         setIsLinking(true);
         try {
-            const response = await fetch('http://115.187.62.16:8005/ITEWBRestAPI/api/application/SetAssignUploadedDocByApplicationID', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    "application_id": parseInt(selectedAppID),
-                    "doc_id": doc.docId,
-                    "application_no": appDetail.applicationNumber,
-                    "quotation_id": "",
-                    "udin_no": doc.udinNo,
-                    "application_amount": 0,
-                    "pay_mode": "ONLINE",
-                    "entry_user_id": 1
-                }),
+            const result = await callAPI("/application/SetAssignUploadedDocByApplicationID", {
+                "application_id": parseInt(selectedAppID),
+                "doc_id": doc.docId,
+                "application_no": appDetail.applicationNumber,
+                "quotation_id": "",
+                "udin_no": doc.udinNo,
+                "application_amount": 0,
+                "pay_mode": "ONLINE",
+                "entry_user_id": 1
             });
 
-            const result = await response.json();
             if (result.status === 0) {
                 await fetchApplicationDetails();
             } else {
@@ -203,9 +179,9 @@ const DocumentUploadHeader: React.FC = () => {
 
     return (
         <div className="w-full max-w-screen mx-auto p-4 flex flex-col font-sans antialiased">
-           
+
             <div className="bg-white rounded-t-2xl shadow-md border border-slate-100 overflow-hidden">
-                
+
                 {/* SELECTION HEADER */}
                 <div className="relative bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 p-6 overflow-hidden">
                     <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
