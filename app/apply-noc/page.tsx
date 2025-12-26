@@ -82,11 +82,11 @@ export default function WizardPage() {
                             {/* Connecting Line */}
                             {index < steps.length - 1 && (
                                 <div
-                                    className="absolute top-6 left-[50%] w-full h-[2px] bg-gray-100 -z-0"
+                                    className="absolute top-6 left-[50%] w-full h-[3px] bg-gray-100 -z-0"
                                     aria-hidden="true"
                                 >
                                     <div
-                                        className={`h-full bg-blue-600 transition-all duration-500 ease-in-out ${isNextStepReached ? 'w-full' : 'w-0'
+                                        className={`h-full bg-blue-600 transition-all duration-1000 ease-in-out ${isNextStepReached ? 'w-full' : 'w-0'
                                             }`}
                                     />
                                 </div>
