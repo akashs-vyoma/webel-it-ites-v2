@@ -78,7 +78,7 @@ const MultiOwnPropertyForm: React.FC = () => {
                     {/* SHIMMER OVERLAY */}
                     <div className="absolute inset-0 gradient-shimmer pointer-events-none"></div>
                     <FileText size={24} className="text-cyan-300" />
-                    Generate Multi-Own Property Declaration
+                    Generate Multi-Owner Property Declaration
                 </div>
 
                 <div className="p-6 space-y-8">
@@ -105,16 +105,16 @@ const MultiOwnPropertyForm: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* SECTION 2: APPLICANTS DETAILS */}
+                    {/* SECTION 2: OwnerS DETAILS */}
                     <div className="shadow-sm rounded-lg border border-slate-100">
-                        <SectionHeader title="Applicants Details" icon={<Users />} />
+                        <SectionHeader title="Owners Details" icon={<Users />} />
                         <div className="p-6 space-y-8 bg-white rounded-b-lg">
 
                             {/* 2.1 Add Yourself */}
                             <div className="bg-slate-50/50 border border-blue-100 rounded-lg overflow-hidden">
                                 <div className="bg-blue-100/50 text-blue-800 py-2.5 px-4 text-xs font-bold uppercase tracking-wide flex items-center gap-2 border-b border-blue-100">
                                     <div className="bg-blue-600 text-white p-1 rounded-full"><Plus size={12} /></div>
-                                    Add Yourself As First Applicant
+                                    Add Yourself As First Owner
                                 </div>
                                 <div className="p-5">
                                     <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-5">
@@ -134,11 +134,11 @@ const MultiOwnPropertyForm: React.FC = () => {
                                 </div>
                             </div>
 
-                            {/* 2.2 Add Other Applicants */}
+                            {/* 2.2 Add Other Owners */}
                             <div className="bg-slate-50/50 border border-slate-200 rounded-lg overflow-hidden">
                                 <div className="bg-slate-100 text-slate-700 py-2.5 px-4 text-xs font-bold uppercase tracking-wide flex items-center gap-2 border-b border-slate-200">
                                     <div className="bg-slate-600 text-white p-1 rounded-full"><Users size={12} /></div>
-                                    Add Your Other Applicants Details
+                                    Add Your Other Owners Details
                                 </div>
                                 <div className="p-5">
                                     <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-5">
@@ -166,17 +166,17 @@ const MultiOwnPropertyForm: React.FC = () => {
                                     </div>
                                     <div className="flex justify-end">
                                         <button className="bg-slate-600 hover:bg-slate-700 text-white text-xs font-bold py-2.5 px-6 rounded-lg shadow-md flex items-center gap-2 transition-all">
-                                            <Users size={16} /> Add Other Applicants
+                                            <Users size={16} /> Add Other Owners
                                         </button>
                                     </div>
                                 </div>
                             </div>
 
-                            {/* 2.3 Applicants Table */}
+                            {/* 2.3 Owners Table */}
                             <div className="mt-8 shadow-sm rounded-lg overflow-hidden border border-slate-200">
                                 <div className="bg-slate-100 px-4 py-3 border-b border-slate-200 flex justify-between items-center">
                                     <h4 className="text-sm font-bold text-slate-700 flex items-center gap-2">
-                                        <FileText size={16} className="text-blue-600" /> Applicants List
+                                        <FileText size={16} className="text-blue-600" /> Owners List
                                     </h4>
 
                                     {/* Table Controls */}
@@ -213,7 +213,7 @@ const MultiOwnPropertyForm: React.FC = () => {
                                             <tbody className="divide-y divide-slate-100">
                                                 <tr>
                                                     <td colSpan={6} className="p-8 text-center text-slate-400 italic">
-                                                        No applicants added yet
+                                                        No Owners added yet
                                                     </td>
                                                 </tr>
                                             </tbody>

@@ -46,7 +46,11 @@ interface Project {
     projectName: string;
 }
 
-const CreateApplicationForm: React.FC = () => {
+interface CreateApplicationFormProps {
+    onNext: () => void;
+}
+
+const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ onNext }) => {
     const [appType, setAppType] = useState("");
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [projects, setProjects] = useState<Project[]>([]);
@@ -63,6 +67,8 @@ const CreateApplicationForm: React.FC = () => {
 
     const handleAddTenant = () => {
         // Basic Validation: Ensure fields aren't empty
+        console.log("tenantForm", tenantForm);
+
         if (!tenantForm.tenantName || !tenantForm.tenantGstn || !tenantForm.tenantPan || !tenantForm.tenantActivity) {
             alert("Please fill all tenant details before adding.");
             return;
@@ -216,19 +222,19 @@ const CreateApplicationForm: React.FC = () => {
                                         label="Tenant Name" icon={<User size={18} />}
                                         placeholder="Enter Name" required
                                         value={tenantForm.tenantName}
-                                        onChange={(e) => setTenantForm({ ...tenantForm, tenantName: e.target.value })}
+                                        onChange={(e) => setTenantForm((prev) => ({ ...prev, tenantName: e.target.value }))}
                                     />
                                     <InputGroup
                                         label="Tenant GSTN No." icon={<Hash size={18} />}
                                         placeholder="Enter GSTN" required
                                         value={tenantForm.tenantGstn}
-                                        onChange={(e) => setTenantForm({ ...tenantForm, tenantGstn: e.target.value })}
+                                        onChange={(e) => setTenantForm((prev) => ({ ...prev, tenantGstn: e.target.value }))}
                                     />
                                     <InputGroup
                                         label="Tenant PAN No." icon={<CreditCard size={18} />}
                                         placeholder="Enter PAN" required
                                         value={tenantForm.tenantPan}
-                                        onChange={(e) => setTenantForm({ ...tenantForm, tenantPan: e.target.value })}
+                                        onChange={(e) => setTenantForm((prev) => ({ ...prev, tenantPan: e.target.value }))}
                                     />
 
                                     <div className="flex flex-col gap-1.5">
@@ -239,7 +245,7 @@ const CreateApplicationForm: React.FC = () => {
                                             <select
                                                 className="w-full h-10 px-3 pr-10 rounded-lg border border-slate-300 text-sm font-bold outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-blue-400 bg-white"
                                                 value={tenantForm.tenantActivity}
-                                                onChange={(e) => setTenantForm({ ...tenantForm, tenantActivity: e.target.value })}
+                                                onChange={(e) => setTenantForm((prev) => ({ ...prev, tenantActivity: e.target.value }))}
                                             >
                                                 <option value="">Select Tenant Activity</option>
                                                 {TENANT_ACTIVITY_OPTIONS.map((opt, i) => (
@@ -264,7 +270,7 @@ const CreateApplicationForm: React.FC = () => {
                                 </div>
 
                                 {/* Preview Table */}
-                                {tenantList.length > 0 && (
+                                {tenantList?.length > 0 && (
                                     <div className="overflow-hidden border border-slate-200 rounded-xl shadow-sm">
                                         <table className="w-full text-left border-collapse">
                                             <thead className="bg-slate-100 border-b border-slate-200">
@@ -334,7 +340,7 @@ const CreateApplicationForm: React.FC = () => {
                             <p className="text-green-700 font-bold text-sm">
                                 Your Payable amount will be Rs.70800 <span className="text-xs font-normal">(*UDIN charges will be paid extra)</span>
                             </p>
-                            <SubmitButton onClick={() => setIsModalOpen(true)} label="Submit Application" />
+                            {/* <SubmitButton onClick={() => setIsModalOpen(true)} label="Submit Application" /> */}
                         </div>
                     </div>
                 </div>
@@ -410,6 +416,8 @@ const InputGroup: React.FC<InputGroupProps> = ({ label, icon, placeholder, requi
                 <input
                     type={type}
                     placeholder={placeholder}
+                    value={value}
+                    onChange={onChange}
                     className="flex-1 px-3 text-sm font-bold outline-none h-full bg-white text-slate-800 placeholder:text-slate-400"
                 />
             </div>

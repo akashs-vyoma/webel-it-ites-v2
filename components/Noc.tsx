@@ -37,7 +37,7 @@ const NOCForm: React.FC = () => {
 
                 {/* --- HEADER: COMPACT NEON BLUE GRADIENT (Matched Size: py-3) --- */}
                 <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-500 px-6 py-3">
-                    
+
                     {/* Shimmer Effect */}
                     <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
 
@@ -49,8 +49,8 @@ const NOCForm: React.FC = () => {
                             Application Details
                         </h2>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4"> 
-                            
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+
                             {/* Dropdown 1: Application Type */}
                             <div className="flex flex-col gap-1 group">
                                 <label className="text-blue-50 text-[11px] font-bold uppercase tracking-wider pl-1">
@@ -100,7 +100,7 @@ const NOCForm: React.FC = () => {
                             <Info size={14} className="text-[#4c4f95]" />
                         </div>
                         <p>
-                            <span className="font-bold text-black">Instruction:</span> To Generate Declaration Letter please select <span className="font-bold text-black">Application Type</span> from the drop down, then select <span className="font-bold text-black">Application Number</span>. All documents with UDIN Number will show with pre-defined format. Check the letter and click on 
+                            <span className="font-bold text-black">Instruction:</span> To Generate Declaration Letter please select <span className="font-bold text-black">Application Type</span> from the drop down, then select <span className="font-bold text-black">Application Number</span>. All documents with UDIN Number will show with pre-defined format. Check the letter and click on
                             <button
                                 onClick={() => setShowModal(true)}
                                 className="font-bold text-blue-600 hover:text-blue-800 ml-1 cursor-pointer outline-none hover:underline underline-offset-2 transition-all"
@@ -121,8 +121,8 @@ const NOCForm: React.FC = () => {
                                 <h2 className="text-white text-base font-bold tracking-wide">
                                     Verify Aadhaar Number
                                 </h2>
-                                <button 
-                                    onClick={() => setShowModal(false)} 
+                                <button
+                                    onClick={() => setShowModal(false)}
                                     className="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-1 rounded-md transition-all"
                                 >
                                     <X size={18} />

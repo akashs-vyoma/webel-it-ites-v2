@@ -32,7 +32,7 @@ interface AppDetailData {
     applicationNumber: string;
     companyName: string;
     documents: AppDoc[];
-    udinNumber: string; 
+    udinNumber: string;
 }
 
 const DocumentUploadHeader: React.FC = () => {
@@ -42,19 +42,19 @@ const DocumentUploadHeader: React.FC = () => {
     const [projects, setProjects] = useState<Project[]>([]);
     const [selectedProjectID, setSelectedProjectID] = useState<string>("");
     const [selectedProjectName, setSelectedProjectName] = useState<string>("");
-    
+
     const [applications, setApplications] = useState<ApplicationNumber[]>([]);
     const [selectedAppID, setSelectedAppID] = useState<string>("");
-    
+
     const [isProjectsLoading, setIsProjectsLoading] = useState(true);
     const [isAppsLoading, setIsAppsLoading] = useState(false);
     const [isTable1Loading, setIsTable1Loading] = useState(false);
     const [isTable2Loading, setIsTable2Loading] = useState(false);
     const [isLinking, setIsLinking] = useState(false); // New linking state
 
-    const [udinDocs, setUdinDocs] = useState<UDINDocument[]>([]); 
-    const [appDetail, setAppDetail] = useState<AppDetailData | null>(null); 
-    
+    const [udinDocs, setUdinDocs] = useState<UDINDocument[]>([]);
+    const [appDetail, setAppDetail] = useState<AppDetailData | null>(null);
+
     const [searchTermUDIN, setSearchTermUDIN] = useState("");
     const [searchTermApp, setSearchTermApp] = useState("");
 
@@ -69,7 +69,7 @@ const DocumentUploadHeader: React.FC = () => {
                 });
                 const result = await response.json();
                 if (result.status === 0) setProjects(result.data);
-            } catch (err) { console.error(err); } 
+            } catch (err) { console.error(err); }
             finally { setIsProjectsLoading(false); }
         };
         fetchProjects();
@@ -108,7 +108,7 @@ const DocumentUploadHeader: React.FC = () => {
             const res = await fetch('http://115.187.62.16:8005/ITEWBRestAPI/api/application/GetApplicationDetailsByApplicationID', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ "applicationID": parseInt(selectedAppID) }), 
+                body: JSON.stringify({ "applicationID": parseInt(selectedAppID) }),
             });
             const result = await res.json();
             if (result.status === 0) setAppDetail(result.data);
@@ -130,7 +130,7 @@ const DocumentUploadHeader: React.FC = () => {
                 const res = await fetch('http://115.187.62.16:8005/ITEWBRestAPI/api/application/GetUploadedDocumentDetailsByApplicationTypeID', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ "ownerID": 1, "applicationTypeID":1, "userTypeID": 5 }),
+                    body: JSON.stringify({ "ownerID": 1, "applicationTypeID": 1, "userTypeID": 5 }),
                 });
                 const result = await res.json();
                 if (result.status === 0) setUdinDocs(result.data);
@@ -164,7 +164,7 @@ const DocumentUploadHeader: React.FC = () => {
                     "application_id": parseInt(selectedAppID),
                     "doc_id": doc.docId,
                     "application_no": appDetail.applicationNumber,
-                    "quotation_id": "", 
+                    "quotation_id": "",
                     "udin_no": doc.udinNo,
                     "application_amount": 0,
                     "pay_mode": "ONLINE",
@@ -191,19 +191,19 @@ const DocumentUploadHeader: React.FC = () => {
         setAppDetail({ ...appDetail, documents: appDetail.documents.filter(d => d.applicationDocID !== id) });
     };
 
-    const filteredUdinDocs = udinDocs.filter(doc => 
-        doc.docName.toLowerCase().includes(searchTermUDIN.toLowerCase()) || 
+    const filteredUdinDocs = udinDocs.filter(doc =>
+        doc.docName.toLowerCase().includes(searchTermUDIN.toLowerCase()) ||
         doc.docType.toLowerCase().includes(searchTermUDIN.toLowerCase())
     );
 
-    const filteredAppDocs = appDetail?.documents.filter(doc => 
-        doc.documentName.toLowerCase().includes(searchTermApp.toLowerCase()) || 
+    const filteredAppDocs = appDetail?.documents.filter(doc =>
+        doc.documentName.toLowerCase().includes(searchTermApp.toLowerCase()) ||
         doc.documentType.toLowerCase().includes(searchTermApp.toLowerCase())
     ) || [];
 
     return (
-        <div className="w-full max-w-7xl mx-auto p-4 flex flex-col font-sans antialiased">
-            
+        <div className="w-full max-w-screen mx-auto p-4 flex flex-col font-sans antialiased">
+
             {/* SELECTION HEADER */}
             <div className="bg-white rounded-t-2xl shadow-md border border-slate-100 overflow-hidden">
                 <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 p-6">
@@ -211,7 +211,7 @@ const DocumentUploadHeader: React.FC = () => {
                         <div className="space-y-1.5">
                             <label className="text-blue-100 text-[10px] font-bold uppercase tracking-widest ml-1">Application Type</label>
                             <div className="relative group">
-                                <select 
+                                <select
                                     value={selectedProjectID}
                                     onChange={(e) => { setSelectedProjectID(e.target.value); setSelectedAppID(""); }}
                                     className="w-full h-11 px-4 rounded-xl bg-white/95 text-slate-800 font-bold text-sm outline-none appearance-none"
@@ -226,7 +226,7 @@ const DocumentUploadHeader: React.FC = () => {
                         <div className="space-y-1.5">
                             <label className="text-blue-100 text-[10px] font-bold uppercase tracking-widest ml-1">Application No</label>
                             <div className="relative group">
-                                <select 
+                                <select
                                     value={selectedAppID}
                                     onChange={(e) => setSelectedAppID(e.target.value)}
                                     disabled={!selectedProjectID || isAppsLoading}
@@ -251,8 +251,8 @@ const DocumentUploadHeader: React.FC = () => {
                             </div>
                             <div className="relative w-64">
                                 <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-400" />
-                                <input 
-                                    type="text" 
+                                <input
+                                    type="text"
                                     placeholder="Search UDIN pool..."
                                     value={searchTermUDIN}
                                     onChange={(e) => setSearchTermUDIN(e.target.value)}
@@ -285,14 +285,14 @@ const DocumentUploadHeader: React.FC = () => {
                                                 <td className="px-4 py-3">{doc.docName}</td>
                                                 <td className="px-4 py-3"><span className="bg-green-500 text-white px-2 py-0.5 rounded-full text-[9px]">{doc.udinNo}</span></td>
                                                 <td className="px-4 py-3 text-slate-400">{formatTimestamp(doc.uploadOn)}</td>
-                                                <td className="px-4 py-3 text-center"><button className="p-1.5 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition-all"><Eye size={14}/></button></td>
+                                                <td className="px-4 py-3 text-center"><button className="p-1.5 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition-all"><Eye size={14} /></button></td>
                                                 <td className="px-4 py-3 text-center">
-                                                    <button 
-                                                        onClick={() => handleAddFromUDIN(doc)} 
+                                                    <button
+                                                        onClick={() => handleAddFromUDIN(doc)}
                                                         disabled={isLinking}
                                                         className="p-1.5 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition-all disabled:opacity-50"
                                                     >
-                                                        <Plus size={14}/>
+                                                        <Plus size={14} />
                                                     </button>
                                                 </td>
                                             </tr>
@@ -307,9 +307,9 @@ const DocumentUploadHeader: React.FC = () => {
                 )}
             </div>
 
-            
+
             <div className="bg-[#FFF8E1] border-x border-slate-100 p-4">
-                <div 
+                <div
                     onClick={() => fileInputRef.current?.click()}
                     className="bg-[#FFB800] hover:bg-[#FFA000] text-[#7B1D1D] px-6 py-3 rounded-lg flex items-center gap-3 cursor-pointer shadow-sm transition-all"
                 >
@@ -326,8 +326,8 @@ const DocumentUploadHeader: React.FC = () => {
                         <h2 className="text-white font-bold text-sm uppercase">Documents For Application Number {appDetail?.applicationNumber || "..."}</h2>
                         <div className="relative w-56">
                             <Search className="absolute left-3 top-2 w-3.5 h-3.5 text-slate-400" />
-                            <input 
-                                type="text" 
+                            <input
+                                type="text"
                                 placeholder="Search application docs..."
                                 value={searchTermApp}
                                 onChange={(e) => setSearchTermApp(e.target.value)}
@@ -347,7 +347,7 @@ const DocumentUploadHeader: React.FC = () => {
                             <div className="space-y-1">
                                 <label className="text-slate-400 text-[10px] font-bold uppercase">Company Name</label>
                                 <div className="flex items-center gap-3 h-11 px-4 rounded-lg bg-slate-50 border font-bold text-slate-700 text-sm">
-                                    <div className="p-1 bg-blue-600 rounded text-white"><Search size={12}/></div> {appDetail?.companyName}
+                                    <div className="p-1 bg-blue-600 rounded text-white"><Search size={12} /></div> {appDetail?.companyName}
                                 </div>
                             </div>
                         </div>
@@ -376,8 +376,8 @@ const DocumentUploadHeader: React.FC = () => {
                                                 <td className="px-4 py-3">{doc.documentName}</td>
                                                 <td className="px-4 py-3"><span className="bg-green-500 text-white px-2 py-0.5 rounded-full text-[9px]">{appDetail?.udinNumber}</span></td>
                                                 <td className="px-4 py-3 text-slate-400">{doc.docUploadOn}</td>
-                                                <td className="px-4 py-3 text-center"><button className="p-1.5 bg-blue-100 text-blue-600 rounded-full"><Eye size={14}/></button></td>
-                                                <td className="px-4 py-3 text-center"><button onClick={() => handleDelete(doc.applicationDocID)} className="p-1.5 bg-blue-100 text-red-600 rounded-full hover:bg-red-600 hover:text-white transition-all"><Trash2 size={14}/></button></td>
+                                                <td className="px-4 py-3 text-center"><button className="p-1.5 bg-blue-100 text-blue-600 rounded-full"><Eye size={14} /></button></td>
+                                                <td className="px-4 py-3 text-center"><button onClick={() => handleDelete(doc.applicationDocID)} className="p-1.5 bg-blue-100 text-red-600 rounded-full hover:bg-red-600 hover:text-white transition-all"><Trash2 size={14} /></button></td>
                                             </tr>
                                         ))
                                     ) : (
