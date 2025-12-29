@@ -1,6 +1,7 @@
 "use client"
 import React from 'react'
 import Image from 'next/image'
+import { assetConfig } from './asset-config'
 
 const CommonBg = () => {
     return (
@@ -8,7 +9,7 @@ const CommonBg = () => {
             <Image
                 width={1920}
                 height={1080}
-                src="/11234.jpeg"
+                src={`${assetConfig}/11234.jpeg`}
                 alt="Background Pattern"
                 className="w-full h-full object-cover mix-blend-dark opacity-60"
             />
