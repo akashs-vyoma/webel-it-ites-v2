@@ -26,6 +26,7 @@ import {
     ChevronRight
 } from 'lucide-react';
 import NonIndividualUploadDoc from './NonIndividualUploadDoc';
+import { callAPI } from './apis/commonAPIs';
 
 // --- DOCUMENT LOOKUP TABLE ---
 const APPLICATION_DOCUMENTS: Record<string, string[]> = {
@@ -117,12 +118,9 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
     useEffect(() => {
         const fetchProjects = async () => {
             try {
-                const response = await fetch('http://115.187.62.16:8005/ITEWBRestAPI/api/application/GetProjectDetailsByDeptID', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ "departmentID": 1 }),
+                const result = await callAPI('/application/GetProjectDetailsByDeptID', {
+                    "departmentID": 1
                 });
-                const result = await response.json();
                 console.log("result", result);
                 setApplicationTypes(result?.data);
                 const filteredProjects = result?.data?.filter((project: any) => project?.projectName?.includes(category));

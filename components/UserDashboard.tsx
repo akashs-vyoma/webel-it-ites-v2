@@ -10,6 +10,7 @@ import {
     Sparkles
 } from 'lucide-react';
 import { assetConfig } from './asset-config';
+import { callAPI } from './apis/commonAPIs';
 
 // Define the interface for the API response
 interface DashboardData {
@@ -29,18 +30,10 @@ const UserDashboard: React.FC = () => {
     useEffect(() => {
         const fetchDashboardDetails = async () => {
             try {
-                const response = await fetch('http://115.187.62.16:8005/ITEWBRestAPI/api/user/GetDashboardDetails', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        "ownerID": 2,
-                        "userTypeID": 1
-                    }),
+                const result = await callAPI('/user/GetDashboardDetails', {
+                    "ownerID": 2,
+                    "userTypeID": 1
                 });
-
-                const result = await response.json();
 
                 if (result.status === 0) {
                     setDashboardData(result.data);
