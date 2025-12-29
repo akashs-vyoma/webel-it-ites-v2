@@ -57,7 +57,7 @@ export default function WizardPage() {
             case 2:
                 return <DocumentUploadHeader applicationNo={applicationNo} applicationType={applicationType} category={category} isWizard={true} />;
             case 3:
-                return <MultiOwnPropertyForm applicationNo={applicationNo} applicationType={applicationType} category={category} isWizard={true} />;
+                return <MultiOwnPropertyForm isWizard={true} />;
             case 4:
                 return <NOCForm applicationNo={applicationNo} applicationType={applicationType} category={category} isWizard={true} />;
             case 5:

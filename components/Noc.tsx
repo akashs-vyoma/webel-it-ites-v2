@@ -1,27 +1,44 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Eye, X, ChevronDown, FileText, Info } from 'lucide-react';
+import { callAPI } from './apis/commonAPIs';
 
 // --- OPTIONS DATA ---
-const applicationTypes = [
-    "Select Application Type",
-    "DPR of IT & ITeS - Vetting - SINGLE PARTY",
-    "NOC for Renting Out Leased property - SINGLE PARTY",
-    "Certificate for Tax Exemption - SINGLE PARTY",
-    "DPR of IT & ITeS - vetting - MULTIPARTY",
-    "NOC for Renting Out Leased property - MULTIPARTY",
-    "Certificate for Tax Exemption - MULTIPARTY",
-    "Renewal of NOC Renting out Leased Property - SINGLE PARTY",
-    "Renewal of NOC Renting out Leased Property - MULTI PARTY"
-];
+// const applicationTypes = [
+//     "Select Application Type",
+//     "DPR of IT & ITeS - Vetting - SINGLE PARTY",
+//     "NOC for Renting Out Leased property - SINGLE PARTY",
+//     "Certificate for Tax Exemption - SINGLE PARTY",
+//     "DPR of IT & ITeS - vetting - MULTIPARTY",
+//     "NOC for Renting Out Leased property - MULTIPARTY",
+//     "Certificate for Tax Exemption - MULTIPARTY",
+//     "Renewal of NOC Renting out Leased Property - SINGLE PARTY",
+//     "Renewal of NOC Renting out Leased Property - MULTI PARTY"
+// ];
 
 const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicationType?: string, category?: string }> = ({ isWizard = false, applicationNo = "", applicationType = "", category = "" }) => {
     const [showModal, setShowModal] = useState(false);
-    const [selectedType, setSelectedType] = useState(applicationTypes[0]);
+    const [applicationTypes, setApplicationTypes] = useState([]);
+    const [selectedType, setSelectedType] = useState("");
     const [selectedNumber, setSelectedNumber] = useState("Select Application Number");
+    const [isProjectsLoading, setIsProjectsLoading] = useState(true);
 
     // Logic to check if both are selected
-    const isBothSelected = selectedType !== applicationTypes[0] && selectedNumber !== "Select Application Number";
+    // const isBothSelected = selectedType !== applicationTypes[0] && selectedNumber !== "Select Application Number";
+
+    useEffect(() => {
+        const fetchProjects = async () => {
+            try {
+                const result = await callAPI("/application/GetProjectDetailsByDeptID", { "departmentID": 1 });
+                if (result.status === 0) {
+                    setApplicationTypes(result.data)
+                    applicationType && setSelectedType(applicationType);
+                };
+            } catch (err) { console.error(err); }
+            finally { setIsProjectsLoading(false); }
+        };
+        fetchProjects();
+    }, []);
 
     return (
         <>
@@ -69,8 +86,9 @@ const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicatio
                                         onChange={(e) => setSelectedType(e.target.value)}
                                         className="w-full h-9 px-3 pr-8 rounded-md bg-white text-slate-700 font-bold text-sm outline-none focus:ring-2 focus:ring-cyan-300 border border-transparent shadow-sm appearance-none cursor-pointer transition-shadow"
                                     >
-                                        {applicationTypes.map((type, index) => (
-                                            <option key={index} value={type}>{type}</option>
+                                        <option value="">{isProjectsLoading ? "Loading..." : "Select Type"}</option>
+                                        {applicationTypes.map((type: any, index: number) => (
+                                            <option key={index} value={type.projectId}>{type.projectName}</option>
                                         ))}
                                     </select>
                                     <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
