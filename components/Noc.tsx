@@ -22,9 +22,8 @@ const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicatio
     const [selectedType, setSelectedType] = useState("");
     const [selectedNumber, setSelectedNumber] = useState("Select Application Number");
     const [isProjectsLoading, setIsProjectsLoading] = useState(true);
-
-    // Logic to check if both are selected
-    // const isBothSelected = selectedType !== applicationTypes[0] && selectedNumber !== "Select Application Number";
+    const [isBothSelected, setIsBothSelected] = useState(false);
+    const [applications, setApplications] = useState([]);
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -39,6 +38,23 @@ const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicatio
         };
         fetchProjects();
     }, []);
+
+    useEffect(() => {
+        if (!selectedType) { setApplications([]); return; }
+
+        const fetchApps = async () => {
+            try {
+                const result = await callAPI("/application/GetApplicationNumber", { "entryUser": 1, "projectID": parseInt(selectedType) });
+                if (result.status === 0) setApplications(result.data);
+                applicationNo && setSelectedNumber(applicationNo);
+            } catch (err) { console.error(err); }
+        };
+        fetchApps();
+    }, [selectedType]);
+
+    // useEffect(() => {
+    //     setIsBothSelected(selectedType !== applicationTypes[0] && selectedNumber !== "Select Application Number");
+    // }, [selectedType, selectedNumber]);
 
     return (
         <>
@@ -88,7 +104,7 @@ const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicatio
                                     >
                                         <option value="">{isProjectsLoading ? "Loading..." : "Select Type"}</option>
                                         {applicationTypes.map((type: any, index: number) => (
-                                            <option key={index} value={type.projectId}>{type.projectName}</option>
+                                            <option key={index} value={type.projectID}>{type.projectName}</option>
                                         ))}
                                     </select>
                                     <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
@@ -107,7 +123,8 @@ const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicatio
                                         onChange={(e) => setSelectedNumber(e.target.value)}
                                         className="w-full h-9 px-3 pr-8 rounded-md bg-white text-slate-700 font-bold text-sm outline-none focus:ring-2 focus:ring-cyan-300 border border-transparent shadow-sm appearance-none cursor-pointer transition-shadow"
                                     >
-                                        <option>Select Application Number</option>
+                                        <option value="">Select Application Number</option>
+                                        {applications.map((app: any, index: number) => <option key={index} value={app.applicationNumber}>{app.applicationNumber}</option>)}
                                         <option value="AP/DPRITVET/643/20251222071220">AP/DPRITVET/643/20251222071220</option>
                                     </select>
                                     <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">

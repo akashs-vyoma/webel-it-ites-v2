@@ -173,7 +173,7 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
 
                     <div className="relative overflow-hidden bg-gradient-to-r from-blue-600 to-cyan-500 p-6">
                         <h2 className="text-white text-lg font-semibold mb-4 tracking-wide uppercase">
-                            {appType || "Create New Application"}
+                            {"Create New Application"}
                         </h2>
                         <div className="flex gap-4">
                             <div className="relative flex items-center col-span-2 w-[50%]">
@@ -205,7 +205,7 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
                                 >
                                     <option value="">{isLoadingProjects ? "Loading Projects..." : "Select Application Type"}</option>
                                     {projects.map((project, index) => (
-                                        <option key={index} value={project.projectName}>{project.projectName}</option>
+                                        <option key={index} value={project.projectID}>{project.projectName}</option>
                                     ))}
                                 </select>
                                 <div className="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">

@@ -51,6 +51,7 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
             try {
                 const result = await callAPI("/application/GetProjectDetailsByDeptID", { "departmentID": 1 });
                 if (result.status === 0) setProjects(result.data);
+                applicationType && setSelectedProjectID(applicationType);
             } catch (err) { console.error(err); }
             finally { setIsProjectsLoading(false); }
         };
@@ -68,6 +69,10 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
             try {
                 const result = await callAPI("/application/GetApplicationNumber", { "entryUser": 1, "projectID": parseInt(selectedProjectID) });
                 if (result.status === 0) setApplications(result.data);
+                console.log("result.data", result.data);
+
+                const app = result.data.find((a: any) => a.applicationNumber == applicationNo);
+                setSelectedAppID(app?.applicationId.toString() || "");
             } catch (err) { console.error(err); }
             finally { setIsAppsLoading(false); }
         };

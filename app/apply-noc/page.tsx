@@ -28,7 +28,7 @@ export default function WizardPage() {
 
     const nextStep = () => {
         if (currentStep === 1) {
-            setApplicationNo("AP/DPRITVET/643/20251222071220");
+            setApplicationNo("AP/DPRITVET/432/20240105050148");
             setApplicationType(localStorage.getItem("application-type") || "");
             setCurrentStep((prev) => Math.min(prev + 1, totalSteps))
         } else if (currentStep === 2 && category === "SINGLE") setCurrentStep(4);
