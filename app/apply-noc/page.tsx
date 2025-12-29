@@ -12,6 +12,8 @@ import CoSignerApplication from '@/components/CoSignerApplication';
 export default function WizardPage() {
     const [currentStep, setCurrentStep] = useState(1);
     const [category, setCategory] = useState("");
+    const [applicationType, setApplicationType] = useState("");
+    const [applicationNo, setApplicationNo] = useState("");
     const totalSteps = 6;
 
     // Navigation logic
@@ -25,7 +27,10 @@ export default function WizardPage() {
     ];
 
     const nextStep = () => {
-        if (currentStep === 2 && category === "SINGLE") setCurrentStep(4);
+        if (currentStep === 1) {
+            setApplicationNo("AP/DPRITVET/643/20251222071220");
+            setApplicationType(localStorage.getItem("application-type") || "");
+        } else if (currentStep === 2 && category === "SINGLE") setCurrentStep(4);
         else setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
     };
 
@@ -49,11 +54,11 @@ export default function WizardPage() {
             case 1:
                 return <CreateApplicationForm category={category} setCategory={setCategory} />;
             case 2:
-                return <DocumentUploadHeader isWizard={true} />;
+                return <DocumentUploadHeader applicationNo={applicationNo} applicationType={applicationType} category={category} isWizard={true} />;
             case 3:
-                return <MultiOwnPropertyForm isWizard={true} />;
+                return <MultiOwnPropertyForm applicationNo={applicationNo} applicationType={applicationType} category={category} isWizard={true} />;
             case 4:
-                return <NOCForm isWizard={true} />;
+                return <NOCForm applicationNo={applicationNo} applicationType={applicationType} category={category} isWizard={true} />;
             case 5:
                 return <CoSignerApplication />;
             case 6:

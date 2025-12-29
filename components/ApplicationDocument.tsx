@@ -36,7 +36,7 @@ interface AppDetailData {
     udinNumber: string;
 }
 
-const DocumentUploadHeader: React.FC<{ isWizard?: boolean }> = ({ isWizard = false }) => {
+const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: string, applicationType?: string, category?: string }> = ({ isWizard = false, applicationNo = "", applicationType = "", category = "" }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 

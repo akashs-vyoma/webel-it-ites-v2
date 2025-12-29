@@ -15,7 +15,7 @@ const applicationTypes = [
     "Renewal of NOC Renting out Leased Property - MULTI PARTY"
 ];
 
-const NOCForm: React.FC<{ isWizard?: boolean }> = ({ isWizard = false }) => {
+const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicationType?: string, category?: string }> = ({ isWizard = false, applicationNo = "", applicationType = "", category = "" }) => {
     const [showModal, setShowModal] = useState(false);
     const [selectedType, setSelectedType] = useState(applicationTypes[0]);
     const [selectedNumber, setSelectedNumber] = useState("Select Application Number");

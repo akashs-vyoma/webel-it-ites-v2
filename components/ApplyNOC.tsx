@@ -179,7 +179,10 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
                             <div className="relative flex items-center col-span-2 w-[50%]">
                                 <select
                                     value={category}
-                                    onChange={(e) => setCategory(e.target.value)}
+                                    onChange={(e) => {
+                                        setCategory(e.target.value);
+                                        localStorage.setItem("category", e.target.value);
+                                    }}
                                     className="w-full h-11 pl-4 pr-10 rounded-lg bg-white text-slate-700 font-bold text-sm outline-none focus:ring-4 focus:ring-cyan-500/30 transition-shadow appearance-none cursor-pointer disabled:bg-slate-100"
                                 >
                                     <option value="">Select Application Category</option>
@@ -193,7 +196,10 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
                             <div className="relative flex items-center col-span-2 w-[50%]">
                                 <select
                                     value={appType}
-                                    onChange={(e) => setAppType(e.target.value)}
+                                    onChange={(e) => {
+                                        setAppType(e.target.value);
+                                        localStorage.setItem("application-type", e.target.value);
+                                    }}
                                     disabled={isLoadingProjects}
                                     className="w-full h-11 pl-4 pr-10 rounded-lg bg-white text-slate-700 font-bold text-sm outline-none focus:ring-4 focus:ring-cyan-500/30 transition-shadow appearance-none cursor-pointer disabled:bg-slate-100"
                                 >

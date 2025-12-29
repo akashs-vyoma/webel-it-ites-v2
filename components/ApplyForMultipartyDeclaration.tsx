@@ -68,7 +68,7 @@ const SectionHeader: React.FC<{ title: string; icon?: React.ReactNode }> = ({ ti
     </div>
 );
 
-const MultiOwnPropertyForm: React.FC<{ isWizard?: boolean }> = ({ isWizard = false }) => {
+const MultiOwnPropertyForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicationType?: string, category?: string }> = ({ isWizard = false, applicationNo = "", applicationType = "", category = "" }) => {
     return (
         <div className="min-h-screen  p-4 md:p-6 font-sans">
             <div className="w-full mx-auto bg-white shadow-xl rounded-xl border border-slate-100 overflow-hidden">
