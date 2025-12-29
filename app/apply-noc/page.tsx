@@ -30,6 +30,7 @@ export default function WizardPage() {
         if (currentStep === 1) {
             setApplicationNo("AP/DPRITVET/643/20251222071220");
             setApplicationType(localStorage.getItem("application-type") || "");
+            setCurrentStep((prev) => Math.min(prev + 1, totalSteps))
         } else if (currentStep === 2 && category === "SINGLE") setCurrentStep(4);
         else setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
     };
