@@ -28,7 +28,7 @@ interface AppDoc {
     documentType: string;
     docUploadOn: string;
     // Added fields from your JSON response to enable dynamic mapping
-    documentTypeID?: number; 
+    documentTypeID?: number;
     quotationID?: string;
     documentAmount?: number;
 }
@@ -40,7 +40,7 @@ interface AppDetailData {
     udinNumber: string;
 }
 
-const DocumentUploadHeader: React.FC = () => {
+const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: string, applicationType?: string, category?: string }> = ({ isWizard = false, applicationNo = "", applicationType = "", category = "" }) => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -416,15 +416,15 @@ const DocumentUploadHeader: React.FC = () => {
                             </table>
                         </div>
 
-                        <div className="flex justify-center pt-2">
-                            <button 
+                        {!isWizard && <div className="flex justify-center pt-2">
+                            <button
                                 onClick={handleGenerateDeclaration}
                                 disabled={isLinking || !appDetail}
                                 className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 px-12 rounded-lg shadow-lg text-xs uppercase tracking-widest transition-all disabled:opacity-50"
                             >
                                 {isLinking ? "Processing..." : "Generate Declaration"}
                             </button>
-                        </div>
+                        </div>}
                     </div>
                 </div>
             )}
