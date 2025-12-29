@@ -1,0 +1,1 @@
+export const assetConfig = "/itits-v2"

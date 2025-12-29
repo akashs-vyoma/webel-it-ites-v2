@@ -9,6 +9,7 @@ import {
     TrendingUp,
     Sparkles
 } from 'lucide-react';
+import { assetConfig } from './asset-config';
 
 // Define the interface for the API response
 interface DashboardData {
@@ -92,7 +93,7 @@ const UserDashboard: React.FC = () => {
                             <div className="relative z-10 h-full flex items-center justify-center p-8 lg:p-10">
                                 <div className="w-full max-w-md rounded-2xl overflow-hidden">
                                     <img
-                                        src="/7127980.jpg"
+                                        src={`${assetConfig}/7127980.jpg`}
                                         alt="Dashboard Illustration"
                                         className="w-full h-auto object-contain drop-shadow-xl transition-all duration-700 group-hover:scale-105 group-hover:drop-shadow-[0_20px_60px_rgba(6,182,212,0.25)]"
                                     />

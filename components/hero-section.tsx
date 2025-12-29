@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button"
 import { ArrowRight, FileText } from "lucide-react"
 import Link from "next/link"
+import { assetConfig } from "./asset-config"
 
 export function HeroSection() {
   return (
@@ -31,7 +32,7 @@ export function HeroSection() {
                 className="gap-2 border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground/10 font-semibold text-base px-8 bg-transparent"
                 asChild
               >
-                <Link href="/user-manual">
+                <Link href={`${assetConfig}/Webel_Online_Services_UserManual.pdf`}>
                   <FileText className="h-5 w-5" />
                   User Manual
                 </Link>
@@ -43,7 +44,7 @@ export function HeroSection() {
             <div className="relative w-full max-w-lg">
               <div className="rounded-full bg-primary-foreground/10 p-8">
                 <img
-                  src="/professional-illustration-of-person-working-at-des.jpg"
+                  src={`${assetConfig}/professional-illustration-of-person-working-at-des.jpg`}
                   alt="Document Management Illustration"
                   className="w-full h-auto"
                 />

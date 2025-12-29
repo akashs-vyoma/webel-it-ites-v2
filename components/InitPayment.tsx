@@ -1,5 +1,6 @@
 import React from 'react';
 import { CreditCard } from 'lucide-react';
+import { assetConfig } from './asset-config';
 
 const PaymentCard: React.FC<{ isWizard?: boolean }> = ({ isWizard = false }) => {
   return (
@@ -20,7 +21,7 @@ const PaymentCard: React.FC<{ isWizard?: boolean }> = ({ isWizard = false }) => 
             {/* Logo Section */}
             <div className="flex flex-col items-center mb-8">
               <img
-                src="webel-logo.png"
+                src={`${assetConfig}/webel-logo.png`}
                 alt="Company Logo"
                 className="h-20 w-auto object-contain"
               />

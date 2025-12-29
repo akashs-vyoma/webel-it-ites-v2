@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, ChevronDown, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import { assetConfig } from './asset-config';
 
 const Hero: React.FC = () => {
 
@@ -99,7 +100,7 @@ const Hero: React.FC = () => {
               </div>
               <a
                 download
-                href="./Webel_Online_Services_UserManual.pdf"
+                href={`${assetConfig}/Webel_Online_Services_UserManual.pdf`}
                 className="inline-flex items-center gap-2 px-8 py-4 bg-transparent border-2 border-white text-white rounded-full font-bold text-lg hover:bg-white/10 transition-all backdrop-blur-sm"
               >
                 <FileText className="w-5 h-5" />
@@ -113,7 +114,7 @@ const Hero: React.FC = () => {
           <div className="relative flex justify-center items-center order-1 lg:order-2">
             <div className="w-full max-w-[1000px] lg:max-w-full lg:scale-150 transform transition-transform">
               <DotLottieReact
-                src="Business.lottie"
+                src={`${assetConfig}/Business.lottie`}
                 loop
                 autoplay
                 className="w-full h-auto"

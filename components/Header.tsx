@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
+import { assetConfig } from './asset-config';
 
 const Header: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -29,7 +30,7 @@ const Header: React.FC = () => {
         <div className="flex items-center justify-between h-20">
           <Link href="/">
             <img
-              src="/webel-logo.png"
+              src={`${assetConfig}/webel-logo.png`}
               alt="Webel Logo"
               className="w-[100px] h-auto cursor-pointer"
             />
@@ -111,7 +112,7 @@ const Header: React.FC = () => {
 
             {/* Mobile Organization Accordion */}
             <div className="flex flex-col border-b border-gray-50">
-              <button 
+              <button
                 onClick={() => setIsOrgMobileOpen(!isOrgMobileOpen)}
                 className="flex items-center justify-between w-full py-4 text-[16px] font-medium text-gray-700 hover:text-[#1a73e8]"
               >
@@ -131,7 +132,7 @@ const Header: React.FC = () => {
 
             {/* Mobile User Accordion */}
             <div className="flex flex-col border-b border-gray-50">
-              <button 
+              <button
                 onClick={() => setIsUserMobileOpen(!isUserMobileOpen)}
                 className="flex items-center justify-between w-full py-4 text-[16px] font-medium text-gray-700 hover:text-[#1a73e8]"
               >
@@ -149,8 +150,8 @@ const Header: React.FC = () => {
               )}
             </div>
 
-            <Link 
-              href="#contact" 
+            <Link
+              href="#contact"
               className="text-[16px] font-medium text-gray-700 hover:text-[#1a73e8] py-4"
               onClick={closeMenu}
             >

@@ -10,6 +10,7 @@ import {
     TrendingUp,
     ChevronRight
 } from 'lucide-react';
+import { assetConfig } from './asset-config';
 
 const CompanyDashboard: React.FC = () => {
     return (
@@ -45,15 +46,15 @@ const CompanyDashboard: React.FC = () => {
                                     <div className="absolute inset-0 bg-gradient-to-tr from-cyan-400/20 via-transparent to-blue-500/20 blur-xl"></div>
                                 </div>
                             </div>
-                                                    <div className="relative z-10 h-full flex items-center justify-center p-8 lg:p-10">
-    <div className="w-full max-w-md rounded-2xl overflow-hidden">
-        <img
-            src="/7127980.jpg"
-            alt="Dashboard Illustration"
-            className="w-full h-auto object-contain drop-shadow-xl transition-all duration-700 group-hover:scale-105 group-hover:drop-shadow-[0_20px_60px_rgba(6,182,212,0.25)]"
-        />
-    </div>
-</div>
+                            <div className="relative z-10 h-full flex items-center justify-center p-8 lg:p-10">
+                                <div className="w-full max-w-md rounded-2xl overflow-hidden">
+                                    <img
+                                        src={`${assetConfig}/7127980.jpg`}
+                                        alt="Dashboard Illustration"
+                                        className="w-full h-auto object-contain drop-shadow-xl transition-all duration-700 group-hover:scale-105 group-hover:drop-shadow-[0_20px_60px_rgba(6,182,212,0.25)]"
+                                    />
+                                </div>
+                            </div>
                         </div>
                     </div>
 

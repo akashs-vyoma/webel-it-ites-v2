@@ -1,6 +1,7 @@
 import React from 'react';
 import { CheckCircle2, FileText, IndianRupee } from 'lucide-react';
 import Link from 'next/link';
+import { assetConfig } from './asset-config';
 
 interface ServiceItem {
   id: number;
@@ -128,7 +129,7 @@ const ServicesList: React.FC = () => {
                 </div>
 
                 <img
-                  src={service.image}
+                  src={`${assetConfig}${service.image}`}
                   alt={service.title}
                   className="w-full h-auto rounded-2xl shadow-xl border-4 border-white transform hover:scale-[1.02] transition-transform duration-300"
                 />
