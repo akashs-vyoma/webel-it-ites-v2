@@ -51,7 +51,7 @@ const UserDashboard: React.FC = () => {
     }, []);
 
     return (
-        <main className="relative z-10 min-h-screen selection:bg-cyan-200 selection:text-blue-900">
+        <main className="relative z-10 min-h-screen px-20 sm:px-6 lg:px-20 md:px-24 selection:bg-cyan-200 selection:text-blue-900">
             {/* Background gradient effects */}
             <div className="absolute top-0 left-0 w-full h-96 to-transparent -z-10"></div>
             <div className="absolute top-0 right-0 w-1/3 h-96 bg-gradient-to-bl from-cyan-100/40 via-blue-50/20 to-transparent blur-3xl -z-10"></div>
@@ -88,7 +88,7 @@ const UserDashboard: React.FC = () => {
                                     <img
                                         src={`${assetConfig}/7127980.jpg`}
                                         alt="Dashboard Illustration"
-                                        className="w-full h-auto object-contain drop-shadow-xl transition-all duration-700 group-hover:scale-105 group-hover:drop-shadow-[0_20px_60px_rgba(6,182,212,0.25)]"
+                                        className="w-full h-auto object-contain drop-shadow-xl transition-all duration-700 group-hover:scale-105 group-hover:drop-shadow-[0_20px_60px_rgba(6,182,212,0.50)]"
                                     />
                                 </div>
                             </div>

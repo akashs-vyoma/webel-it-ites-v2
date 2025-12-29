@@ -25,7 +25,7 @@ const layout = ({ children }: { children: React.ReactNode }) => {
             {/* -------------------------------------------------------------
           MAIN CONTENT AREA
       ----------------------------------------------------------------- */}
-            <main className="relative z-10 flex min-h-screen w-screen items-center justify-center">
+            <main className="relative z-10 flex min-h-screen items-center justify-center">
                 {children}
             </main>
 
