@@ -23,9 +23,14 @@ import {
     PhoneCall,
     CheckCircle2,
     AlertCircle,
-    ChevronRight
+    ChevronRight,
+    Loader2
 } from 'lucide-react';
 import NonIndividualUploadDoc from './NonIndividualUploadDoc';
+import {
+    Dialog,
+    DialogContent,
+} from "@/components/ui/dialog";
 import { callAPI } from './apis/commonAPIs';
 
 // --- DOCUMENT LOOKUP TABLE ---
@@ -59,6 +64,8 @@ interface CreateApplicationFormProps {
 
 const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category, setCategory }) => {
     const [appType, setAppType] = useState("");
+    const [requiredDocuments, setRequiredDocuments] = useState<any>([]);
+    const [isLoadingRequiredDocs, setIsLoadingRequiredDocs] = useState(false);
     const [uploadedDocs, setUploadedDocs] = useState<any>({
         "Balance Sheet": true,
         "IT Return": true,
@@ -78,12 +85,12 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
     const [activeDoc, setActiveDoc] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const handleUploadClick = (docName: any) => {
-        setActiveDoc(docName);
+    const handleUploadClick = (doc: any) => {
+        setActiveDoc(doc?.project_id);
         setIsModalOpen(true);
     };
     const [projects, setProjects] = useState<Project[]>([]);
-    const [isLoadingProjects, setIsLoadingProjects] = useState(true);
+    const [isLoadingProjects, setIsLoadingProjects] = useState(false);
     const [role, setRole] = useState("");
     const [applicationTypes, setApplicationTypes] = useState([]);
     const [verifierRole, setVerifierRole] = useState("");
@@ -115,38 +122,52 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
         setTenantList(tenantList.filter(t => t.id !== id));
     };
 
-    useEffect(() => {
-        const fetchProjects = async () => {
-            try {
-                const result = await callAPI('/application/GetProjectDetailsByDeptID', {
-                    "departmentID": 1
-                });
-                console.log("result", result);
-                setApplicationTypes(result?.data);
-                const filteredProjects = result?.data?.filter((project: any) => project?.projectName?.includes(category));
-                if (result && Array.isArray(result?.data)) setProjects(filteredProjects);
-                else setProjects([]);
-            } catch (error) {
-                console.error("Error fetching projects:", error);
-            } finally {
-                setIsLoadingProjects(false);
-            }
-        };
-        fetchProjects();
-        const loginType = localStorage.getItem("role");
-        if (loginType) setRole(loginType);
-    }, []);
+    const fetchProjects = async () => {
+        try {
+            const result = await callAPI('/application/GetProjectDetailsByDeptID', {
+                "departmentID": 1
+            });
+            console.log("result", result);
+            setApplicationTypes(result?.data);
+            const filteredProjects = result?.data?.filter((project: any) => project?.projectName?.includes(category));
+            if (result && Array.isArray(result?.data)) setProjects(filteredProjects);
+            else setProjects([]);
+        } catch (error) {
+            console.error("Error fetching projects:", error);
+        } finally {
+            setIsLoadingProjects(false);
+        }
+    };
 
     useEffect(() => {
-        const filteredProjects = applicationTypes?.filter((project: any) => project?.projectName?.includes(category));
+        const loginType = localStorage.getItem("role");
+        if (loginType) setRole(loginType);
         if (category) {
-            setProjects(filteredProjects)
+            fetchProjects();
             localStorage.setItem("category", category);
         }
         else setProjects([]);
     }, [category]);
 
-    const requiredDocs = appType ? APPLICATION_DOCUMENTS[appType] || [] : [];
+    const getRequiredDocumetListByProjectID = async (projectID: any) => {
+        try {
+            setIsLoadingProjects(true);
+            setIsLoadingRequiredDocs(true);
+            const result = await callAPI("/application/GetAllProjectDocByProjectID", { projectID });
+            setRequiredDocuments(result?.data || [])
+        } catch (erorr: any) {
+            console.log(erorr);
+        } finally {
+            setIsLoadingRequiredDocs(false);
+            setIsLoadingProjects(false);
+        }
+    }
+    useEffect(() => {
+
+        if (appType) {
+            getRequiredDocumetListByProjectID(appType);
+        }
+    }, [appType]);
 
     const isVetting = appType.toLowerCase().includes("vetting");
     const isRenting = appType.toLowerCase().includes("renting out") && !appType.toLowerCase().includes("renewal");
@@ -468,10 +489,12 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
                             <div className="bg-white rounded-lg p-3 shadow-sm border border-slate-200 flex justify-center items-center h-16">
                                 <span className="text-xs text-slate-400 italic">Select application type to see documents</span>
                             </div>
-                        ) : (
+                        ) : isLoadingRequiredDocs ? <div className="bg-white rounded-lg p-3 shadow-sm border border-slate-200 flex justify-center items-center gap-2 h-16">
+                            <Loader2 className='animate-spin text-slate-500' /> <span className="text-xs text-slate-400 italic">Loading...</span>
+                        </div> : (
                             <div className="max-h-[600px] overflow-y-auto flex flex-col gap-3 pr-1 custom-scrollbar">
-                                {requiredDocs.map((doc, idx) => {
-                                    const isUploaded = uploadedDocs[doc];
+                                {requiredDocuments?.map((doc: any, idx: number) => {
+                                    const isUploaded = uploadedDocs[doc?.project_name];
 
                                     return (
                                         <div
@@ -501,7 +524,7 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
                                                     {/* Text Details */}
                                                     <div>
                                                         <p className={`text-sm font-semibold ${isUploaded ? 'text-green-800' : 'text-slate-800'}`}>
-                                                            {doc}
+                                                            {doc?.project_name}
                                                         </p>
                                                         <p className="text-xs text-slate-500 mt-0.5">
                                                             {isUploaded ? 'Document verified and uploaded' : 'Required format: PDF'}
@@ -545,8 +568,10 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
 
             {/* Modal for Verifier */}
             {isModalOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-                    <NonIndividualUploadDoc isWizard={true} onClose={() => setIsModalOpen(false)} />
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-0">
+                    <div className='w-full max-w-screen max-h-screen overflow-y-auto rounded-xl'>
+                        <NonIndividualUploadDoc docId={activeDoc} isWizard={true} onClose={() => setIsModalOpen(false)} />
+                    </div>
                 </div>
             )}
         </div>

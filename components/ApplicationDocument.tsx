@@ -2,6 +2,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { PlusCircle, CheckCircle2, ChevronDown, Info, Eye, Trash2, Search, FileCheck, Plus } from 'lucide-react';
 import { callAPI } from './apis/commonAPIs';
+import NonIndividualUploadDoc from './NonIndividualUploadDoc';
 
 // Interfaces
 interface Project {
@@ -41,9 +42,7 @@ interface AppDetailData {
 }
 
 const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: string, applicationType?: string, category?: string }> = ({ isWizard = false, applicationNo = "", applicationType = "", category = "" }) => {
-    const fileInputRef = useRef<HTMLInputElement>(null);
-    const [selectedFile, setSelectedFile] = useState<File | null>(null);
-
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [projects, setProjects] = useState<Project[]>([]);
     const [selectedProjectID, setSelectedProjectID] = useState<string>("");
     const [selectedProjectName, setSelectedProjectName] = useState<string>("");
@@ -338,14 +337,19 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
 
             <div className="bg-[#FFF8E1] border-x border-slate-100 p-4">
                 <div
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() => setIsModalOpen(true)}
                     className="bg-[#FFB800] hover:bg-[#FFA000] text-[#7B1D1D] px-6 py-3 rounded-lg flex items-center gap-3 cursor-pointer shadow-sm transition-all"
                 >
                     <span className="font-bold text-sm">Upload new document. Click on the sign</span>
                     <PlusCircle size={20} />
                 </div>
-                <input type="file" ref={fileInputRef} className="hidden" onChange={(e) => setSelectedFile(e.target.files?.[0] || null)} />
+
             </div>
+            {isModalOpen && <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-0">
+                <div className='w-full max-w-screen max-h-screen overflow-y-auto rounded-xl'>
+                    <NonIndividualUploadDoc docId={""} isWizard={true} onClose={() => setIsModalOpen(false)} />
+                </div>
+            </div>}
 
             {/* TABLE 2: APPLICATION SPECIFIC */}
             {selectedAppID && (

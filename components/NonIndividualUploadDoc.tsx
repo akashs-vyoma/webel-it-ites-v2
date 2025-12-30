@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
     Upload,
     FileText,
@@ -18,18 +18,18 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 
-const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void }> = ({ isWizard, onClose }) => {
+const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void, docId: string }> = ({ isWizard, onClose, docId }) => {
     const [showModal, setShowModal] = useState(true);
 
     const [formData, setFormData] = useState({
         DocumentOwnership: '',
         DocValidity: '50',
         ApplicationID: '0',
-        DocTypeID: '0',
+        DocTypeID: docId || '0',
         DocFileSize: '',
         fileToUpload: null,
         UDINNumber: '',
-        UploadType: '',
+        UploadType: '1',
         DocName: '',
         DocDesc: '',
         DocRemarks: '',
@@ -45,6 +45,14 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void 
             setFormData({ ...formData, fileToUpload: event.target.files[0] || null });
         }
     };
+    useEffect(() => {
+        if (docId) document.body.style.overflow = "hidden";
+
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, []);
+
 
     const handleUploadClick = () => {
         fileInputRef.current?.click();
@@ -66,7 +74,7 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void 
         <div className="min-h-screen flex items-center justify-center p-4 font-sans z-[9999]">
 
             {/* Main Card - No Border, just Shadow */}
-            <div className="w-full max-w-4xl mx-auto bg-white shadow-2xl rounded-xl overflow-hidden z-[9999]">
+            <div className={`w-full ${isWizard ? "max-w-7xl" : ""} mx-auto bg-white shadow-2xl rounded-xl overflow-hidden z-[9999]`}>
 
                 {/* Header - Solid Background Color */}
                 <div className="relative bg-gradient-to-r from-blue-600 to-cyan-500 px-8 py-5 overflow-hidden">
@@ -85,12 +93,12 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void 
 
                 {/* Form Content */}
                 <div className="p-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                    <div className={`grid grid-cols-1 ${isWizard ? "md:grid-cols-3" : "md:grid-cols-2"} gap-x-12 gap-y-6`}>
 
                         {/* 1. Do Want to Upload Document? */}
                         <div>
                             <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
-                                Do Want to Upload Document? <span className="text-red-500 text-lg">*</span>
+                                Do Want to Upload Document? <span className="text-red-500 text-md">*</span>
                             </label>
                             <div className="relative">
                                 {/* Changed Dropdown Colors: Text is now Slate-700, Focus turns slightly blue */}
@@ -111,7 +119,7 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void 
                         {/* 7. UDIN Number Of the Document */}
                         {formData.UploadType !== "1" && <div>
                             <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
-                                UDIN Number Of the Document <span className="text-red-500 text-lg">*</span>
+                                UDIN Number Of the Document <span className="text-red-500 text-md">*</span>
                             </label>
                             <input
                                 type="text"
@@ -124,7 +132,7 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void 
                         {/* 2. Document Name */}
                         <div>
                             <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
-                                Document Name <span className="text-red-500 text-lg">*</span>
+                                Document Name <span className="text-red-500 text-md">*</span>
                             </label>
                             <input
                                 type="text"
@@ -137,13 +145,14 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void 
                         {/* 3. Select Document Type */}
                         <div>
                             <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
-                                Select Document Type <span className="text-red-500 text-lg">*</span>
+                                Select Document Type <span className="text-red-500 text-md">*</span>
                             </label>
                             <div className="relative">
                                 <select
                                     value={formData.DocTypeID}
+                                    disabled={!!docId}
                                     onChange={(e) => setFormData({ ...formData, DocTypeID: e.target.value })}
-                                    className="w-full border border-gray-300 rounded-lg text-sm px-4 py-3 outline-none focus:border-blue-500 focus:text-blue-700 bg-white text-slate-700 font-medium appearance-none transition-colors cursor-pointer">
+                                    className={`w-full border ${docId ? "disabled:bg-gray-50 disabled:text-gray-500" : ""} border-gray-300 rounded-lg text-sm px-4 py-3 outline-none focus:border-blue-500 focus:text-blue-700 bg-white text-slate-700 font-medium appearance-none transition-colors cursor-pointer`}>
                                     <option value="1">Project Report</option>
                                     <option value="2">MOA (Memorandum of Association)</option>
                                     <option value="3">IT Return</option>
@@ -171,7 +180,7 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void 
                         {/* 4. Document Description */}
                         <div>
                             <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
-                                Document Description <span className="text-red-500 text-lg">*</span>
+                                Document Description <span className="text-red-500 text-md">*</span>
                             </label>
                             <input
                                 type="text"
@@ -184,7 +193,7 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void 
                         {/* 5. Document Validity (Read only) */}
                         <div>
                             <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
-                                Document Validity <span className="text-red-500 text-lg">*</span>
+                                Document Validity (in years) <span className="text-red-500 text-md">*</span>
                             </label>
                             <input
                                 type="text"
@@ -208,9 +217,9 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void 
                         </div>
 
                         {/* 7. Upload Area (Functional) */}
-                        {formData.UploadType === "1" && <div className="mt-2 md:col-span-1">
+                        {formData.UploadType === "1" && <div className={`mt-2 ${isWizard ? "md:col-span-3" : "md:col-span-2"}`}>
                             <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
-                                Upload Document <span className="text-red-500 text-lg">*</span>
+                                Upload Document <span className="text-red-500 text-md">*</span>
                             </label>
 
                             <input
@@ -267,7 +276,7 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void 
                     </div>
 
                     {/* Verify Button */}
-                    <div className="mt-10 flex gap-2">
+                    <div className="mt-10 flex justify-center gap-6">
                         <button className="cursor-pointer bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white text-sm font-semibold px-8 py-3 rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-2">
                             <ShieldCheck size={18} />
                             Verify Aadhar

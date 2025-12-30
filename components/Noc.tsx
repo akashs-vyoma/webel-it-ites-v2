@@ -52,9 +52,9 @@ const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicatio
         fetchApps();
     }, [selectedType]);
 
-    // useEffect(() => {
-    //     setIsBothSelected(selectedType !== applicationTypes[0] && selectedNumber !== "Select Application Number");
-    // }, [selectedType, selectedNumber]);
+    useEffect(() => {
+        setIsBothSelected(selectedType !== applicationTypes[0] && selectedNumber !== "Select Application Number");
+    }, [selectedType, selectedNumber]);
 
     return (
         <>
