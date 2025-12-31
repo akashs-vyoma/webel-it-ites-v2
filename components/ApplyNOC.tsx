@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from 'react';
 import {
     ChevronDown,
     Calendar,
@@ -62,7 +62,8 @@ interface CreateApplicationFormProps {
     setCategory: (category: string) => void;
 }
 
-const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category, setCategory }) => {
+const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref) => {
+    const { category, setCategory } = props;
     const [appType, setAppType] = useState("");
     const [requiredDocuments, setRequiredDocuments] = useState<any>([]);
     const [isLoadingRequiredDocs, setIsLoadingRequiredDocs] = useState(false);
@@ -81,9 +82,24 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
         "Original Deed": false,
         "MultiParty Declaration Letter": false,
         "Letter from NDITA": false,
-    }); // Example: { "Balance Sheet": true }
+    }); 
     const [activeDoc, setActiveDoc] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+
+    // --- API DATA STATE ---
+    const [formData, setFormData] = useState<any>({
+        name: "", pan: "", gstin: "", address: "", email: "", phone: "",
+        site_address: "", rentable_area: 0, space_no: "", floor_no: "", 
+        plot_no: "", block_no: "", building_area: 0, comm_area: 0,
+        ag_from: "", ag_to: "", old_noc: "", old_noc_date: "",
+        old_ag_from: "", old_ag_to: "", amt_paid: 0, renewal_from: "", renewal_to: "",
+        tax_auth_id: 0, tax_addr: "", tax_space: "", tax_breakup: "", tax_desc: "", tax_ites_total: "",
+        v_name: "", v_phone: "", v_reg: ""
+    });
+
+    const updateField = (key: string, value: any) => {
+        setFormData((prev: any) => ({ ...prev, [key]: value }));
+    };
 
     const handleUploadClick = (doc: any) => {
         setActiveDoc(doc?.project_id);
@@ -104,16 +120,70 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
         tenantActivity: ''
     });
 
-    const handleAddTenant = () => {
-        // Basic Validation: Ensure fields aren't empty
-        console.log("tenantForm", tenantForm);
+    const toNull = (value: any) =>
+        value === "" || value === undefined ? null : value;
 
+    useImperativeHandle(ref, () => ({
+        submitApplication: async () => {
+            const body = {
+                "application_details": {
+                    "project_id": parseInt(appType),
+                    "company_or_person_name": formData.name,
+                    "company_or_person_pan": formData.pan,
+                    "company_gst_no_or_aadhaar_no": formData.gstin,
+                    "company_or_person_registered_address": formData.address,
+                    "company_or_person_registration_no": formData.v_reg,
+                    "registered_area_in_sqft": parseFloat(formData.rentable_area),
+                    "tenant_gst_no": tenantList[0]?.tenantGstn || "",
+                    "tenant_pan_no": tenantList[0]?.tenantPan || "",
+                    "tenant_name": tenantList[0]?.tenantName || "",
+                    "tenant_activity": tenantList[0]?.tenantActivity || "",
+                    "building_area_in_sqft": parseFloat(formData.building_area),
+                    "commercial_area_on_rent_in_sqft": parseFloat(formData.comm_area),
+                    "user_type_id": role === "company" ? 1 : 2,
+                    "renting_floor": formData.floor_no,
+                    "renting_plot_no": formData.plot_no,
+                    "renting_address_block": formData.block_no,
+                    "renting_space_no": formData.space_no,
+                    "renting_from_month": formData.ag_from,
+                    "renting_to_month": formData.ag_to,
+                    "tax_service_authority_id": formData.tax_auth_id,
+                    "tax_addressof_premises": formData.tax_addr,
+                    "tax_total_space_used_by_applicant": formData.tax_space,
+                    "tax_break_up_of_builtup_space": formData.tax_breakup,
+                    "tax_desc_of_ites_operation": formData.tax_desc,
+                    "tax_total_used_for_ites_activities": formData.tax_ites_total,
+                    "in_application_id": 0,
+                    "company_or_person_contact_no": formData.phone,
+                    "company_or_person_email_id": formData.email,
+                    "dprvet_site_address": formData.site_address,
+                    "renting_old_noc_no": formData.old_noc,
+                    "renting_old_noc_date": formData.old_noc_date,
+                    "renting_old_agreement_from_date": formData.old_ag_from,
+                    "renting_old_agreement_to_date": formData.old_ag_to,
+                    "renting_amount_paid_till": parseFloat(formData.amt_paid),
+                    "application_id": 0
+                },
+                "lst_cosigner_details": [{
+                    "cosigner_name": formData.v_name,
+                    "cosigner_contact_no": formData.v_phone,
+                    "cosigner_reg_no": formData.v_reg,
+                    "cosigner_role": verifierRole,
+                    "cosigner_sign_status": "PENDING"
+                }],
+                "lst_coapplicant_details": [],
+                "entry_user_id": parseInt(localStorage.getItem("userId") || "1"),
+                "owner_id": parseInt(localStorage.getItem("ownerId") || "1")
+            };
+            return await callAPI('/application/SetApplicationDetailsV9', body);
+        }
+    }));
+
+    const handleAddTenant = () => {
         if (!tenantForm.tenantName || !tenantForm.tenantGstn || !tenantForm.tenantPan || !tenantForm.tenantActivity) {
             alert("Please fill all tenant details before adding.");
             return;
         }
-
-        // Add to list and reset form
         setTenantList([...tenantList, { ...tenantForm, id: Date.now() }]);
         setTenantForm({ tenantName: '', tenantGstn: '', tenantPan: '', tenantPhone: '', tenantActivity: '' });
     };
@@ -124,10 +194,7 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
 
     const fetchProjects = async () => {
         try {
-            const result = await callAPI('/application/GetProjectDetailsByDeptID', {
-                "departmentID": 1
-            });
-            console.log("result", result);
+            const result = await callAPI('/application/GetProjectDetailsByDeptID', { "departmentID": 1 });
             setApplicationTypes(result?.data);
             const filteredProjects = result?.data?.filter((project: any) => project?.projectName?.includes(category));
             if (result && Array.isArray(result?.data)) setProjects(filteredProjects);
@@ -163,7 +230,6 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
         }
     }
     useEffect(() => {
-
         if (appType) {
             getRequiredDocumetListByProjectID(appType);
         }
@@ -176,19 +242,9 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
     const isRenting = projectSearchString.includes("renting out") && !projectSearchString.includes("renewal");
     const isTax = projectSearchString.includes("tax exemption");
     const isRenewal = projectSearchString.includes("renewal");
-    // REUSABLE SUBMIT BUTTON (Matches Header Gradient, No Neon Effect)
-    const SubmitButton = ({ onClick, label }: { onClick?: () => void, label: string }) => (
-        <button
-            onClick={onClick}
-            className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2 active:scale-95"
-        >
-            <Send size={18} />
-            {label}
-        </button>
-    );
 
     return (
-        <div className="w-full min-h-screen p-4 md:p-6 font-sans relative  text-slate-900">
+        <div className="w-full min-h-screen p-4 md:p-6 font-sans relative text-slate-900">
             <div className="max-w-[1600px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
 
                 {/* ================= LEFT COLUMN: FORM ================= */}
@@ -247,52 +303,52 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
 
                     <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
 
-                        {role === "company" && <InputGroupGSTIN label="GSTIN of the company" icon={<CreditCard size={18} />} placeholder="GST Number" required />}
-                        <InputGroup label={`PAN Number of the ${role}`} icon={<CreditCard size={18} />} placeholder="PAN Number" required />
-                        <InputGroup label={`Name of the ${role}`} icon={<User size={18} />} placeholder="Name" required />
-                        <InputGroup label={`Phone Number of the ${role}`} icon={<Phone size={18} />} placeholder="Phone Number" required />
-                        <InputGroup label={`Email of the ${role}`} icon={<Mail size={18} />} placeholder="Email" />
+                        {role === "company" && <InputGroupGSTIN label="GSTIN of the company" icon={<CreditCard size={18} />} placeholder="GST Number" required onChange={(e) => updateField('gstin', e.target.value)} />}
+                        <InputGroup label={`PAN Number of the ${role}`} icon={<CreditCard size={18} />} placeholder="PAN Number" required onChange={(e) => updateField('pan', e.target.value)} />
+                        <InputGroup label={`Name of the ${role}`} icon={<User size={18} />} placeholder="Name" required onChange={(e) => updateField('name', e.target.value)} />
+                        <InputGroup label={`Phone Number of the ${role}`} icon={<Phone size={18} />} placeholder="Phone Number" required onChange={(e) => updateField('phone', e.target.value)} />
+                        <InputGroup label={`Email of the ${role}`} icon={<Mail size={18} />} placeholder="Email" onChange={(e) => updateField('email', e.target.value)} />
                         <div className="md:col-span-2">
-                            <InputGroup label={`Registered Address of the ${role}`} icon={<MapPin size={18} />} placeholder="Registered Address" required />
+                            <InputGroup label={`Registered Address of the ${role}`} icon={<MapPin size={18} />} placeholder="Registered Address" required onChange={(e) => updateField('address', e.target.value)} />
                         </div>
 
                         {isVetting && (
                             <div className="md:col-span-2">
-                                <InputGroup label="Site Address" icon={<MapPin size={18} />} placeholder="Site Address" required />
+                                <InputGroup label="Site Address" icon={<MapPin size={18} />} placeholder="Site Address" required onChange={(e) => updateField('site_address', e.target.value)} />
                             </div>
                         )}
 
                         {(isRenting || isRenewal) && (
                             <>
-                                <InputGroup label="Rentable Area in Sqft (Super Built Up Area)" icon={<Maximize size={18} />} placeholder="Area (in Sqft)" required />
-                                <InputGroup label="Space Number" icon={<Layers size={18} />} placeholder="Space No." required />
-                                <InputGroup label="Floor No." icon={<Building size={18} />} placeholder="Floor No." required />
-                                <InputGroup label="Plot No." icon={<Hash size={18} />} placeholder="Plot No." required />
-                                <InputGroup label="Block No." icon={<Building size={18} />} placeholder="Block No." />
+                                <InputGroup label="Rentable Area in Sqft (Super Built Up Area)" icon={<Maximize size={18} />} placeholder="Area (in Sqft)" required onChange={(e) => updateField('rentable_area', e.target.value)} />
+                                <InputGroup label="Space Number" icon={<Layers size={18} />} placeholder="Space No." required onChange={(e) => updateField('space_no', e.target.value)} />
+                                <InputGroup label="Floor No." icon={<Building size={18} />} placeholder="Floor No." required onChange={(e) => updateField('floor_no', e.target.value)} />
+                                <InputGroup label="Plot No." icon={<Hash size={18} />} placeholder="Plot No." required onChange={(e) => updateField('plot_no', e.target.value)} />
+                                <InputGroup label="Block No." icon={<Building size={18} />} placeholder="Block No." onChange={(e) => updateField('block_no', e.target.value)} />
                             </>
                         )}
 
                         {isRenewal && (
                             <>
-                                <InputGroup label="Old NOC No. / Application No." icon={<FileText size={18} />} placeholder="Old NOC No." required />
-                                <InputGroup label="Old NOC Date" icon={<Calendar size={18} />} type="date" required />
-                                <InputGroup label="Old Agreement Tenure (Effective From)" icon={<Calendar size={18} />} type="date" required />
-                                <InputGroup label="Old Agreement End Date" icon={<Calendar size={18} />} type="date" required />
-                                <InputGroup label="Amount Paid till (Rs.)" icon={<DollarSign size={18} />} placeholder="Amount Paid..." required />
-                                <InputGroup label="Renewal From Date" icon={<Calendar size={18} />} type="date" required />
-                                <InputGroup label="Renewal To Date" icon={<Calendar size={18} />} type="date" required />
+                                <InputGroup label="Old NOC No. / Application No." icon={<FileText size={18} />} placeholder="Old NOC No." required onChange={(e) => updateField('old_noc', e.target.value)} />
+                                <InputGroup label="Old NOC Date" icon={<Calendar size={18} />} type="date" required onChange={(e) => updateField('old_noc_date', e.target.value)} />
+                                <InputGroup label="Old Agreement Tenure (Effective From)" icon={<Calendar size={18} />} type="date" required onChange={(e) => updateField('old_ag_from', e.target.value)} />
+                                <InputGroup label="Old Agreement End Date" icon={<Calendar size={18} />} type="date" required onChange={(e) => updateField('old_ag_to', e.target.value)} />
+                                <InputGroup label="Amount Paid till (Rs.)" icon={<DollarSign size={18} />} placeholder="Amount Paid..." required onChange={(e) => updateField('amt_paid', e.target.value)} />
+                                <InputGroup label="Renewal From Date" icon={<Calendar size={18} />} type="date" required onChange={(e) => updateField('renewal_from', e.target.value)} />
+                                <InputGroup label="Renewal To Date" icon={<Calendar size={18} />} type="date" required onChange={(e) => updateField('renewal_to', e.target.value)} />
                                 <InputGroup label="Total Payment made" icon={<DollarSign size={18} />} placeholder="Total Payment" required />
                             </>
                         )}
 
                         {(isRenting || isRenewal) && (
                             <>
-                                <InputGroup label="Agreement Tenure (Effective From)" icon={<Calendar size={18} />} type="date" required />
-                                {isRenting && <InputGroup label="Agreement End Date" icon={<Calendar size={18} />} type="date" required />}
+                                <InputGroup label="Agreement Tenure (Effective From)" icon={<Calendar size={18} />} type="date" required onChange={(e) => updateField('ag_from', e.target.value)} />
+                                {isRenting && <InputGroup label="Agreement End Date" icon={<Calendar size={18} />} type="date" required onChange={(e) => updateField('ag_to', e.target.value)} />}
 
-                                <InputGroup label="Building Area in Sqft (Super Built-Up Area)" icon={<Maximize size={18} />} placeholder="Building Area In Sqft" required />
+                                <InputGroup label="Building Area in Sqft (Super Built-Up Area)" icon={<Maximize size={18} />} placeholder="Building Area In Sqft" required onChange={(e) => updateField('building_area', e.target.value)} />
                                 <div className="md:col-span-2">
-                                    <InputGroup label="Commercial Area On Rent (Other than IT/ITeS Activity)" icon={<Maximize size={18} />} placeholder="Commercial Area On Rent In Sqft" />
+                                    <InputGroup label="Commercial Area On Rent (Other than IT/ITeS Activity)" icon={<Maximize size={18} />} placeholder="Commercial Area On Rent In Sqft" onChange={(e) => updateField('comm_area', e.target.value)} />
                                 </div>
                                 <p className="md:col-span-2 text-[10px] text-slate-600 font-bold italic mt-[-10px]">
                                     Permission fees will be charged @Rs.3/sqft. till the expiry of the Rental Agreement/Surrender of the space by the tenant
@@ -435,14 +491,17 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
                                     <InputGroup
                                         label="Verifier Name" icon={<User size={18} />}
                                         placeholder="Enter Name" required
+                                        onChange={(e) => updateField('v_name', e.target.value)}
                                     />
                                     <InputGroup
                                         label="Verifier Phone No." icon={<PhoneCall size={18} />}
                                         placeholder="Enter Phone" required
+                                        onChange={(e) => updateField('v_phone', e.target.value)}
                                     />
                                     <InputGroup
                                         label="Registration No." icon={<Hash size={18} />}
                                         placeholder="Enter Registration No."
+                                        onChange={(e) => updateField('v_reg', e.target.value)}
                                     />
                                 </div>
                             </div>
@@ -450,11 +509,11 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
 
                         {isTax && (
                             <>
-                                <InputGroup label="Rentable Area In Sqft (Super Built-Up Area)" icon={<Maximize size={18} />} placeholder="Area (In Sqft)" required />
+                                <InputGroup label="Rentable Area In Sqft (Super Built-Up Area)" icon={<Maximize size={18} />} placeholder="Area (In Sqft)" required onChange={(e) => updateField('rentable_area', e.target.value)} />
                                 <div className="flex flex-col gap-1.5">
                                     <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Tax Service Authority <span className="text-red-500">*</span></label>
                                     <div className="relative">
-                                        <select className="w-full h-10 px-3 pr-10 rounded-lg border border-slate-300 text-sm font-bold outline-none appearance-none bg-white">
+                                        <select className="w-full h-10 px-3 pr-10 rounded-lg border border-slate-300 text-sm font-bold outline-none appearance-none bg-white" onChange={(e) => updateField('tax_auth_id', e.target.value)}>
                                             <option>Select Tax Service Authority</option>
                                         </select>
                                         <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
@@ -462,12 +521,12 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
                                         </div>
                                     </div>
                                 </div>
-                                <InputGroup label="Address of Premises/Building/Plot of Land" icon={<MapPin size={18} />} placeholder="Address" required />
-                                <InputGroup label="Total space used by the applicant/tenant" icon={<Maximize size={18} />} placeholder="Total space" required />
-                                <InputGroup label="Break up of built up space vis-à-vis number of occupant company" icon={<Layers size={18} />} placeholder="Break up details" required />
-                                <InputGroup label="Description of IT / ITES operation of the occupant" icon={<Activity size={18} />} placeholder="Description" required />
+                                <InputGroup label="Address of Premises/Building/Plot of Land" icon={<MapPin size={18} />} placeholder="Address" required onChange={(e) => updateField('tax_addr', e.target.value)} />
+                                <InputGroup label="Total space used by the applicant/tenant" icon={<Maximize size={18} />} placeholder="Total space" required onChange={(e) => updateField('tax_space', e.target.value)} />
+                                <InputGroup label="Break up of built up space vis-à-vis number of occupant company" icon={<Layers size={18} />} placeholder="Break up details" required onChange={(e) => updateField('tax_breakup', e.target.value)} />
+                                <InputGroup label="Description of IT / ITES operation of the occupant" icon={<Activity size={18} />} placeholder="Description" required onChange={(e) => updateField('tax_desc', e.target.value)} />
                                 <div className="md:col-span-2">
-                                    <InputGroup label="Total used for IT/ITeS activities" icon={<Building size={18} />} placeholder="Total used" required />
+                                    <InputGroup label="Total used for IT/ITeS activities" icon={<Building size={18} />} placeholder="Total used" required onChange={(e) => updateField('tax_ites_total', e.target.value)} />
                                 </div>
                             </>
                         )}
@@ -476,7 +535,6 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
                             <p className="text-green-700 font-bold text-sm">
                                 Your Payable amount will be Rs.70800 <span className="text-xs font-normal">(*UDIN charges will be paid extra)</span>
                             </p>
-                            {/* <SubmitButton onClick={() => setIsModalOpen(true)} label="Submit Application" /> */}
                         </div>
                     </div>
                 </div>
@@ -497,68 +555,26 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
                             <div className="max-h-[600px] overflow-y-auto flex flex-col gap-3 pr-1 custom-scrollbar">
                                 {requiredDocuments?.map((doc: any, idx: number) => {
                                     const isUploaded = uploadedDocs[doc?.project_name];
-
                                     return (
                                         <div
                                             key={idx}
-                                            className={`
-                    group relative bg-white rounded-xl p-4 border transition-all duration-200
-                    ${isUploaded
-                                                    ? 'border-green-100 bg-green-50/30'
-                                                    : 'border-slate-200 hover:border-blue-300 hover:shadow-md cursor-pointer hover:rounded-b-none'
-                                                }
-                `}
+                                            className={`group relative bg-white rounded-xl p-4 border transition-all duration-200 ${isUploaded ? 'border-green-100 bg-green-50/30' : 'border-slate-200 hover:border-blue-300 hover:shadow-md cursor-pointer hover:rounded-b-none'}`}
                                             onClick={() => !isUploaded && handleUploadClick(doc)}
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-4">
-                                                    {/* Icon Container */}
-                                                    <div className={`
-                            p-2.5 rounded-lg transition-colors
-                            ${isUploaded
-                                                            ? 'bg-green-100 text-green-600'
-                                                            : 'bg-slate-100 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600'
-                                                        }
-                        `}>
+                                                    <div className={`p-2.5 rounded-lg transition-colors ${isUploaded ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600'}`}>
                                                         <FileText size={20} />
                                                     </div>
-
-                                                    {/* Text Details */}
                                                     <div>
-                                                        <p className={`text-sm font-semibold ${isUploaded ? 'text-green-800' : 'text-slate-800'}`}>
-                                                            {doc?.project_name}
-                                                        </p>
-                                                        <p className="text-xs text-slate-500 mt-0.5">
-                                                            {isUploaded ? 'Document verified and uploaded' : 'Required format: PDF'}
-                                                        </p>
+                                                        <p className={`text-sm font-semibold ${isUploaded ? 'text-green-800' : 'text-slate-800'}`}>{doc?.project_name}</p>
+                                                        <p className="text-xs text-slate-500 mt-0.5">{isUploaded ? 'Document verified and uploaded' : 'Required format: PDF'}</p>
                                                     </div>
                                                 </div>
-
-                                                {/* Status Action Area */}
                                                 <div className="flex items-center gap-3">
-                                                    {isUploaded ? (
-                                                        <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-xs font-bold animate-in fade-in zoom-in">
-                                                            <CheckCircle2 size={14} />
-                                                            Uploaded
-                                                        </div>
-                                                    ) : (
-                                                        <div className="flex items-center gap-2">
-                                                            <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-600 rounded-full text-xs font-bold border border-amber-100">
-                                                                <AlertCircle size={14} />
-                                                                Pending
-                                                            </div>
-                                                            <div className="p-1 text-slate-300 group-hover:text-blue-500 transition-colors">
-                                                                <ChevronRight size={18} />
-                                                            </div>
-                                                        </div>
-                                                    )}
+                                                    {isUploaded ? <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-xs font-bold"><CheckCircle2 size={14} /> Uploaded</div> : <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-600 rounded-full text-xs font-bold border border-amber-100"><AlertCircle size={14} /> Pending</div>}
                                                 </div>
                                             </div>
-
-                                            {/* Hover Progress Bar (Visual Polish) */}
-                                            {!isUploaded && (
-                                                <div className="absolute bottom-0 left-0 h-0.5 bg-blue-500 rounded-full transition-all duration-300 w-0 group-hover:w-full" />
-                                            )}
                                         </div>
                                     );
                                 })}
@@ -578,7 +594,7 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
             )}
         </div>
     );
-};
+});
 
 // --- Helper Component for Inputs ---
 interface InputGroupProps {
@@ -613,7 +629,7 @@ const InputGroup: React.FC<InputGroupProps> = ({ label, icon, placeholder, requi
     );
 };
 
-const InputGroupGSTIN: React.FC<InputGroupProps> = ({ label, icon, placeholder, required, type = "text" }) => {
+const InputGroupGSTIN: React.FC<InputGroupProps> = ({ label, icon, placeholder, required, type = "text", onChange }) => {
     return (
         <div className="flex flex-col gap-1.5">
             <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
@@ -626,6 +642,7 @@ const InputGroupGSTIN: React.FC<InputGroupProps> = ({ label, icon, placeholder, 
                 <input
                     type={type}
                     placeholder={placeholder}
+                    onChange={onChange}
                     className="flex-1 px-3 text-sm font-bold outline-none h-full bg-white text-slate-800 placeholder:text-slate-400"
                 />
                 <button className="w-20 cursor-pointer h-full bg-amber-300 hover:bg-amber-400 text-slate-800 font-bold text-xs border-l border-slate-200 flex items-center justify-center text-slate-500">
