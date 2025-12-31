@@ -1,7 +1,7 @@
 import { Lock } from 'lucide-react'
 import React from 'react'
 
-const CommonCard = ({ children }: { children: React.ReactNode }) => {
+const CommonCard = ({ children, title, subtitle }: { children: React.ReactNode, title: string, subtitle: string }) => {
     return (
         <div className="glass-morphism rounded-[32px]  overflow-hidden border border-white/60 animate-scale-in">
             {/* Header with Gradient */}
@@ -23,8 +23,8 @@ const CommonCard = ({ children }: { children: React.ReactNode }) => {
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md border border-white/30 mb-5 shadow-xl">
                         <Lock className="text-white" size={28} />
                     </div>
-                    <h1 className="text-2xl font-bold text-white tracking-tight mb-2">Individual Sign-In</h1>
-                    <p className="text-indigo-100 text-sm font-medium">Sign in to access your dashboard</p>
+                    <h1 className="text-2xl font-bold text-white tracking-tight mb-2">{title}</h1>
+                    <p className="text-indigo-100 text-sm font-medium">{subtitle}</p>
                 </div>
 
                 {/* Bottom Wave */}

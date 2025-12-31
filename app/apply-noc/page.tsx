@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import CreateApplicationForm from '@/components/ApplyNOC';
 import { ArrowLeft, BadgeCheck, Check, ClipboardEdit, CreditCard, FileCheck, FileUp, ListChecks, Send, Users } from 'lucide-react';
 import DocumentUploadHeader from '@/components/ApplicationDocument';
@@ -16,6 +16,9 @@ export default function WizardPage() {
     const [applicationType, setApplicationType] = useState("");
     const [applicationNo, setApplicationNo] = useState("");
     const totalSteps = 6;
+    
+    // Ref to access the API call inside CreateApplicationForm
+    const formRef = useRef<any>(null);
 
     // Navigation logic
     const steps = [
@@ -27,11 +30,33 @@ export default function WizardPage() {
         { id: 6, label: "Payment", icon: CreditCard }
     ];
 
-    const nextStep = () => {
+    const nextStep = async () => {
         if (currentStep === 1) {
-            setApplicationNo("AP/DPRITVET/432/20240105050148");
-            setApplicationType(localStorage.getItem("application-type") || "");
-            setCurrentStep((prev) => Math.min(prev + 1, totalSteps))
+            if (formRef.current) {
+                try {
+                    // Triggering the API call implemented in the child component
+                    const result = await formRef.current.submitApplication();
+                    
+                    if (result?.status === "Success" || result?.statusCode === 200) {
+                        // Use application no from API if available, otherwise fallback
+                        setApplicationNo(result?.data?.application_no || "AP/DPRITVET/432/20240105050148");
+                        setApplicationType(localStorage.getItem("application-type") || "");
+                        setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Submission Failed',
+                            text: result?.message || 'Failed to create application details.'
+                        });
+                    }
+                } catch (error) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An unexpected error occurred during submission.'
+                    });
+                }
+            }
         } else if (currentStep === 2 && category === "SINGLE") setCurrentStep(4);
         else setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
     };
@@ -54,7 +79,7 @@ export default function WizardPage() {
     const renderStep = () => {
         switch (currentStep) {
             case 1:
-                return <CreateApplicationForm category={category} setCategory={setCategory} />;
+                return <CreateApplicationForm ref={formRef} category={category} setCategory={setCategory} />;
             case 2:
                 return <DocumentUploadHeader applicationNo={applicationNo} applicationType={applicationType} category={category} isWizard={true} />;
             case 3:
@@ -81,8 +106,6 @@ export default function WizardPage() {
                     const isActive = currentStep === step.id;
                     const isCompleted = currentStep > step.id;
 
-                    // Logic to calculate if the line to the right should be colored
-                    // This looks ahead to see if the next visible step is completed or active
                     const isNextStepReached = currentStep > step.id;
 
                     return (
@@ -101,7 +124,6 @@ export default function WizardPage() {
                             )}
 
                             <div className="flex flex-col items-center relative z-10">
-                                {/* The Icon Circle */}
                                 <div className={`
                     w-12 h-12 rounded-full flex items-center justify-center 
                     transition-all duration-500 border-2 
@@ -123,7 +145,6 @@ export default function WizardPage() {
                                     )}
                                 </div>
 
-                                {/* Label Container */}
                                 <div className="mt-3 flex flex-col items-center">
                                     <span className={`
                         text-[11px] uppercase tracking-wider font-bold transition-colors duration-300
@@ -164,20 +185,20 @@ export default function WizardPage() {
                     <SubmitButton onClick={() => nextStep()} label="Submit & Continue" />
                 ) : (
                  <button
-    onClick={() =>
-        Swal.fire({
-            title: 'Payment Successful 🎉',
-            text: 'Wizard completed successfully!',
-            icon: 'success',
-            confirmButtonText: 'Done',
-            confirmButtonColor: '#06b6d4',
-        })
-    }
-    className="cursor-pointer bg-gradient-to-r from-emerald-600 to-cyan-500 hover:from-cyan-700 hover:to-emerald-600 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2 active:scale-95"
->
-    <BadgeCheck size={18} />
-    Pay & Complete
-</button>
+                    onClick={() =>
+                        Swal.fire({
+                            title: 'Payment Successful 🎉',
+                            text: 'Wizard completed successfully!',
+                            icon: 'success',
+                            confirmButtonText: 'Done',
+                            confirmButtonColor: '#06b6d4',
+                        })
+                    }
+                    className="cursor-pointer bg-gradient-to-r from-emerald-600 to-cyan-500 hover:from-cyan-700 hover:to-emerald-600 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2 active:scale-95"
+                >
+                    <BadgeCheck size={18} />
+                    Pay & Complete
+                </button>
                 )}
             </div>
         </div>

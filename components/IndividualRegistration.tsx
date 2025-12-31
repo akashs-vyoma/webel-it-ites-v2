@@ -58,7 +58,7 @@ const IndividualRegistration: React.FC = () => {
   // ----------------------------------------------------------------------
 
   return (
-    <CommonCard>
+    <CommonCard title="Individual Sign-Up" subtitle="Sign up to access your dashboard">
 
       <div className="w-full max-w-[500px] relative">
         <div className="px-8 pb-8 pt-4 space-y-6">
@@ -175,7 +175,7 @@ const IndividualRegistration: React.FC = () => {
             <p className="text-sm text-slate-500 font-medium">
               Already have an account?{' '}
               <Link href="/individual-sign-in" className="font-bold text-[#1F51FF] hover:underline transition-all">
-                Sign In Now
+                Sign up Now
               </Link>
             </p>
           </div>

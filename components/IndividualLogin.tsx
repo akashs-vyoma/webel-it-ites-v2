@@ -62,7 +62,7 @@ const IndividualLogin: React.FC = () => {
                     localStorage.setItem("token", result.data.token);
                     setOtpSent(true);
                     setShowSwalAlert(true);
-                    setTimer(30); 
+                    setTimer(60); 
 
                     Swal.fire({
                         ...smallSwal,
