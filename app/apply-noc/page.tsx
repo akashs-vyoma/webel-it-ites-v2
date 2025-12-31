@@ -8,6 +8,7 @@ import NOCForm from '@/components/Noc';
 import MultiOwnPropertyForm from '@/components/ApplyForMultipartyDeclaration';
 import PaymentCard from '@/components/InitPayment';
 import CoSignerApplication from '@/components/CoSignerApplication';
+import Swal from 'sweetalert2';
 
 export default function WizardPage() {
     const [currentStep, setCurrentStep] = useState(1);
@@ -162,13 +163,21 @@ export default function WizardPage() {
                 {currentStep < totalSteps ? (
                     <SubmitButton onClick={() => nextStep()} label="Submit & Continue" />
                 ) : (
-                    <button
-                        onClick={() => alert('Wizard Completed!')}
-                        className="cursor-pointer bg-gradient-to-r from-emerald-600 to-cyan-500 hover:from-cyan-700 hover:to-emerald-600 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2 active:scale-95"
-                    >
-                        <BadgeCheck size={18} />
-                        Pay & Complete
-                    </button>
+                 <button
+    onClick={() =>
+        Swal.fire({
+            title: 'Payment Successful 🎉',
+            text: 'Wizard completed successfully!',
+            icon: 'success',
+            confirmButtonText: 'Done',
+            confirmButtonColor: '#06b6d4',
+        })
+    }
+    className="cursor-pointer bg-gradient-to-r from-emerald-600 to-cyan-500 hover:from-cyan-700 hover:to-emerald-600 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2 active:scale-95"
+>
+    <BadgeCheck size={18} />
+    Pay & Complete
+</button>
                 )}
             </div>
         </div>

@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import { RefreshCw, CheckCircle2, Clock, Send } from 'lucide-react'; // Added Send icon
-
+import Swal from 'sweetalert2';
 interface CoSignerData {
     slNo: number;
     name: string;
@@ -34,10 +34,15 @@ const CoSignerTable: React.FC = () => {
     };
 
     // SMS Handler
-    const handleSendSMS = (name: string) => {
-        alert(`SMS notification sent to ${name}`);
-    };
-
+const handleSendSMS = (name: string) => {
+    Swal.fire({
+        title: 'SMS Sent 📩',
+        text: `SMS notification sent to ${name}`,
+        icon: 'success',
+        confirmButtonText: 'OK',
+        confirmButtonColor: '#06b6d4',
+    });
+};
     return (
         <div className="w-full max-w-screen mx-auto p-4 font-sans">
 

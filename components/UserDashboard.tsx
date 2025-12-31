@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link'; // Added for navigation
+import Link from 'next/link'; 
 import {
     FileText,
     Users,
@@ -9,12 +9,11 @@ import {
     Plus,
     TrendingUp,
     Sparkles,
-    Link as LinkIcon // Renamed to avoid conflict with next/link
+    Link as LinkIcon 
 } from 'lucide-react';
 import { assetConfig } from './asset-config';
 import { callAPI } from './apis/commonAPIs';
 
-// Define the interface for the API response
 interface DashboardData {
     totalUploadedDoc: number;
     totalLetterIssued: number;
@@ -53,12 +52,13 @@ const UserDashboard: React.FC = () => {
     }, []);
 
     return (
-        <main className="relative z-10 min-h-screen px-20 sm:px-6 lg:px-20 md:px-24 selection:bg-cyan-200 selection:text-blue-900">
+        /* Reduced horizontal padding on medium/large screens to prevent "squeezing" cards on laptops */
+        <main className="relative z-10 min-h-screen px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 selection:bg-cyan-200 selection:text-blue-900">
             {/* Background gradient effects */}
             <div className="absolute top-0 left-0 w-full h-96 to-transparent -z-10"></div>
             <div className="absolute top-0 right-0 w-1/3 h-96 bg-gradient-to-bl from-cyan-100/40 via-blue-50/20 to-transparent blur-3xl -z-10"></div>
 
-            <div className="container mx-auto px-4 sm:px-6 lg:px-0 py-8 lg:py-12">
+            <div className="container mx-auto py-8 lg:py-12">
 
                 {/* Welcome Message */}
                 <div className="mb-10 lg:mb-14">
@@ -74,23 +74,23 @@ const UserDashboard: React.FC = () => {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 xl:gap-10">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-10 items-start">
 
-                    {/* Left Column: Image */}
+                    {/* Left Column: Image - Adjusted sizing to be more fluid */}
                     <div className="lg:col-span-5 w-full">
-                        <div className="relative group h-full min-h-[400px] lg:min-h-[500px]">
+                        <div className="relative group h-full">
                             <div className="absolute overflow-hidden inset-0 rounded-[2.5rem] ">
                                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-blue-600/5"></div>
                                 <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
                                     <div className="absolute inset-0 bg-gradient-to-tr from-cyan-400/20 via-transparent to-blue-500/20 blur-xl"></div>
                                 </div>
                             </div>
-                            <div className="relative z-10 h-full flex items-center justify-center p-8 lg:p-10">
+                            <div className="relative z-10 h-full flex items-center justify-center p-4 lg:p-8">
                                 <div className="w-full max-w-md rounded-2xl overflow-hidden">
                                     <img
                                         src={`${assetConfig}/7127980.jpg`}
                                         alt="Dashboard Illustration"
-                                        className="w-full h-auto object-contain drop-shadow-xl transition-all duration-700 group-hover:scale-105 group-hover:drop-shadow-[0_20px_60px_rgba(6,182,212,0.50)]"
+                                        className="w-full h-auto object-contain drop-shadow-xl transition-all duration-700 group-hover:scale-105"
                                     />
                                 </div>
                             </div>
@@ -98,103 +98,90 @@ const UserDashboard: React.FC = () => {
                     </div>
 
                     {/* Right Column: Dashboard Cards */}
-                    <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-5 lg:gap-6">
+                    <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-5 xl:gap-6">
 
-                        {/* Card 1: Total Uploaded Document (DYNAMIC) */}
-                        <div className="group relative overflow-hidden rounded-[2rem] min-h-[220px] cursor-default shadow-xl shadow-blue-200/50 hover:shadow-2xl hover:shadow-cyan-400/20 transition-all duration-500">
+                        {/* Card 1: Total Uploaded Document */}
+                        <div className="group relative overflow-hidden rounded-[2rem] min-h-[200px] lg:min-h-[220px] cursor-default shadow-xl shadow-blue-200/50 hover:shadow-2xl hover:shadow-cyan-400/20 transition-all duration-500">
                             <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500"></div>
                             <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                            <div className="absolute inset-0 border border-white/20 rounded-[2rem]"></div>
-
-                            <div className="relative z-10 p-6 lg:p-8 h-full flex flex-col justify-between text-white">
+                            
+                            <div className="relative z-10 p-6 xl:p-8 h-full flex flex-col justify-between text-white">
                                 <div className="flex items-start justify-between">
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-4">
-                                            <div className="w-9 h-9 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/10">
-                                                <FileText size={18} className="text-white" />
+                                            <div className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/10">
+                                                <FileText size={16} className="text-white" />
                                             </div>
-                                            <p className="text-sm font-semibold text-blue-50 tracking-wide">Webel Services</p>
+                                            <p className="text-xs font-semibold text-blue-50 tracking-wide uppercase">Webel Services</p>
                                         </div>
-                                        <h3 className="text-6xl lg:text-7xl font-bold mb-3 tracking-tighter drop-shadow-sm">
+                                        {/* Adjusted font size for laptop screens (text-5xl scaling to 7xl) */}
+                                        <h3 className="text-5xl xl:text-7xl font-bold mb-3 tracking-tighter drop-shadow-sm">
                                             {isLoading ? "..." : dashboardData?.totalUploadedDoc ?? 0}
                                         </h3>
                                     </div>
-                                    <div className="w-11 h-11 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center group-hover:scale-110 group-hover:bg-white/20 transition-all duration-300 border border-white/10">
-                                        <TrendingUp size={22} className="text-white" />
+                                    <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center group-hover:scale-110 transition-all duration-300">
+                                        <TrendingUp size={20} className="text-white" />
                                     </div>
                                 </div>
-                                <div>
-                                    <p className="text-xl font-medium leading-snug opacity-90">
-                                        Total Upload <br /> Document
-                                    </p>
-                                </div>
+                                <p className="text-lg xl:text-xl font-medium leading-tight opacity-95">
+                                    Total Upload <br /> Document
+                                </p>
                             </div>
                         </div>
 
-                        {/* Card 2: Multi Party Declaration (DYNAMIC) */}
-                        <div className="group relative overflow-hidden rounded-[2rem] min-h-[220px] cursor-default shadow-xl shadow-blue-200/50 hover:shadow-2xl hover:shadow-cyan-400/20 transition-all duration-500">
+                        {/* Card 2: Multi Party Declaration */}
+                        <div className="group relative overflow-hidden rounded-[2rem] min-h-[200px] lg:min-h-[220px] cursor-default shadow-xl shadow-blue-200/50 hover:shadow-2xl hover:shadow-cyan-400/20 transition-all duration-500">
                             <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-blue-900"></div>
                             <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-500/40 via-transparent to-transparent opacity-60"></div>
-                            <div className="absolute inset-0 border border-white/10 rounded-[2rem]"></div>
 
-                            <div className="relative z-10 p-6 lg:p-8 h-full flex flex-col justify-between text-white">
+                            <div className="relative z-10 p-6 xl:p-8 h-full flex flex-col justify-between text-white">
                                 <div className="flex items-start justify-between">
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-4">
-                                            <div className="w-9 h-9 rounded-xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/10">
-                                                <Users size={18} className="text-cyan-300" />
+                                            <div className="w-8 h-8 rounded-lg bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/10">
+                                                <Users size={16} className="text-cyan-300" />
                                             </div>
-                                            <p className="text-sm font-semibold text-slate-300 tracking-wide">Webel Services</p>
+                                            <p className="text-xs font-semibold text-slate-400 tracking-wide uppercase">Webel Services</p>
                                         </div>
-                                        <h3 className="text-6xl lg:text-7xl font-bold mb-3 tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-cyan-100 drop-shadow-sm">
+                                        <h3 className="text-5xl xl:text-7xl font-bold mb-3 tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-cyan-100">
                                             {isLoading ? "..." : dashboardData?.totalJointVentureCreatedCount ?? 0}
                                         </h3>
                                     </div>
-                                    <div className="w-11 h-11 rounded-full bg-white/5 backdrop-blur-md flex items-center justify-center group-hover:scale-110 group-hover:bg-cyan-500/20 transition-all duration-300 border border-white/10">
-                                        <TrendingUp size={22} className="text-cyan-300" />
+                                    <div className="w-10 h-10 rounded-full bg-white/5 backdrop-blur-md flex items-center justify-center group-hover:scale-110 transition-all duration-300">
+                                        <TrendingUp size={20} className="text-cyan-300" />
                                     </div>
                                 </div>
-                                <div>
-                                    <p className="text-xl font-medium leading-snug text-slate-200">
-                                        Multi Party <br /> Declaration
-                                    </p>
-                                </div>
+                                <p className="text-lg xl:text-xl font-medium leading-tight text-slate-200">
+                                    Multi Party <br /> Declaration
+                                </p>
                             </div>
                         </div>
 
-                        {/* Card 3: Upload Document (LINK ADDED) */}
+                        {/* Card 3: Upload Document */}
                         <Link href="/non-individual-upload-document" className="block group">
-                            <div className="relative overflow-hidden rounded-[2rem] min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 group-hover:border-cyan-400 transition-colors duration-300">
-                                <div className="relative z-10 p-6 lg:p-8 h-full flex flex-col justify-center gap-5">
-                                    <div className="relative w-fit">
-                                        <div className="absolute inset-0 bg-cyan-400/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                                        
-                                        <div className="relative bg-white w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 border border-slate-100 shadow-sm">
-                                            <CloudUpload size={28} className="text-cyan-600" strokeWidth={2} />
-                                        </div>
+                            <div className="relative overflow-hidden rounded-[2rem] min-h-[180px] lg:min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 group-hover:border-cyan-400 transition-all duration-300">
+                                <div className="relative z-10 p-6 xl:p-8 h-full flex flex-col justify-center gap-4">
+                                    <div className="relative bg-white w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 border border-slate-100 shadow-sm">
+                                        <CloudUpload size={24} className="text-cyan-600" strokeWidth={2} />
                                     </div>
                                     <div>
-                                        <p className="text-2xl lg:text-3xl font-bold leading-tight text-slate-800 group-hover:text-cyan-700 transition-colors">Upload Document</p>
-                                        <p className="text-sm text-slate-400 mt-2 font-medium">Click to add new files</p>
+                                        <p className="text-xl lg:text-2xl xl:text-3xl font-bold leading-tight text-slate-800 group-hover:text-cyan-700 transition-colors">Upload Document</p>
+                                        <p className="text-xs text-slate-400 mt-1 font-medium">Click to add new files</p>
                                     </div>
                                 </div>
                             </div>
                         </Link>
                         
-
-                        {/* Card 4: Create Application (LINK ADDED) */}
+                        {/* Card 4: Create Application */}
                         <Link href="/apply-noc" className="block group">
-                            <div className="relative overflow-hidden rounded-[2rem] min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 group-hover:border-blue-500 transition-colors duration-300">
-                                <div className="relative z-10 p-6 lg:p-8 h-full flex flex-col justify-center gap-5">
-                                    <div className="relative w-fit">
-                                        <div className="absolute inset-0 bg-blue-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                                        <div className="relative bg-white w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 border border-slate-100 shadow-sm">
-                                            <Plus size={28} className="text-blue-600" strokeWidth={2.5} />
-                                        </div>
+                            <div className="relative overflow-hidden rounded-[2rem] min-h-[180px] lg:min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 group-hover:border-blue-500 transition-all duration-300">
+                                <div className="relative z-10 p-6 xl:p-8 h-full flex flex-col justify-center gap-4">
+                                    <div className="relative bg-white w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 border border-slate-100 shadow-sm">
+                                        <Plus size={24} className="text-blue-600" strokeWidth={2.5} />
                                     </div>
                                     <div>
-                                        <p className="text-2xl lg:text-3xl font-bold leading-tight text-slate-800 group-hover:text-blue-700 transition-colors">Create Application</p>
-                                        <p className="text-sm text-slate-400 mt-2 font-medium">Start a new submission</p>
+                                        <p className="text-xl lg:text-2xl xl:text-3xl font-bold leading-tight text-slate-800 group-hover:text-blue-700 transition-colors">Create Application</p>
+                                        <p className="text-xs text-slate-400 mt-1 font-medium">Start a new submission</p>
                                     </div>
                                 </div>
                             </div>
