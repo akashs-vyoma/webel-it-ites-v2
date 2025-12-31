@@ -19,7 +19,7 @@ import {
 } from "@/components/ui/dialog";
 
 const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void, docId: string }> = ({ isWizard, onClose, docId }) => {
-    const [showModal, setShowModal] = useState(true);
+    const [showModal, setShowModal] = useState(false);
 
     const [formData, setFormData] = useState({
         DocumentOwnership: '',
@@ -46,6 +46,8 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
         }
     };
     useEffect(() => {
+        const authToken = localStorage.getItem('authToken');
+        if (!authToken) setShowModal(true);
         if (docId) document.body.style.overflow = "hidden";
 
         return () => {
@@ -278,8 +280,8 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
                     {/* Verify Button */}
                     <div className="mt-10 flex justify-center gap-6">
                         <button className="cursor-pointer bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white text-sm font-semibold px-8 py-3 rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-2">
-                            <ShieldCheck size={18} />
-                            Verify Aadhar
+                            <Upload size={18} />
+                            Upload Document
                         </button>
                         {isWizard && <button onClick={onClose} className="cursor-pointer bg-gradient-to-r from-red-600 to-amber-500 hover:from-red-700 hover:to-amber-600 text-white text-sm font-semibold px-8 py-3 rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-2">
                             <X size={18} />
