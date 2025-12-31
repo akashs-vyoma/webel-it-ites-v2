@@ -23,11 +23,11 @@ const IndividualLogin: React.FC = () => {
     const [showSwalAlert, setShowSwalAlert] = useState(false);
     const [accounts, setAccounts] = useState([]);
     const [accountName, setAccountName] = useState('');
-
+    
     // Independent Loading States
     const [sendingOtp, setSendingOtp] = useState(false);
     const [verifyingOtp, setVerifyingOtp] = useState(false);
-
+    
     // Timer state for Resend OTP (30 seconds)
     const [timer, setTimer] = useState(0);
 
@@ -62,7 +62,7 @@ const IndividualLogin: React.FC = () => {
                     localStorage.setItem("token", result.data.token);
                     setOtpSent(true);
                     setShowSwalAlert(true);
-                    setTimer(60);
+                    setTimer(60); 
 
                     Swal.fire({
                         ...smallSwal,
@@ -116,7 +116,7 @@ const IndividualLogin: React.FC = () => {
             if (otp.length > 0) {
                 const token = localStorage.getItem("token");
                 const result = await callAPI("/udin/individualValidateAadhaarOtp", { aadhaar_number: aadhaarNumber, otp, token });
-
+                
                 if (result.status == 0) {
                     Swal.fire({
                         ...smallSwal,
@@ -224,7 +224,7 @@ const IndividualLogin: React.FC = () => {
                             {/* Aadhaar Input */}
                             <div className="mb-6 animate-fade-in-up" style={{ animationDelay: '0.1s', opacity: 0, animationFillMode: 'forwards' }}>
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 ml-1">
-                                    Aadhaar Number
+                                    Aadhar Number
                                 </label>
                                 <div className="input-modern relative group">
                                     <div className="relative flex items-center bg-white border-2 border-slate-200 rounded-2xl overflow-hidden shadow-sm group-focus-within:border-indigo-500 transition-all duration-300">
@@ -286,14 +286,14 @@ const IndividualLogin: React.FC = () => {
                                         </div>
                                     </div>
                                     <div className="mt-3 text-right">
-                                        <button
+                                        <button 
                                             onClick={handleResendOtp}
-                                            disabled={sendingOtp || timer > 0}
+                                            disabled={sendingOtp || timer > 0} 
                                             className={`text-xs font-bold transition-colors bg-transparent border-none p-0 cursor-pointer ${timer > 0 ? 'text-slate-400' : 'text-indigo-600 hover:text-indigo-700'}`}
                                         >
                                             {sendingOtp ? 'Resending...' : (timer > 0 ? `Resend OTP in ${timer}s` : 'Resend OTP')}
                                         </button>
-                                    </div>
+                                    </div>  
                                 </div>
                             )}
 
@@ -333,7 +333,7 @@ const IndividualLogin: React.FC = () => {
                                     <div className="flex-1">
                                         <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2">Quick Guide</h4>
                                         <p className="text-xs text-slate-700">
-                                            Enter your Aadhaar number and tap <span className="font-bold">"Send OTP"</span>. Once received, click <span className="font-bold">"Verify"</span> to continue.
+                                            Enter your Aadhar number and tap <span className="font-bold">"Send OTP"</span>. Once received, click <span className="font-bold">"Verify"</span> to continue.
                                         </p>
                                     </div>
                                 </div>
@@ -367,13 +367,15 @@ const IndividualLogin: React.FC = () => {
                                 }}
                                 className={`group cursor-pointer transition-all duration-300 ${selectedRole === (account?.account_type === 'INDIVIDUAL' ? 'individual' : 'company') ? 'scale-[1.02]' : ''}`}
                             >
-                                <div className={`p-6 rounded-2xl border-2 transition-all ${(account?.account_type === 'INDIVIDUAL' ? 'individual' : 'company') === selectedRole
-                                        ? 'border-indigo-500 bg-indigo-50/50 shadow-lg shadow-indigo-100'
-                                        : 'border-slate-200 bg-white hover:border-slate-300'
-                                    }`}>
+                                <div className={`p-6 rounded-2xl border-2 transition-all ${
+                                    (account?.account_type === 'INDIVIDUAL' ? 'individual' : 'company') === selectedRole
+                                    ? 'border-indigo-500 bg-indigo-50/50 shadow-lg shadow-indigo-100'
+                                    : 'border-slate-200 bg-white hover:border-slate-300'
+                                }`}>
                                     <div className="flex items-center gap-5">
-                                        <div className={`w-6 h-6 rounded-full border-[3px] flex items-center justify-center ${(account?.account_type === 'INDIVIDUAL' ? 'individual' : 'company') === selectedRole ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300'
-                                            }`}>
+                                        <div className={`w-6 h-6 rounded-full border-[3px] flex items-center justify-center ${
+                                            (account?.account_type === 'INDIVIDUAL' ? 'individual' : 'company') === selectedRole ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300'
+                                        }`}>
                                             {(account?.account_type === 'INDIVIDUAL' ? 'individual' : 'company') === selectedRole && <div className="w-2.5 h-2.5 rounded-full bg-white"></div>}
                                         </div>
                                         <div className="flex-1">
