@@ -10,28 +10,54 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { callAPI } from './apis/commonAPIs';
 
 const IndividualLogin: React.FC = () => {
-    const [phoneNumber, setPhoneNumber] = useState('');
+    const [aadhaarNumber, setAadhaarNumber] = useState('');
     const [otpSent, setOtpSent] = useState(false);
     const [otp, setOtp] = useState('');
     const [showRoleModal, setShowRoleModal] = useState(false);
     const [selectedRole, setSelectedRole] = useState<string>('individual');
     const [showSwalAlert, setShowSwalAlert] = useState(false);
+    const [accounts, setAccounts] = useState([]);
+    const [accountName, setAccountName] = useState('');
 
-    const handleSendOtp = () => {
-        if (phoneNumber.length === 12) {
-            setOtpSent(true);
-            setShowSwalAlert(true);
-            setTimeout(() => setShowSwalAlert(false), 4000);
-        } else {
-            alert("Please enter a valid 12-digit Aadhar number");
+    const handleSendOtp = async () => {
+        try {
+            if (aadhaarNumber.length === 12) {
+                const result = await callAPI("/udin/individualRegisterAndSendOtp", { aadhaar_number: aadhaarNumber });
+                if (result.status == 0) {
+                    localStorage.setItem("token", result.data.token);
+                    setOtpSent(true);
+                    setShowSwalAlert(true);
+                    alert(`OTP sent to registered mobile linked with Aadhaar: ${aadhaarNumber}`);
+                } else {
+                    alert(result.message);
+                }
+            } else {
+                alert("Please enter a valid 12-digit Aadhaar number");
+            }
+        } catch (error) {
+            console.error("Error sending OTP:", error);
+            alert("Failed to send OTP. Please try again later.");
+        } finally {
+            setShowSwalAlert(false);
         }
     };
 
-    const handleVerifyOtp = () => {
+    const handleVerifyOtp = async () => {
         if (otp.length > 0) {
-            setShowRoleModal(true);
+            const token = localStorage.getItem("token");
+            const result = await callAPI("/udin/individualValidateAadhaarOtp", { aadhaar_number: aadhaarNumber, otp, token });
+            if (result.status == 0) {
+                alert("OTP verified successfully");
+                localStorage.removeItem("token");
+                localStorage.setItem("authToken", result.data.token);
+                setAccounts(result?.data?.udin_profile_details?.accounts);
+                setShowRoleModal(true);
+            } else {
+                alert(result.message);
+            }
         } else {
             alert("Please enter the OTP");
         }
@@ -41,6 +67,7 @@ const IndividualLogin: React.FC = () => {
     const handleSubmit = () => {
         if (typeof window !== 'undefined') {
             localStorage.setItem("role", selectedRole);
+            localStorage.setItem("account_name", accountName);
             localStorage.setItem("isLogin", "1");
         }
         setShowRoleModal(false);
@@ -123,10 +150,10 @@ const IndividualLogin: React.FC = () => {
                                         </div>
                                         <input
                                             type="text"
-                                            value={phoneNumber}
+                                            value={aadhaarNumber}
                                             onChange={(e) => {
                                                 const val = e.target.value.replace(/\D/g, '');
-                                                if (val.length <= 12) setPhoneNumber(val);
+                                                if (val.length <= 12) setAadhaarNumber(val);
                                             }}
                                             className="flex-1 h-14 bg-transparent outline-none text-base font-semibold text-slate-900 placeholder:text-slate-400 placeholder:font-normal"
                                             placeholder="Enter 12-digit number"
@@ -270,79 +297,51 @@ const IndividualLogin: React.FC = () => {
 
                     {/* Modal Body */}
                     <div className="p-8 space-y-4 bg-gradient-to-b from-slate-50 to-white">
-                        {/* Company Option */}
-                        <div
-                            onClick={() => setSelectedRole('company')}
-                            className={`card-hover group cursor-pointer transition-all duration-300 ${selectedRole === 'company' ? 'scale-[1.02]' : ''
-                                }`}
-                        >
-                            <div className={`relative p-6 rounded-2xl border-2 transition-all duration-300 ${selectedRole === 'company'
-                                ? 'border-indigo-500 bg-gradient-to-br from-indigo-50 to-violet-50 shadow-xl shadow-indigo-100'
-                                : 'border-slate-200 bg-white shadow-sm hover:border-slate-300 hover:shadow-md'
-                                }`}>
-                                <div className="flex items-center gap-5">
-                                    <div className={`radio-custom flex-shrink-0 w-6 h-6 rounded-full border-[3px] flex items-center justify-center ${selectedRole === 'company'
-                                        ? 'border-indigo-600 bg-indigo-600'
-                                        : 'border-slate-300 bg-white'
-                                        }`}>
-                                        {selectedRole === 'company' && (
-                                            <div className="w-2.5 h-2.5 rounded-full bg-white"></div>
-                                        )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className={`text-[10px] font-bold tracking-widest uppercase mb-1.5 ${selectedRole === 'company' ? 'text-indigo-600' : 'text-slate-400'
+                        {accounts?.map((account: any, index) => (
+                            <div
+                                key={index}
+                                onClick={() => {
+                                    setSelectedRole(account?.account_type == 'INDIVIDUAL' ? 'individual' : 'company');
+                                    setAccountName(account?.account_name);
+                                }}
+                                className={`card-hover group cursor-pointer transition-all duration-300 ${selectedRole ? 'scale-[1.02]' : ''
+                                    }`}
+                            >
+                                <div className={`relative p-6 rounded-2xl border-2 transition-all duration-300 ${selectedRole
+                                    ? 'border-indigo-500 bg-gradient-to-br from-indigo-50 to-violet-50 shadow-xl shadow-indigo-100'
+                                    : 'border-slate-200 bg-white shadow-sm hover:border-slate-300 hover:shadow-md'
+                                    }`}>
+                                    <div className="flex items-center gap-5">
+                                        <div className={`radio-custom flex-shrink-0 w-6 h-6 rounded-full border-[3px] flex items-center justify-center ${selectedRole
+                                            ? 'border-indigo-600 bg-indigo-600'
+                                            : 'border-slate-300 bg-white'
                                             }`}>
-                                            Company Authorized Person
+                                            {selectedRole && (
+                                                <div className="w-2.5 h-2.5 rounded-full bg-white"></div>
+                                            )}
                                         </div>
-                                        <h3 className="font-bold text-slate-900 text-sm leading-tight">
-                                            VYOMA INNOVUS GLOBAL PRIVATE LIMITED
-                                        </h3>
+                                        <div className="flex-1 min-w-0">
+                                            <div className={`text-[10px] font-bold tracking-widest uppercase mb-1.5 ${selectedRole ? 'text-indigo-600' : 'text-slate-400'
+                                                }`}>
+                                                {account?.account_type == 'INDIVIDUAL' ? 'Individual' : 'Company Authorized Person'}
+                                            </div>
+                                            <h3 className="font-bold text-slate-900 text-sm leading-tight">
+                                                {account?.account_name}
+                                            </h3>
+                                        </div>
+                                        {account?.account_type == 'INDIVIDUAL' ? <User
+                                            size={20}
+                                            className={`flex-shrink-0 ${selectedRole ? 'text-indigo-600' : 'text-slate-400'}`}
+                                            strokeWidth={2.5}
+                                        /> : <Building2
+                                            size={20}
+                                            className={`flex-shrink-0 ${selectedRole ? 'text-indigo-600' : 'text-slate-400'}`}
+                                            strokeWidth={2.5}
+                                        />}
                                     </div>
-                                    <Building2
-                                        size={20}
-                                        className={`flex-shrink-0 ${selectedRole === 'company' ? 'text-indigo-600' : 'text-slate-400'}`}
-                                        strokeWidth={2.5}
-                                    />
                                 </div>
                             </div>
-                        </div>
-
-                        {/* Individual Option */}
-                        <div
-                            onClick={() => setSelectedRole('individual')}
-                            className={`card-hover group cursor-pointer transition-all duration-300 ${selectedRole === 'individual' ? 'scale-[1.02]' : ''
-                                }`}
-                        >
-                            <div className={`relative p-6 rounded-2xl border-2 transition-all duration-300 ${selectedRole === 'individual'
-                                ? 'border-indigo-500 bg-gradient-to-br from-indigo-50 to-violet-50 shadow-xl shadow-indigo-100'
-                                : 'border-slate-200 bg-white shadow-sm hover:border-slate-300 hover:shadow-md'
-                                }`}>
-                                <div className="flex items-center gap-5">
-                                    <div className={`radio-custom flex-shrink-0 w-6 h-6 rounded-full border-[3px] flex items-center justify-center ${selectedRole === 'individual'
-                                        ? 'border-indigo-600 bg-indigo-600'
-                                        : 'border-slate-300 bg-white'
-                                        }`}>
-                                        {selectedRole === 'individual' && (
-                                            <div className="w-2.5 h-2.5 rounded-full bg-white"></div>
-                                        )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className={`text-[10px] font-bold tracking-widest uppercase mb-1.5 ${selectedRole === 'individual' ? 'text-indigo-600' : 'text-slate-400'
-                                            }`}>
-                                            Individual
-                                        </div>
-                                        <h3 className="font-bold text-slate-900 text-sm leading-tight">
-                                            SOUMEN DAS
-                                        </h3>
-                                    </div>
-                                    <User
-                                        size={20}
-                                        className={`flex-shrink-0 ${selectedRole === 'individual' ? 'text-indigo-600' : 'text-slate-400'}`}
-                                        strokeWidth={2.5}
-                                    />
-                                </div>
-                            </div>
-                        </div>
+                        ))}
                     </div>
 
                     {/* Modal Footer */}

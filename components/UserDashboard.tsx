@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link'; 
+import Link from 'next/link';
 import {
     FileText,
     Users,
@@ -9,7 +9,7 @@ import {
     Plus,
     TrendingUp,
     Sparkles,
-    Link as LinkIcon 
+    Link as LinkIcon
 } from 'lucide-react';
 import { assetConfig } from './asset-config';
 import { callAPI } from './apis/commonAPIs';
@@ -27,8 +27,10 @@ const UserDashboard: React.FC = () => {
 
     const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [accountName, setAccountName] = useState('');
 
     useEffect(() => {
+        setAccountName(localStorage.getItem('account_name') || '');
         const fetchDashboardDetails = async () => {
             try {
                 const result = await callAPI('/user/GetDashboardDetails', {
@@ -70,7 +72,7 @@ const UserDashboard: React.FC = () => {
                         Welcome Back
                     </h2>
                     <p className="text-lg lg:text-xl text-slate-500 mt-2 font-medium uppercase tracking-wide">
-                        Vyoma Innovus Global Private Limited
+                        {accountName}
                     </p>
                 </div>
 
@@ -104,7 +106,7 @@ const UserDashboard: React.FC = () => {
                         <div className="group relative overflow-hidden rounded-[2rem] min-h-[200px] lg:min-h-[220px] cursor-default shadow-xl shadow-blue-200/50 hover:shadow-2xl hover:shadow-cyan-400/20 transition-all duration-500">
                             <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500"></div>
                             <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                            
+
                             <div className="relative z-10 p-6 xl:p-8 h-full flex flex-col justify-between text-white">
                                 <div className="flex items-start justify-between">
                                     <div className="flex-1">
@@ -171,7 +173,7 @@ const UserDashboard: React.FC = () => {
                                 </div>
                             </div>
                         </Link>
-                        
+
                         {/* Card 4: Create Application */}
                         <Link href="/apply-noc" className="block group">
                             <div className="relative overflow-hidden rounded-[2rem] min-h-[180px] lg:min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 group-hover:border-blue-500 transition-all duration-300">

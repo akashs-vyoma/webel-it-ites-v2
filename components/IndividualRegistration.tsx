@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Eye, EyeOff, Fingerprint, KeyRound, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import CommonCard from './common-card';
+import { callAPI } from './apis/commonAPIs';
 
 const IndividualRegistration: React.FC = () => {
   // ----------------------------------------------------------------------
@@ -14,25 +15,41 @@ const IndividualRegistration: React.FC = () => {
   const [showAadhaar, setShowAadhaar] = useState(false);
   const [isConsentGiven, setIsConsentGiven] = useState(false);
   const [readMore, setReadMore] = useState(false);
-  const [shortText, setShortText] = useState("I hereby state that I have no objection in authenticating myself on Unique Document Identification Number (UDIN) portal * with Aadhaar based authentication system and *give my consent to providing my Aadhaar number, Biometric and/or One-Time Password (OTP) data for Aadhaar based authentication for the Unique Document Identification Number (UDIN) Portal access ...");
-  const [expandedText, setExpandedText] = useState("I hereby state that I have no objection in authenticating myself on Unique Document Identification Number (UDIN) portal * with Aadhaar based authentication system and *give my consent to providing my Aadhaar number, Biometric and/or One-Time Password (OTP) data for Aadhaar based authentication for the Unique Document Identification Number (UDIN) Portal access. I understand that the Aadhaar number, Biometrics and/ or OTP I provide for authentication shall be used for authenticating my identity and the Department of Information Technology & Electronics Government of West Bengal shall ensure security and confidentiality of my personal identity data provided for the purpose of Aadhaar based authentication.");
+  const shortText = "I hereby state that I have no objection in authenticating myself on Unique Document Identification Number (UDIN) portal * with Aadhaar based authentication system and *give my consent to providing my Aadhaar number, Biometric and/or One-Time Password (OTP) data for Aadhaar based authentication for the Unique Document Identification Number (UDIN) Portal access ...";
+  const expandedText = "I hereby state that I have no objection in authenticating myself on Unique Document Identification Number (UDIN) portal * with Aadhaar based authentication system and *give my consent to providing my Aadhaar number, Biometric and/or One-Time Password (OTP) data for Aadhaar based authentication for the Unique Document Identification Number (UDIN) Portal access. I understand that the Aadhaar number, Biometrics and/ or OTP I provide for authentication shall be used for authenticating my identity and the Department of Information Technology & Electronics Government of West Bengal shall ensure security and confidentiality of my personal identity data provided for the purpose of Aadhaar based authentication.";
 
-  const handleSendOtp = () => {
+  const handleSendOtp = async () => {
+    if (!isConsentGiven) {
+      alert("Please check the consent box before verifying.");
+      return;
+    }
     if (aadhaarNumber.length === 12) {
-      setOtpSent(true);
-      alert(`OTP sent to registered mobile linked with Aadhaar: ${aadhaarNumber}`);
+      const result = await callAPI("/udin/individualRegisterAndSendOtp", { aadhaar_number: aadhaarNumber });
+      if (result.status == 0) {
+        localStorage.setItem("token", result.data.token);
+        setOtpSent(true);
+        alert(`OTP sent to registered mobile linked with Aadhaar: ${aadhaarNumber}`);
+      } else {
+        alert(result.message);
+      }
     } else {
       alert("Please enter a valid 12-digit Aadhaar number");
     }
   };
 
-  const handleVerifyOtp = () => {
-    if (otp.length > 0) {
+  const handleVerifyOtp = async () => {
+    if (otp?.length > 0) {
       if (!isConsentGiven) {
         alert("Please check the consent box before verifying.");
         return;
       }
-      alert("Verifying OTP and fetching details...");
+      const token = localStorage.getItem("token");
+      const result = await callAPI("/udin/individualValidateAadhaarOtp", { aadhaar_number: aadhaarNumber, otp, token });
+      if (result.status == 0) {
+        alert("OTP verified successfully");
+      } else {
+        alert(result.message);
+      }
       // Logic to auto-fill name would go here
     } else {
       alert("Please enter the OTP");
@@ -109,6 +126,7 @@ const IndividualRegistration: React.FC = () => {
                   type="text"
                   value={otp}
                   onChange={(e) => setOtp(e.target.value)}
+                  maxLength={6}
                   className="flex-1 h-full bg-transparent outline-none text-base font-semibold text-slate-900 placeholder:text-slate-400 tracking-widest"
                   placeholder="• • • • • •"
                 />
