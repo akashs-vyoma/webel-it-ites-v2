@@ -279,7 +279,7 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
                     <div className="mt-10 flex justify-center gap-6">
                         <button className="cursor-pointer bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white text-sm font-semibold px-8 py-3 rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-2">
                             <ShieldCheck size={18} />
-                            Verify Aadhar
+                            Verify Aadhaar
                         </button>
                         {isWizard && <button onClick={onClose} className="cursor-pointer bg-gradient-to-r from-red-600 to-amber-500 hover:from-red-700 hover:to-amber-600 text-white text-sm font-semibold px-8 py-3 rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-2">
                             <X size={18} />
