@@ -235,6 +235,7 @@ const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicatio
                                         </div>
                                     </div>
                                 </div>
+                                {/*comment*/}
                             </div>
                             <div className="p-4 border-t border-slate-100 flex justify-end bg-slate-50">
                                 <button className="text-slate-600 hover:text-slate-900 bg-white border border-slate-300 font-bold text-xs px-4 py-2 rounded-md transition-colors" onClick={() => setShowModal(false)}>Cancel</button>
