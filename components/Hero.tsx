@@ -64,7 +64,7 @@ const Hero: React.FC = () => {
                 {open && (
                   <div className="absolute -right-0 mt-0 w-90 rounded-xl rounded-tr-none bg-white shadow-xl border border-gray-100 border-t-0 overflow-hidden z-[999]">
                     <Link
-                      href="/company-sign-up"
+                      href="/company-sign-up?tab=gstn"
                       className="flex items-center justify-between px-5 py-2 hover:bg-blue-50 transition"
                       onClick={() => setOpen(false)}
                     >
@@ -75,7 +75,7 @@ const Hero: React.FC = () => {
                     </Link>
 
                     <Link
-                      href="/company-sign-up"
+                      href="/company-sign-up?tab=dsc"
                       className="flex items-center justify-between px-5 py-2 hover:bg-blue-50 transition"
                       onClick={() => setOpen(false)}
                     >

@@ -20,12 +20,12 @@ const IndividualLogin: React.FC = () => {
     const [showSwalAlert, setShowSwalAlert] = useState(false);
 
     const handleSendOtp = () => {
-        if (phoneNumber.length === 10) {
+        if (phoneNumber.length === 12) {
             setOtpSent(true);
             setShowSwalAlert(true);
             setTimeout(() => setShowSwalAlert(false), 4000);
         } else {
-            alert("Please enter a valid 10-digit phone number");
+            alert("Please enter a valid 12-digit Aadhar number");
         }
     };
 
@@ -113,7 +113,7 @@ const IndividualLogin: React.FC = () => {
                             {/* Phone Number Input */}
                             <div className="mb-6 animate-fade-in-up" style={{ animationDelay: '0.1s', opacity: 0, animationFillMode: 'forwards' }}>
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 ml-1">
-                                    Mobile Number
+                                    Aadhar Number
                                 </label>
                                 <div className="input-modern relative group">
                                     <div className="absolute inset-0 bg-gradient-to-r  rounded-2xl opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity duration-500"></div>
@@ -126,10 +126,10 @@ const IndividualLogin: React.FC = () => {
                                             value={phoneNumber}
                                             onChange={(e) => {
                                                 const val = e.target.value.replace(/\D/g, '');
-                                                if (val.length <= 10) setPhoneNumber(val);
+                                                if (val.length <= 12) setPhoneNumber(val);
                                             }}
                                             className="flex-1 h-14 bg-transparent outline-none text-base font-semibold text-slate-900 placeholder:text-slate-400 placeholder:font-normal"
-                                            placeholder="Enter 10-digit number"
+                                            placeholder="Enter 12-digit number"
                                         />
                                         {!otpSent && (
                                             <button

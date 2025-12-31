@@ -169,11 +169,13 @@ const CreateApplicationForm: React.FC<CreateApplicationFormProps> = ({ category,
         }
     }, [appType]);
 
-    const isVetting = appType.toLowerCase().includes("vetting");
-    const isRenting = appType.toLowerCase().includes("renting out") && !appType.toLowerCase().includes("renewal");
-    const isTax = appType.toLowerCase().includes("tax exemption");
-    const isRenewal = appType.toLowerCase().includes("renewal");
+    const selectedProject = projects.find(p => String(p.projectID) === String(appType));
+    const projectSearchString = selectedProject ? selectedProject.projectName.toLowerCase() : "";
 
+    const isVetting = projectSearchString.includes("vetting");
+    const isRenting = projectSearchString.includes("renting out") && !projectSearchString.includes("renewal");
+    const isTax = projectSearchString.includes("tax exemption");
+    const isRenewal = projectSearchString.includes("renewal");
     // REUSABLE SUBMIT BUTTON (Matches Header Gradient, No Neon Effect)
     const SubmitButton = ({ onClick, label }: { onClick?: () => void, label: string }) => (
         <button

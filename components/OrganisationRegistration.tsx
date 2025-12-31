@@ -1,11 +1,24 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import OrganisationRegByGSTIN from './OrganisationRegByGSTIN';
 import OrganisationRegByDSC from './OrganisationRegByDSC';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 
-const OrganisationRegistration = () => {
+// Logic component to handle URL parameters
+const OrganisationRegistrationContent = () => {
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState('gstn');
+
+  // Sync state with URL parameter on load or change
+  useEffect(() => {
+    const tab = searchParams.get('tab');
+    if (tab === 'dsc') {
+      setActiveTab('dsc');
+    } else if (tab === 'gstn') {
+      setActiveTab('gstn');
+    }
+  }, [searchParams]);
 
   return (
     <main className="relative z-10 flex-grow flex justify-center
@@ -22,9 +35,11 @@ const OrganisationRegistration = () => {
                         bg-[#1F51FF]
                         border-b border-[#1F51FF]
                         rounded-t-xl">
-                          <div className="absolute inset-0 gradient-shimmer pointer-events-none"></div>
+          <div className="absolute inset-0 gradient-shimmer pointer-events-none"></div>
           <h2 className="text-white text-base font-semibold tracking-wide">
-            Organisation Registration
+            {activeTab === 'gstn' 
+              ? 'Company / Proprietorship Registration By GSTIN' 
+              : 'Company / Proprietorship Registration By DSC'}
           </h2>
         </div>
 
@@ -100,6 +115,15 @@ const OrganisationRegistration = () => {
       </div>
     </main>
   );
+};
+
+
+const OrganisationRegistration = () => {
+    return (
+        <Suspense fallback={<div className="flex justify-center p-10">Loading...</div>}>
+            <OrganisationRegistrationContent />
+        </Suspense>
+    );
 };
 
 export default OrganisationRegistration;

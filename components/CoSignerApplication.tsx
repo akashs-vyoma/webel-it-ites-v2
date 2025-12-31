@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { RefreshCw, CheckCircle2, Clock } from 'lucide-react';
+import { RefreshCw, CheckCircle2, Clock, Send } from 'lucide-react'; // Added Send icon
 
 interface CoSignerData {
     slNo: number;
@@ -31,6 +31,11 @@ const CoSignerTable: React.FC = () => {
             setData([...initialData]);
             setIsLoading(false);
         }, 800);
+    };
+
+    // SMS Handler
+    const handleSendSMS = (name: string) => {
+        alert(`SMS notification sent to ${name}`);
     };
 
     return (
@@ -88,17 +93,29 @@ const CoSignerTable: React.FC = () => {
                                         </span>
                                     </td>
                                     <td className="px-6 py-4">
-                                        {row.status === 'Completed' ? (
-                                            <span className="flex items-center gap-1.5 text-green-600 font-bold italic">
-                                                <CheckCircle2 size={14} />
-                                                Completed
-                                            </span>
-                                        ) : (
-                                            <span className="flex items-center gap-1.5 text-amber-500 font-bold italic">
-                                                <Clock size={14} />
-                                                Pending
-                                            </span>
-                                        )}
+                                        <div className="flex items-center justify-between gap-4">
+                                            {row.status === 'Completed' ? (
+                                                <span className="flex items-center gap-1.5 text-green-600 font-bold italic">
+                                                    <CheckCircle2 size={14} />
+                                                    Completed
+                                                </span>
+                                            ) : (
+                                                <>
+                                                    <span className="flex items-center gap-1.5 text-amber-500 font-bold italic">
+                                                        <Clock size={14} />
+                                                        Pending
+                                                    </span>
+                                                    {/* Added Send SMS Button */}
+                                                    <button 
+                                                        onClick={() => handleSendSMS(row.name)}
+                                                        className="flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-600 px-2 py-1 rounded text-[10px] font-bold border border-blue-200 transition-colors active:scale-95"
+                                                    >
+                                                        <Send size={10} />
+                                                        SEND SMS
+                                                    </button>
+                                                </>
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 text-slate-400 font-medium">
                                         {row.time}

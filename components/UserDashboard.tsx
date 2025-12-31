@@ -1,5 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link'; // Added for navigation
 import {
     FileText,
     Users,
@@ -7,7 +8,8 @@ import {
     CloudUpload,
     Plus,
     TrendingUp,
-    Sparkles
+    Sparkles,
+    Link as LinkIcon // Renamed to avoid conflict with next/link
 } from 'lucide-react';
 import { assetConfig } from './asset-config';
 import { callAPI } from './apis/commonAPIs';
@@ -160,37 +162,43 @@ const UserDashboard: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Card 3: Upload Document */}
-                        <div className="group relative overflow-hidden rounded-[2rem] min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 hover:border-cyan-400 transition-colors duration-300">
-                            <div className="relative z-10 p-6 lg:p-8 h-full flex flex-col justify-center gap-5">
-                                <div className="relative w-fit">
-                                    <div className="absolute inset-0 bg-cyan-400/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                                    <div className="relative bg-white w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 border border-slate-100 shadow-sm">
-                                        <CloudUpload size={28} className="text-cyan-600" strokeWidth={2} />
+                        {/* Card 3: Upload Document (LINK ADDED) */}
+                        <Link href="/non-individual-upload-document" className="block group">
+                            <div className="relative overflow-hidden rounded-[2rem] min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 group-hover:border-cyan-400 transition-colors duration-300">
+                                <div className="relative z-10 p-6 lg:p-8 h-full flex flex-col justify-center gap-5">
+                                    <div className="relative w-fit">
+                                        <div className="absolute inset-0 bg-cyan-400/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                                        
+                                        <div className="relative bg-white w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 border border-slate-100 shadow-sm">
+                                            <CloudUpload size={28} className="text-cyan-600" strokeWidth={2} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="text-2xl lg:text-3xl font-bold leading-tight text-slate-800 group-hover:text-cyan-700 transition-colors">Upload Document</p>
+                                        <p className="text-sm text-slate-400 mt-2 font-medium">Click to add new files</p>
                                     </div>
                                 </div>
-                                <div>
-                                    <p className="text-2xl lg:text-3xl font-bold leading-tight text-slate-800 group-hover:text-cyan-700 transition-colors">Upload Document</p>
-                                    <p className="text-sm text-slate-400 mt-2 font-medium">Click to add new files</p>
-                                </div>
                             </div>
-                        </div>
+                        </Link>
+                        
 
-                        {/* Card 4: Create Application */}
-                        <div className="group relative overflow-hidden rounded-[2rem] min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 hover:border-blue-500 transition-colors duration-300">
-                            <div className="relative z-10 p-6 lg:p-8 h-full flex flex-col justify-center gap-5">
-                                <div className="relative w-fit">
-                                    <div className="absolute inset-0 bg-blue-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
-                                    <div className="relative bg-white w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 border border-slate-100 shadow-sm">
-                                        <Plus size={28} className="text-blue-600" strokeWidth={2.5} />
+                        {/* Card 4: Create Application (LINK ADDED) */}
+                        <Link href="/apply-noc" className="block group">
+                            <div className="relative overflow-hidden rounded-[2rem] min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 group-hover:border-blue-500 transition-colors duration-300">
+                                <div className="relative z-10 p-6 lg:p-8 h-full flex flex-col justify-center gap-5">
+                                    <div className="relative w-fit">
+                                        <div className="absolute inset-0 bg-blue-500/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all duration-500"></div>
+                                        <div className="relative bg-white w-14 h-14 rounded-2xl flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 border border-slate-100 shadow-sm">
+                                            <Plus size={28} className="text-blue-600" strokeWidth={2.5} />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <p className="text-2xl lg:text-3xl font-bold leading-tight text-slate-800 group-hover:text-blue-700 transition-colors">Create Application</p>
+                                        <p className="text-sm text-slate-400 mt-2 font-medium">Start a new submission</p>
                                     </div>
                                 </div>
-                                <div>
-                                    <p className="text-2xl lg:text-3xl font-bold leading-tight text-slate-800 group-hover:text-blue-700 transition-colors">Create Application</p>
-                                    <p className="text-sm text-slate-400 mt-2 font-medium">Start a new submission</p>
-                                </div>
                             </div>
-                        </div>
+                        </Link>
                     </div>
                 </div>
             </div>
