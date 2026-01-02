@@ -212,10 +212,8 @@ const IndividualLogin: React.FC = () => {
                             {/* Sign Up Link */}
                             <div className="text-center mb-6 animate-fade-in-up" style={{ animationDelay: '0.5s', opacity: 0, animationFillMode: 'forwards' }}>
                                 <p className="text-sm text-slate-600">
-                                    New to the platform?{' '}
-                                    <a href="/individual-sign-up" className="font-bold text-indigo-600 hover:text-indigo-700 transition-colors no-underline">
-                                        Create Account →
-                                    </a>
+                                    Not registered as Individual?{' '}
+                                    <a href="/individual-sign-up" className="font-bold text-indigo-600 no-underline">Create Account </a>
                                 </p>
                             </div>
 

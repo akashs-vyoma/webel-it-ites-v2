@@ -110,14 +110,16 @@ const UserDashboard: React.FC = () => {
                         <Sparkles size={16} className="text-cyan-500 fill-cyan-500/20" />
                         <span className="text-sm font-semibold text-cyan-600 tracking-wide">Dashboard Overview</span>
                     </div>
-                    <h2 className="text-3xl lg:text-4xl xl:text-5xl font-extrabold tracking-tight drop-shadow-sm animate-fade-in">
-                        Welcome back
-                        <p className="text-sm font-medium">
-                            <span className="bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 bg-clip-text text-transparent">
-                                {accountName || ""}
-                            </span>
-                        </p>
-                    </h2>
+               <h2 className="text-3xl lg:text-4xl xl:text-5xl font-extrabold tracking-tight drop-shadow-sm animate-fade-in">
+  <span className="text-slate-800 block">
+    Welcome,
+  </span>
+
+  <span className="block mt-1 bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-700 bg-clip-text text-transparent text-1xl lg:text-2xl xl:text-3xl font-semibold">
+    {accountName || ""}
+  </span>
+</h2>
+
                 </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-10 items-start">
