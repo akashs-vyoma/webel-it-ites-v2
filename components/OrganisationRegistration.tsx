@@ -57,7 +57,7 @@ const OrganisationRegistrationContent = () => {
                   : 'text-gray-500 hover:text-[#1F51FF]'
                 }`}
             >
-              Sign In by GSTN
+              Sign up by GSTN
             </button>
 
             <button
@@ -68,7 +68,7 @@ const OrganisationRegistrationContent = () => {
                   : 'text-gray-500 hover:text-[#1F51FF]'
                 }`}
             >
-              Sign In by DSC
+              Sign up by DSC
             </button>
           </div>
 

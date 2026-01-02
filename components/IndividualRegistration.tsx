@@ -175,7 +175,7 @@ const IndividualRegistration: React.FC = () => {
             <p className="text-sm text-slate-500 font-medium">
               Already have an account?{' '}
               <Link href="/individual-sign-in" className="font-bold text-[#1F51FF] hover:underline transition-all">
-                Sign up Now
+                Sign in Now
               </Link>
             </p>
           </div>

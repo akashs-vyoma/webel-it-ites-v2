@@ -97,9 +97,9 @@ const Hero: React.FC = ({ open, setOpen }: { open: boolean; setOpen: (open: bool
           </div>
           <div className="flex-grow">
             <p className="font-semibold text-slate-900 group-hover:text-blue-700 transition-colors">
-              Company / Proprietorship
+              GSTIN
             </p>
-            <p className="text-xs text-slate-500 uppercase tracking-wider font-medium">Via GSTIN Verification</p>
+            <p className="text-xs text-slate-500 uppercase tracking-wider font-medium"> For Company / Proprietorship</p>
           </div>
           <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-blue-500 group-hover:translate-x-1 transition-all" />
         </Link>
@@ -115,9 +115,9 @@ const Hero: React.FC = ({ open, setOpen }: { open: boolean; setOpen: (open: bool
           </div>
           <div className="flex-grow">
             <p className="font-semibold text-slate-900 group-hover:text-indigo-700 transition-colors">
-              Company / Proprietorship
+           DSC(Digital Signature Certificate)
             </p>
-            <p className="text-xs text-slate-500 uppercase tracking-wider font-medium">Via Digital Signature (DSC)</p>
+            <p className="text-xs text-slate-500 uppercase tracking-wider font-medium">For Company / Proprietorship</p>
           </div>
           <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-indigo-500 group-hover:translate-x-1 transition-all" />
         </Link>
@@ -133,9 +133,9 @@ const Hero: React.FC = ({ open, setOpen }: { open: boolean; setOpen: (open: bool
           </div>
           <div className="flex-grow">
             <p className="font-semibold text-slate-900 group-hover:text-emerald-700 transition-colors">
-              Individual / HUF
+              Individual Registration
             </p>
-            <p className="text-xs text-slate-500 uppercase tracking-wider font-medium">Personal Registration</p>
+            <p className="text-xs text-slate-500 uppercase tracking-wider font-medium">For Individual/HUF</p>
           </div>
           <ArrowRight className="w-5 h-5 text-slate-300 group-hover:text-emerald-500 group-hover:translate-x-1 transition-all" />
         </Link>

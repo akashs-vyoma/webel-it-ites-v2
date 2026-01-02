@@ -322,8 +322,8 @@ const IndividualLogin: React.FC = () => {
 
                             <div className="text-center mb-6">
                                 <p className="text-sm text-slate-600">
-                                    New to the platform?{' '}
-                                    <a href="/individual-sign-up" className="font-bold text-indigo-600 no-underline">Create Account →</a>
+                                    Not registered as Individual?{' '}
+                                    <a href="/individual-sign-up" className="font-bold text-indigo-600 no-underline">Create Account </a>
                                 </p>
                             </div>
 

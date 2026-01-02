@@ -67,22 +67,6 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
     const [appType, setAppType] = useState("");
     const [requiredDocuments, setRequiredDocuments] = useState<any>([]);
     const [isLoadingRequiredDocs, setIsLoadingRequiredDocs] = useState(false);
-    const [uploadedDocs, setUploadedDocs] = useState<any>({
-        "Balance Sheet": true,
-        "IT Return": true,
-        "MOA": true,
-        "Project Report": true,
-        "Trade License of Tenant": true,
-        "Agreement with Tenant": true,
-        "Mother Deed with Webel": false,
-        "Copy Agreement": true,
-        "Last Invoice issued by Webel": false,
-        "Old NOC": false,
-        "Renewal Deed": false,
-        "Original Deed": false,
-        "MultiParty Declaration Letter": false,
-        "Letter from NDITA": false,
-    }); 
     const [activeDoc, setActiveDoc] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -110,7 +94,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
     const [role, setRole] = useState("");
     const [applicationTypes, setApplicationTypes] = useState([]);
     const [verifierRole, setVerifierRole] = useState("");
-
+    const [uploadedDocsStatus, setUploadedDocsStatus] = useState<any[]>([]);
     const [tenantList, setTenantList] = useState<any[]>([]);
     const [tenantForm, setTenantForm] = useState({
         tenantName: '',
@@ -178,7 +162,42 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
             return await callAPI('/application/SetApplicationDetailsV9', body);
         }
     }));
+          
+    const fetchUploadedDocumentStatus = async (applicationTypeID: any) => {
+        try {
+            // Get values from localStorage or defaults
+            const ownerID = parseInt(localStorage.getItem("ownerId") || "1");
+            const role = localStorage.getItem("role");
+            const userTypeID = role === "company" ? 1 : 2;
 
+            const body = {
+                ownerID: ownerID || 1,
+                userTypeID: userTypeID || 1,
+                applicationTypeID: parseInt(applicationTypeID)
+            };
+
+            const result = await callAPI('/application/GetUploadedDocumentDetailsByApplicationTypeIDV1', body);
+            
+        
+            if (result && result.data) {
+                setUploadedDocsStatus(result.data);
+            } else {
+                setUploadedDocsStatus([]); 
+            }
+        } catch (error) {
+            console.error("Error fetching uploaded document status:", error);
+            setUploadedDocsStatus([]);
+        }
+    };
+useEffect(() => {
+        if (appType) {
+            getRequiredDocumetListByProjectID(appType); 
+            fetchUploadedDocumentStatus(appType);       
+        } else {
+            setRequiredDocuments([]);
+            setUploadedDocsStatus([]);
+        }
+    }, [appType]);
     const handleAddTenant = () => {
         if (!tenantForm.tenantName || !tenantForm.tenantGstn || !tenantForm.tenantPan || !tenantForm.tenantActivity) {
             alert("Please fill all tenant details before adding.");
@@ -539,7 +558,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
                     </div>
                 </div>
 
-                {/* ================= RIGHT COLUMN: REQUIRED DOCUMENT ================= */}
+   {/* ================= RIGHT COLUMN: REQUIRED DOCUMENT ================= */}
                 <div className="lg:col-span-4 h-fit bg-white rounded-xl shadow-xl overflow-hidden border border-slate-100">
                     <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-4">
                         <h3 className="text-white text-sm font-semibold tracking-wide">Required Document</h3>
@@ -549,31 +568,62 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
                             <div className="bg-white rounded-lg p-3 shadow-sm border border-slate-200 flex justify-center items-center h-16">
                                 <span className="text-xs text-slate-400 italic">Select application type to see documents</span>
                             </div>
-                        ) : isLoadingRequiredDocs ? <div className="bg-white rounded-lg p-3 shadow-sm border border-slate-200 flex justify-center items-center gap-2 h-16">
-                            <Loader2 className='animate-spin text-slate-500' /> <span className="text-xs text-slate-400 italic">Loading...</span>
-                        </div> : (
+                        ) : isLoadingRequiredDocs ? (
+                            <div className="bg-white rounded-lg p-3 shadow-sm border border-slate-200 flex justify-center items-center gap-2 h-16">
+                                <Loader2 className='animate-spin text-slate-500' /> <span className="text-xs text-slate-400 italic">Loading...</span>
+                            </div>
+                        ) : (
                             <div className="max-h-[600px] overflow-y-auto flex flex-col gap-3 pr-1 custom-scrollbar">
                                 {requiredDocuments?.map((doc: any, idx: number) => {
-                                    const isUploaded = uploadedDocs[doc?.project_name];
+                                    
+                                    const uploadInfo = uploadedDocsStatus?.find(
+                                        (u: any) => u.project_document_id === doc.project_document_id
+                                    );
+                                    
+                                   
+                                    const isUploaded = uploadInfo?.is_uploaded === 1;
+
                                     return (
                                         <div
                                             key={idx}
-                                            className={`group relative bg-white rounded-xl p-4 border transition-all duration-200 ${isUploaded ? 'border-green-100 bg-green-50/30' : 'border-slate-200 hover:border-blue-300 hover:shadow-md cursor-pointer hover:rounded-b-none'}`}
+                                            className={`group relative bg-white rounded-xl p-4 border transition-all duration-200 ${
+                                                isUploaded 
+                                                    ? 'border-green-100 bg-green-50/30' 
+                                                    : 'border-slate-200 hover:border-blue-300 hover:shadow-md cursor-pointer'
+                                            }`}
                                             onClick={() => !isUploaded && handleUploadClick(doc)}
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-4">
-                                                    <div className={`p-2.5 rounded-lg transition-colors ${isUploaded ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600'}`}>
+                                                    <div className={`p-2.5 rounded-lg transition-colors ${
+                                                        isUploaded 
+                                                            ? 'bg-green-100 text-green-600' 
+                                                            : 'bg-slate-100 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600'
+                                                    }`}>
                                                         <FileText size={20} />
                                                     </div>
                                                     <div>
-                                                        <p className={`text-sm font-semibold ${isUploaded ? 'text-green-800' : 'text-slate-800'}`}>{doc?.project_name}</p>
-                                                        <p className="text-xs text-slate-500 mt-0.5">{isUploaded ? 'Document verified and uploaded' : 'Required format: PDF'}</p>
+                                                        <p className={`text-sm font-semibold ${isUploaded ? 'text-green-800' : 'text-slate-800'}`}>
+                                                            {doc?.project_name}
+                                                        </p>
+                                                        <p className="text-xs text-slate-500 mt-0.5">
+                                                            {isUploaded ? 'Document is Available' : 'Document Not Available'}
+                                                        </p>
                                                     </div>
                                                 </div>
-                                                <div className="flex items-center gap-3">
-                                                    {isUploaded ? <div className="flex items-center gap-1.5 px-3 py-1.5 bg-green-100 text-green-700 rounded-full text-xs font-bold"><CheckCircle2 size={14} /> Uploaded</div> : <div className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-600 rounded-full text-xs font-bold border border-amber-100"><AlertCircle size={14} /> Pending</div>}
-                                                </div>
+                                              <div className="flex items-center gap-2">
+  {isUploaded ? (
+    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[9px] font-semibold uppercase tracking-wide border border-emerald-100">
+      <CheckCircle2 size={12} />
+      Available
+    </div>
+  ) : (
+    <div className="flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 text-rose-600 rounded-full text-[9px] font-semibold uppercase tracking-wide border border-rose-100">
+       Not Available
+    </div>
+  )}
+</div>
+
                                             </div>
                                         </div>
                                     );
