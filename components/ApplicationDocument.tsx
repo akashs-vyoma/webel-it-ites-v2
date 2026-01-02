@@ -59,7 +59,7 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
         }
     };
 
-    // (Existing useEffects for Projects, Apps, and Details remain exactly as they were...)
+    
     useEffect(() => {
         const fetchProjects = async () => {
             try {

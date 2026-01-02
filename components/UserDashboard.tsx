@@ -9,7 +9,9 @@ import {
     Plus,
     TrendingUp,
     Sparkles,
-    Link as LinkIcon
+    X,
+    Loader2,
+    Info
 } from 'lucide-react';
 import { assetConfig } from './asset-config';
 import { callAPI } from './apis/commonAPIs';
@@ -23,12 +25,19 @@ interface DashboardData {
     totalJointVentureCreatedCount: number;
 }
 
-
 const UserDashboard: React.FC = () => {
-
     const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [accountName, setAccountName] = useState('');
+
+    // --- STATES FOR DOCUMENT ADVISORY MODAL ---
+    const [isAdvisoryModalOpen, setIsAdvisoryModalOpen] = useState(false);
+    const [projects, setProjects] = useState<any[]>([]);
+    const [selectedProjectID, setSelectedProjectID] = useState("");
+    const [isProjectsLoading, setIsProjectsLoading] = useState(false);
+    const [requiredDocsList, setRequiredDocsList] = useState<any[]>([]);
+    const [isReqDocsLoading, setIsReqDocsLoading] = useState(false);
+    const [showDocList, setShowDocList] = useState(false);
 
     useEffect(() => {
         setAccountName(localStorage.getItem('account_name') || '');
@@ -54,44 +63,68 @@ const UserDashboard: React.FC = () => {
         fetchDashboardDetails();
     }, []);
 
+    // --- UPDATED: RESETS STATE ON EVERY OPEN ---
+    const handleOpenAdvisory = async () => {
+        // Reset all previous data for a fresh start
+        setSelectedProjectID("");
+        setRequiredDocsList([]);
+        setShowDocList(false);
+        
+        setIsAdvisoryModalOpen(true);
+        setIsProjectsLoading(true);
+        try {
+            const result = await callAPI("/application/GetProjectDetailsByDeptID", { "departmentID": 1 });
+            if (result.status === 0) setProjects(result.data);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsProjectsLoading(false);
+        }
+    };
+
+    const fetchRequiredDocs = async () => {
+        if (!selectedProjectID) return;
+        setIsReqDocsLoading(true);
+        setShowDocList(true);
+        try {
+            const result = await callAPI("/application/GetAllProjectDocByProjectID", { 
+                "projectID": parseInt(selectedProjectID) 
+            });
+            if (result.status === 0) setRequiredDocsList(result.data);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setIsReqDocsLoading(false);
+        }
+    };
+
     return (
-        /* Reduced horizontal padding on medium/large screens to prevent "squeezing" cards on laptops */
         <main className="relative z-10 min-h-screen px-4 sm:px-6 md:px-10 lg:px-16 xl:px-20 selection:bg-cyan-200 selection:text-blue-900">
-            {/* Background gradient effects */}
             <div className="absolute top-0 left-0 w-full h-96 to-transparent -z-10"></div>
             <div className="absolute top-0 right-0 w-1/3 h-96 bg-gradient-to-bl from-cyan-100/40 via-blue-50/20 to-transparent blur-3xl -z-10"></div>
 
             <div className="container mx-auto py-8 lg:py-12">
-
                 {/* Welcome Message */}
                 <div className="mb-10 lg:mb-14">
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-cyan-100 rounded-full mb-4 shadow-sm shadow-cyan-100">
                         <Sparkles size={16} className="text-cyan-500 fill-cyan-500/20" />
                         <span className="text-sm font-semibold text-cyan-600 tracking-wide">Dashboard Overview</span>
                     </div>
-<h2 className="text-3xl lg:text-4xl xl:text-5xl font-extrabold tracking-tight drop-shadow-sm animate-fade-in">
-  Welcome back
-<p className="text-sm font-medium">
-  <span className="bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 bg-clip-text text-transparent">
-    {accountName || ""}
-  </span>
-</p>
-
-
-
-</h2>
-  </div>
+                    <h2 className="text-3xl lg:text-4xl xl:text-5xl font-extrabold tracking-tight drop-shadow-sm animate-fade-in">
+                        Welcome back
+                        <p className="text-sm font-medium">
+                            <span className="bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 bg-clip-text text-transparent">
+                                {accountName || ""}
+                            </span>
+                        </p>
+                    </h2>
+                </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-10 items-start">
-
-                    {/* Left Column: Image - Adjusted sizing to be more fluid */}
                     <div className="lg:col-span-5 w-full">
                         <div className="relative group h-full">
                             <div className="absolute overflow-hidden inset-0 rounded-[2.5rem] ">
                                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-blue-600/5"></div>
-                                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                                    <div className="absolute inset-0 bg-gradient-to-tr from-cyan-400/20 via-transparent to-blue-500/20 blur-xl"></div>
-                                </div>
                             </div>
                             <div className="relative z-10 h-full flex items-center justify-center p-4 lg:p-8">
                                 <div className="w-full max-w-md rounded-2xl overflow-hidden">
@@ -105,11 +138,8 @@ const UserDashboard: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Right Column: Dashboard Cards */}
                     <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-5 xl:gap-6">
-
-                        
-                           <Link href="/apply-noc" className="block group">
+                        <Link href="/apply-noc" className="block group">
                             <div className="relative overflow-hidden rounded-[2rem] min-h-[180px] lg:min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 group-hover:border-blue-500 transition-all duration-300">
                                 <div className="relative z-10 p-6 xl:p-8 h-full flex flex-col justify-center gap-4">
                                     <div className="relative bg-white w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 border border-slate-100 shadow-sm">
@@ -122,24 +152,28 @@ const UserDashboard: React.FC = () => {
                                 </div>
                             </div>
                         </Link>
-                         <Link href="/non-individual-upload-document" className="block group">
-                            <div className="relative overflow-hidden rounded-[2rem] min-h-[180px] lg:min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 group-hover:border-cyan-400 transition-all duration-300">
-                                <div className="relative z-10 p-6 xl:p-8 h-full flex flex-col justify-center gap-4">
-                                    <div className="relative bg-white w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 border border-slate-100 shadow-sm">
-                                        <CloudUpload size={24} className="text-cyan-600" strokeWidth={2} />
-                                    </div>
-                                    <div>
-                                        <p className="text-xl lg:text-2xl xl:text-3xl font-bold leading-tight text-slate-800 group-hover:text-cyan-700 transition-colors">Document Advisory</p>
-                                        <p className="text-xs text-slate-400 mt-1 font-medium">Click to add new files</p>
-                                    </div>
+
+                        {/* DOCUMENT ADVISORY CARD */}
+                        <div 
+                            onClick={handleOpenAdvisory}
+                            className="relative overflow-hidden rounded-[2rem] min-h-[180px] lg:min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 group-hover:border-cyan-400 transition-all duration-300 group"
+                        >
+                            <div className="relative z-10 p-6 xl:p-8 h-full flex flex-col justify-center gap-4">
+                                <div className="relative bg-white w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 border border-slate-100 shadow-sm">
+                                    <CloudUpload size={24} className="text-cyan-600" strokeWidth={2} />
+                                </div>
+                                <div>
+                                    <p className="text-xl lg:text-2xl xl:text-3xl font-bold leading-tight text-slate-800 group-hover:text-cyan-700 transition-colors">Document Advisory</p>
+                                    <p className="text-xs text-blue-500 mt-1 font-bold flex items-center gap-1">
+                                        Check requirements <Info size={14} />
+                                    </p>
                                 </div>
                             </div>
-                        </Link>
+                        </div>
 
+                        {/* Card: Total Upload */}
                         <div className="group relative overflow-hidden rounded-[2rem] min-h-[200px] lg:min-h-[220px] cursor-default shadow-xl shadow-blue-200/50 hover:shadow-2xl hover:shadow-cyan-400/20 transition-all duration-500">
                             <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500"></div>
-                            <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
                             <div className="relative z-10 p-6 xl:p-8 h-full flex flex-col justify-between text-white">
                                 <div className="flex items-start justify-between">
                                     <div className="flex-1">
@@ -149,7 +183,6 @@ const UserDashboard: React.FC = () => {
                                             </div>
                                             <p className="text-xs font-semibold text-blue-50 tracking-wide uppercase">Webel Services</p>
                                         </div>
-                                        {/* Adjusted font size for laptop screens (text-5xl scaling to 7xl) */}
                                         <h3 className="text-5xl xl:text-7xl font-bold mb-3 tracking-tighter drop-shadow-sm">
                                             {isLoading ? "..." : dashboardData?.totalUploadedDoc ?? 0}
                                         </h3>
@@ -164,11 +197,9 @@ const UserDashboard: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Card 2: Multi Party Declaration */}
+                        {/* Card: Multi Party */}
                         <div className="group relative overflow-hidden rounded-[2rem] min-h-[200px] lg:min-h-[220px] cursor-default shadow-xl shadow-blue-200/50 hover:shadow-2xl hover:shadow-cyan-400/20 transition-all duration-500">
                             <div className="absolute inset-0 bg-gradient-to-br from-slate-800 to-blue-900"></div>
-                            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-cyan-500/40 via-transparent to-transparent opacity-60"></div>
-
                             <div className="relative z-10 p-6 xl:p-8 h-full flex flex-col justify-between text-white">
                                 <div className="flex items-start justify-between">
                                     <div className="flex-1">
@@ -191,12 +222,86 @@ const UserDashboard: React.FC = () => {
                                 </p>
                             </div>
                         </div>
-
-                       
-                     
                     </div>
                 </div>
             </div>
+
+            {/* --- DOCUMENT ADVISORY MODAL --- */}
+            {isAdvisoryModalOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+                    <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
+                        {/* Header */}
+                        <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 p-6 flex justify-between items-center text-white">
+                            <div>
+                                <h3 className="text-xl font-bold tracking-tight">Required Documents</h3>
+                                <p className="text-blue-100 text-xs">Select your application type to check requirements</p>
+                            </div>
+                            <button onClick={() => setIsAdvisoryModalOpen(false)} className="p-2 hover:bg-white/10 rounded-full">
+                                <X size={24} />
+                            </button>
+                        </div>
+
+                        <div className="p-6 space-y-6">
+                            {/* Dropdown Section */}
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Application Type</label>
+                                <div className="relative">
+                                    <select
+                                        value={selectedProjectID}
+                                        onChange={(e) => { setSelectedProjectID(e.target.value); setShowDocList(false); }}
+                                        className="w-full h-12 px-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm outline-none appearance-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                    >
+                                        <option value="">{isProjectsLoading ? "Loading..." : "Select Type"}</option>
+                                        {projects.map((p) => <option key={p.projectID} value={p.projectID}>{p.projectName}</option>)}
+                                    </select>
+                                    <ChevronDown className="absolute right-4 top-4 w-4 h-4 text-slate-400 pointer-events-none" />
+                                </div>
+                            </div>
+
+                            {/* Click to View Trigger */}
+                            {selectedProjectID && !showDocList && (
+                                <div className="text-center py-4">
+                                    <button 
+                                        onClick={fetchRequiredDocs}
+                                        className="text-blue-600 font-bold text-sm underline underline-offset-4 hover:text-blue-800 transition-colors"
+                                    >
+                                        Click here to view required documents
+                                    </button>
+                                </div>
+                            )}
+
+                            {/* Document List View */}
+                            {showDocList && (
+                                <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                    {isReqDocsLoading ? (
+                                        <div className="flex flex-col items-center justify-center py-10 gap-3">
+                                            <Loader2 className="animate-spin text-blue-500" />
+                                            <span className="text-xs text-slate-400 italic">Fetching requirements...</span>
+                                        </div>
+                                    ) : requiredDocsList.length > 0 ? (
+                                        requiredDocsList.map((doc, idx) => (
+                                            <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl group hover:bg-white hover:border-blue-200 transition-all">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="p-2.5 bg-white rounded-xl shadow-sm border border-slate-100 group-hover:text-blue-600">
+                                                        <FileText size={18} />
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-bold text-slate-700">{doc.project_name}</p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="text-center py-10">
+                                            <p className="text-xs text-slate-400 italic">No documents found.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </main>
     );
 };
