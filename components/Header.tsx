@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { Menu, X, ChevronDown, ChevronRight } from 'lucide-react';
 import Link from 'next/link';
 import { assetConfig } from './asset-config';
+import { Button } from './ui/button';
 
-const Header: React.FC = () => {
+const Header: React.FC = ({ open, setOpen }: { open: boolean; setOpen: (open: boolean) => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   // States for mobile dropdown toggles
   const [isOrgMobileOpen, setIsOrgMobileOpen] = useState(false);
@@ -55,31 +56,23 @@ const Header: React.FC = () => {
               <button className="flex items-center gap-1 text-[15px] font-normal text-[#1a73e8] group-hover:text-[#0052cc] bg-transparent border-none outline-none h-full">
                 Organization <ChevronDown className="w-4 h-4 mt-0.5 transition-transform group-hover:rotate-180" />
               </button>
-              
+
               <div className="absolute top-full right-0 w-56 hidden group-hover:block z-50">
                 <div className="bg-white rounded-b shadow-lg border-x border-b border-t-2 border-t-blue-600 border-gray-100 py-2 mt-[1px]">
-                  
+
                   {/* Nested Registration Menu */}
-                  <div className="relative group/sub">
-                    <div className="flex items-center justify-between px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 cursor-pointer">
-                      Registration <ChevronRight className="w-4 h-4" />
-                    </div>
-                    
-                    {/* The 3 specific fields inside Registration */}
-                    <div className="absolute left-full top-[-8px] w-72 hidden group-hover/sub:block">
-                      <div className="bg-white ml-[1px] shadow-lg border border-gray-100 py-2 rounded-md">
-                        <Link href="/company-sign-up?tab=gstn" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
-                          Company / Proprietorship Registration By GSTIN
-                        </Link>
-                        <Link href="/company-sign-up?tab=dsc" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
-                          Company / Proprietorship Registration By DSC
-                        </Link>
-                        <Link href="/individual-sign-up" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
-                          Individual / HUF Registration
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
+                <div className="relative">
+  <Button
+    onClick={() => setOpen(true)}
+    variant="ghost"
+    className="w-full flex items-center justify-between px-4 py-2 text-sm font-medium text-gray-700 
+               hover:bg-blue-50 hover:text-blue-700 transition-colors"
+  >
+    <span>Registration</span>
+    <ChevronRight className="w-4 h-4" />
+  </Button>
+</div>
+
 
                   <Link href="/company-login" className="block px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700">
                     Login
@@ -144,7 +137,7 @@ const Header: React.FC = () => {
               </button>
               {isOrgMobileOpen && (
                 <div className="bg-gray-50 rounded-lg mb-2">
-                  
+
                   {/* Nested Mobile Registration */}
                   <div className="flex flex-col">
                     <button

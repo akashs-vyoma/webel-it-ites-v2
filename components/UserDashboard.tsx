@@ -23,6 +23,7 @@ interface DashboardData {
     totalJointVentureCreatedCount: number;
 }
 
+
 const UserDashboard: React.FC = () => {
 
     const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
@@ -68,13 +69,18 @@ const UserDashboard: React.FC = () => {
                         <Sparkles size={16} className="text-cyan-500 fill-cyan-500/20" />
                         <span className="text-sm font-semibold text-cyan-600 tracking-wide">Dashboard Overview</span>
                     </div>
-                    <h2 className="text-3xl lg:text-4xl xl:text-5xl font-bold text-slate-800 tracking-tight">
-                        Welcome Back
-                    </h2>
-                    <p className="text-lg lg:text-xl text-slate-500 mt-2 font-medium uppercase tracking-wide">
-                        {accountName}
-                    </p>
-                </div>
+<h2 className="text-3xl lg:text-4xl xl:text-5xl font-extrabold tracking-tight drop-shadow-sm animate-fade-in">
+  Welcome back
+<p className="text-sm font-medium">
+  <span className="bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 bg-clip-text text-transparent">
+    {accountName || ""}
+  </span>
+</p>
+
+
+
+</h2>
+  </div>
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 xl:gap-10 items-start">
 
@@ -102,7 +108,34 @@ const UserDashboard: React.FC = () => {
                     {/* Right Column: Dashboard Cards */}
                     <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-5 xl:gap-6">
 
-                        {/* Card 1: Total Uploaded Document */}
+                        
+                           <Link href="/apply-noc" className="block group">
+                            <div className="relative overflow-hidden rounded-[2rem] min-h-[180px] lg:min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 group-hover:border-blue-500 transition-all duration-300">
+                                <div className="relative z-10 p-6 xl:p-8 h-full flex flex-col justify-center gap-4">
+                                    <div className="relative bg-white w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 border border-slate-100 shadow-sm">
+                                        <Plus size={24} className="text-blue-600" strokeWidth={2.5} />
+                                    </div>
+                                    <div>
+                                        <p className="text-xl lg:text-2xl xl:text-3xl font-bold leading-tight text-slate-800 group-hover:text-blue-700 transition-colors">Create Application</p>
+                                        <p className="text-xs text-slate-400 mt-1 font-medium">Start a new submission</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </Link>
+                         <Link href="/non-individual-upload-document" className="block group">
+                            <div className="relative overflow-hidden rounded-[2rem] min-h-[180px] lg:min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 group-hover:border-cyan-400 transition-all duration-300">
+                                <div className="relative z-10 p-6 xl:p-8 h-full flex flex-col justify-center gap-4">
+                                    <div className="relative bg-white w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 border border-slate-100 shadow-sm">
+                                        <CloudUpload size={24} className="text-cyan-600" strokeWidth={2} />
+                                    </div>
+                                    <div>
+                                        <p className="text-xl lg:text-2xl xl:text-3xl font-bold leading-tight text-slate-800 group-hover:text-cyan-700 transition-colors">Document Advisory</p>
+                                        <p className="text-xs text-slate-400 mt-1 font-medium">Click to add new files</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </Link>
+
                         <div className="group relative overflow-hidden rounded-[2rem] min-h-[200px] lg:min-h-[220px] cursor-default shadow-xl shadow-blue-200/50 hover:shadow-2xl hover:shadow-cyan-400/20 transition-all duration-500">
                             <div className="absolute inset-0 bg-gradient-to-br from-blue-600 via-blue-500 to-cyan-500"></div>
                             <div className="absolute inset-0 bg-gradient-to-br from-white/20 via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -159,35 +192,8 @@ const UserDashboard: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* Card 3: Upload Document */}
-                        <Link href="/non-individual-upload-document" className="block group">
-                            <div className="relative overflow-hidden rounded-[2rem] min-h-[180px] lg:min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 group-hover:border-cyan-400 transition-all duration-300">
-                                <div className="relative z-10 p-6 xl:p-8 h-full flex flex-col justify-center gap-4">
-                                    <div className="relative bg-white w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 border border-slate-100 shadow-sm">
-                                        <CloudUpload size={24} className="text-cyan-600" strokeWidth={2} />
-                                    </div>
-                                    <div>
-                                        <p className="text-xl lg:text-2xl xl:text-3xl font-bold leading-tight text-slate-800 group-hover:text-cyan-700 transition-colors">Upload Document</p>
-                                        <p className="text-xs text-slate-400 mt-1 font-medium">Click to add new files</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </Link>
-
-                        {/* Card 4: Create Application */}
-                        <Link href="/apply-noc" className="block group">
-                            <div className="relative overflow-hidden rounded-[2rem] min-h-[180px] lg:min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 group-hover:border-blue-500 transition-all duration-300">
-                                <div className="relative z-10 p-6 xl:p-8 h-full flex flex-col justify-center gap-4">
-                                    <div className="relative bg-white w-12 h-12 rounded-xl flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 border border-slate-100 shadow-sm">
-                                        <Plus size={24} className="text-blue-600" strokeWidth={2.5} />
-                                    </div>
-                                    <div>
-                                        <p className="text-xl lg:text-2xl xl:text-3xl font-bold leading-tight text-slate-800 group-hover:text-blue-700 transition-colors">Create Application</p>
-                                        <p className="text-xs text-slate-400 mt-1 font-medium">Start a new submission</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </Link>
+                       
+                     
                     </div>
                 </div>
             </div>
