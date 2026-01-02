@@ -1,5 +1,5 @@
 
-import IndividualLogin from '@/components/IndividualLogin(bkp)'
+import IndividualLogin from '@/components/IndividualLogin'
 
 export default function page() {
     return (
