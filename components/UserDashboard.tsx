@@ -63,9 +63,9 @@ const UserDashboard: React.FC = () => {
         fetchDashboardDetails();
     }, []);
 
-    // --- UPDATED: RESETS STATE ON EVERY OPEN ---
+  
     const handleOpenAdvisory = async () => {
-        // Reset all previous data for a fresh start
+       
         setSelectedProjectID("");
         setRequiredDocsList([]);
         setShowDocList(false);
