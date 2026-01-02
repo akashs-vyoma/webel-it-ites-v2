@@ -82,14 +82,14 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
         "Original Deed": false,
         "MultiParty Declaration Letter": false,
         "Letter from NDITA": false,
-    }); 
+    });
     const [activeDoc, setActiveDoc] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     // --- API DATA STATE ---
     const [formData, setFormData] = useState<any>({
         name: "", pan: "", gstin: "", address: "", email: "", phone: "",
-        site_address: "", rentable_area: 0, space_no: "", floor_no: "", 
+        site_address: "", rentable_area: 0, space_no: "", floor_no: "",
         plot_no: "", block_no: "", building_area: 0, comm_area: 0,
         ag_from: "", ag_to: "", old_noc: "", old_noc_date: "",
         old_ag_from: "", old_ag_to: "", amt_paid: 0, renewal_from: "", renewal_to: "",
@@ -98,6 +98,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
     });
 
     const updateField = (key: string, value: any) => {
+        console.log(formData);
         setFormData((prev: any) => ({ ...prev, [key]: value }));
     };
 
