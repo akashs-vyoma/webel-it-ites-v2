@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react';
-import { Eye, EyeOff, Fingerprint, KeyRound, ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
+import { Eye, EyeOff, Fingerprint, KeyRound, ArrowRight, ShieldCheck, Sparkles, PenSquare } from 'lucide-react';
 import Link from 'next/link';
 import CommonCard from './common-card';
 import { callAPI } from './apis/commonAPIs';
@@ -27,6 +27,7 @@ const IndividualRegistration: React.FC = () => {
       const result = await callAPI("/udin/individualRegisterAndSendOtp", { aadhaar_number: aadhaarNumber });
       if (result.status == 0) {
         localStorage.setItem("token", result.data.token);
+        localStorage.setItem("trans_id", result.data.trans_id);
         setOtpSent(true);
         alert(`OTP sent to registered mobile linked with Aadhaar: ${aadhaarNumber}`);
       } else {
@@ -44,7 +45,8 @@ const IndividualRegistration: React.FC = () => {
         return;
       }
       const token = localStorage.getItem("token");
-      const result = await callAPI("/udin/individualValidateAadhaarOtp", { aadhaar_number: aadhaarNumber, otp, token });
+      const trans_id = localStorage.getItem("trans_id");
+      const result = await callAPI("/udin/individualRegisterValidateAadhaarOtp", { otp, token, trans_id });
       if (result.status == 0) {
         alert("OTP verified successfully");
       } else {
@@ -79,23 +81,27 @@ const IndividualRegistration: React.FC = () => {
               <input
                 type={showAadhaar ? "text" : "password"}
                 value={aadhaarNumber}
+                disabled={otpSent}
                 onChange={(e) => {
                   const val = e.target.value.replace(/\D/g, '');
                   if (val.length <= 12) setAadhaarNumber(val);
                 }}
-                className="flex-1 h-full bg-transparent outline-none text-base font-semibold text-slate-900 placeholder:text-slate-400 placeholder:font-medium tracking-wide"
+                className="flex-1 disabled:opacity-50 h-full bg-transparent outline-none text-base font-semibold text-slate-900 placeholder:text-slate-400 placeholder:font-medium tracking-wide"
                 placeholder="XXXX XXXX XXXX"
               />
 
               {/* Controls Container (Eye + Button) */}
               <div className="flex items-center gap-2 pr-2">
                 {/* Eye Toggle */}
-                <button
+                {!otpSent ? <button
                   onClick={() => setShowAadhaar(!showAadhaar)}
                   className="p-2 text-slate-400 hover:text-[#1F51FF] transition-colors rounded-full hover:bg-blue-50"
                 >
                   {showAadhaar ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
+                </button> :
+                  <button onClick={() => setOtpSent(false)} className="p-2 text-slate-400 hover:text-[#1F51FF] transition-colors rounded-full hover:bg-blue-50">
+                    <PenSquare size={18} />
+                  </button>}
 
                 {/* Send OTP Button (Inside Input) */}
                 {!otpSent && (

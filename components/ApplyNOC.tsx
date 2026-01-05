@@ -157,8 +157,8 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
                     "cosigner_sign_status": "PENDING"
                 }],
                 "lst_coapplicant_details": [],
-                "entry_user_id": parseInt(localStorage.getItem("userId") || "1"),
-                "owner_id": parseInt(localStorage.getItem("ownerId") || "1")
+                "entry_user_id": parseInt(localStorage.getItem("user_id") || "1"),
+                "owner_id": parseInt(localStorage.getItem("owner_id") || "1")
             };
             return await callAPI('/application/SetApplicationDetailsV9', body);
         }
@@ -167,7 +167,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
     const fetchUploadedDocumentStatus = async (applicationTypeID: any) => {
         try {
             // Get values from localStorage or defaults
-            const ownerID = parseInt(localStorage.getItem("ownerId") || "1");
+            const ownerID = parseInt(localStorage.getItem("owner_id") || "1");
             const role = localStorage.getItem("role");
             const userTypeID = role === "company" ? 1 : 2;
 
@@ -588,16 +588,16 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
                                         <div
                                             key={idx}
                                             className={`group relative bg-white rounded-xl p-4 border transition-all duration-200 ${isUploaded
-                                                    ? 'border-green-100 bg-green-50/30'
-                                                    : 'border-slate-200 hover:border-blue-300 hover:shadow-md cursor-pointer'
+                                                ? 'border-green-100 bg-green-50/30'
+                                                : 'border-slate-200 hover:border-blue-300 hover:shadow-md cursor-pointer'
                                                 }`}
                                             onClick={() => !isUploaded && handleUploadClick(doc)}
                                         >
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-4">
                                                     <div className={`p-2.5 rounded-lg transition-colors ${isUploaded
-                                                            ? 'bg-green-100 text-green-600'
-                                                            : 'bg-slate-100 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600'
+                                                        ? 'bg-green-100 text-green-600'
+                                                        : 'bg-slate-100 text-slate-500 group-hover:bg-blue-100 group-hover:text-blue-600'
                                                         }`}>
                                                         <FileText size={20} />
                                                     </div>

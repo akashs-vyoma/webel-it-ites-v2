@@ -44,8 +44,8 @@ const UserDashboard: React.FC = () => {
         const fetchDashboardDetails = async () => {
             try {
                 const result = await callAPI('/user/GetDashboardDetails', {
-                    "ownerID": 2,
-                    "userTypeID": 1
+                    "ownerID": parseInt(localStorage.getItem("owner_id") || "1"),
+                    "userTypeID": parseInt(localStorage.getItem("user_type_id") || "1")
                 });
 
                 if (result.status === 0) {
@@ -63,13 +63,13 @@ const UserDashboard: React.FC = () => {
         fetchDashboardDetails();
     }, []);
 
-  
+
     const handleOpenAdvisory = async () => {
-       
+
         setSelectedProjectID("");
         setRequiredDocsList([]);
         setShowDocList(false);
-        
+
         setIsAdvisoryModalOpen(true);
         setIsProjectsLoading(true);
         try {
@@ -87,8 +87,8 @@ const UserDashboard: React.FC = () => {
         setIsReqDocsLoading(true);
         setShowDocList(true);
         try {
-            const result = await callAPI("/application/GetAllProjectDocByProjectID", { 
-                "projectID": parseInt(selectedProjectID) 
+            const result = await callAPI("/application/GetAllProjectDocByProjectID", {
+                "projectID": parseInt(selectedProjectID)
             });
             if (result.status === 0) setRequiredDocsList(result.data);
         } catch (err) {
@@ -110,15 +110,15 @@ const UserDashboard: React.FC = () => {
                         <Sparkles size={16} className="text-cyan-500 fill-cyan-500/20" />
                         <span className="text-sm font-semibold text-cyan-600 tracking-wide">Dashboard Overview</span>
                     </div>
-               <h2 className="text-3xl lg:text-4xl xl:text-5xl font-extrabold tracking-tight drop-shadow-sm animate-fade-in">
-  <span className="text-slate-800 block">
-    Welcome,
-  </span>
+                    <h2 className="text-3xl lg:text-4xl xl:text-5xl font-extrabold tracking-tight drop-shadow-sm animate-fade-in">
+                        <span className="text-slate-800 block">
+                            Welcome,
+                        </span>
 
-  <span className="block mt-1 bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-700 bg-clip-text text-transparent text-1xl lg:text-2xl xl:text-3xl font-semibold">
-    {accountName || ""}
-  </span>
-</h2>
+                        <span className="block mt-1 bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-700 bg-clip-text text-transparent text-1xl lg:text-2xl xl:text-3xl font-semibold">
+                            {accountName || ""}
+                        </span>
+                    </h2>
 
                 </div>
 
@@ -156,8 +156,7 @@ const UserDashboard: React.FC = () => {
                         </Link>
 
                         {/* DOCUMENT ADVISORY CARD */}
-                        <div 
-                            onClick={handleOpenAdvisory}
+                        <Link href="/document-advisory"
                             className="relative overflow-hidden rounded-[2rem] min-h-[180px] lg:min-h-[200px] cursor-pointer bg-white shadow-lg shadow-slate-200/50 border border-slate-100 group-hover:border-cyan-400 transition-all duration-300 group"
                         >
                             <div className="relative z-10 p-6 xl:p-8 h-full flex flex-col justify-center gap-4">
@@ -171,7 +170,7 @@ const UserDashboard: React.FC = () => {
                                     </p>
                                 </div>
                             </div>
-                        </div>
+                        </Link>
 
                         {/* Card: Total Upload */}
                         <div className="group relative overflow-hidden rounded-[2rem] min-h-[200px] lg:min-h-[220px] cursor-default shadow-xl shadow-blue-200/50 hover:shadow-2xl hover:shadow-cyan-400/20 transition-all duration-500">
@@ -220,7 +219,7 @@ const UserDashboard: React.FC = () => {
                                     </div>
                                 </div>
                                 <p className="text-lg xl:text-xl font-medium leading-tight text-slate-200">
-                                    Multi Party <br /> Declaration
+                                    Multi Owner <br /> Declaration
                                 </p>
                             </div>
                         </div>
@@ -229,82 +228,84 @@ const UserDashboard: React.FC = () => {
             </div>
 
             {/* --- DOCUMENT ADVISORY MODAL --- */}
-            {isAdvisoryModalOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-                    <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
-                        {/* Header */}
-                        <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 p-6 flex justify-between items-center text-white">
-                            <div>
-                                <h3 className="text-xl font-bold tracking-tight">Required Documents</h3>
-                                <p className="text-blue-100 text-xs">Select your application type to check requirements</p>
-                            </div>
-                            <button onClick={() => setIsAdvisoryModalOpen(false)} className="p-2 hover:bg-white/10 rounded-full">
-                                <X size={24} />
-                            </button>
-                        </div>
-
-                        <div className="p-6 space-y-6">
-                            {/* Dropdown Section */}
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Application Type</label>
-                                <div className="relative">
-                                    <select
-                                        value={selectedProjectID}
-                                        onChange={(e) => { setSelectedProjectID(e.target.value); setShowDocList(false); }}
-                                        className="w-full h-12 px-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm outline-none appearance-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
-                                    >
-                                        <option value="">{isProjectsLoading ? "Loading..." : "Select Type"}</option>
-                                        {projects.map((p) => <option key={p.projectID} value={p.projectID}>{p.projectName}</option>)}
-                                    </select>
-                                    <ChevronDown className="absolute right-4 top-4 w-4 h-4 text-slate-400 pointer-events-none" />
+            {
+                isAdvisoryModalOpen && (
+                    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+                        <div className="w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100">
+                            {/* Header */}
+                            <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 p-6 flex justify-between items-center text-white">
+                                <div>
+                                    <h3 className="text-xl font-bold tracking-tight">Required Documents</h3>
+                                    <p className="text-blue-100 text-xs">Select your application type to check requirements</p>
                                 </div>
+                                <button onClick={() => setIsAdvisoryModalOpen(false)} className="p-2 hover:bg-white/10 rounded-full">
+                                    <X size={24} />
+                                </button>
                             </div>
 
-                            {/* Click to View Trigger */}
-                            {selectedProjectID && !showDocList && (
-                                <div className="text-center py-4">
-                                    <button 
-                                        onClick={fetchRequiredDocs}
-                                        className="text-blue-600 font-bold text-sm underline underline-offset-4 hover:text-blue-800 transition-colors"
-                                    >
-                                        Click here to view required documents
-                                    </button>
+                            <div className="p-6 space-y-6">
+                                {/* Dropdown Section */}
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Application Type</label>
+                                    <div className="relative">
+                                        <select
+                                            value={selectedProjectID}
+                                            onChange={(e) => { setSelectedProjectID(e.target.value); setShowDocList(false); }}
+                                            className="w-full h-12 px-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-bold text-sm outline-none appearance-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+                                        >
+                                            <option value="">{isProjectsLoading ? "Loading..." : "Select Type"}</option>
+                                            {projects.map((p) => <option key={p.projectID} value={p.projectID}>{p.projectName}</option>)}
+                                        </select>
+                                        <ChevronDown className="absolute right-4 top-4 w-4 h-4 text-slate-400 pointer-events-none" />
+                                    </div>
                                 </div>
-                            )}
 
-                            {/* Document List View */}
-                            {showDocList && (
-                                <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
-                                    {isReqDocsLoading ? (
-                                        <div className="flex flex-col items-center justify-center py-10 gap-3">
-                                            <Loader2 className="animate-spin text-blue-500" />
-                                            <span className="text-xs text-slate-400 italic">Fetching requirements...</span>
-                                        </div>
-                                    ) : requiredDocsList.length > 0 ? (
-                                        requiredDocsList.map((doc, idx) => (
-                                            <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl group hover:bg-white hover:border-blue-200 transition-all">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="p-2.5 bg-white rounded-xl shadow-sm border border-slate-100 group-hover:text-blue-600">
-                                                        <FileText size={18} />
-                                                    </div>
-                                                    <div>
-                                                        <p className="text-sm font-bold text-slate-700">{doc.project_name}</p>
+                                {/* Click to View Trigger */}
+                                {selectedProjectID && !showDocList && (
+                                    <div className="text-center py-4">
+                                        <button
+                                            onClick={fetchRequiredDocs}
+                                            className="text-blue-600 font-bold text-sm underline underline-offset-4 hover:text-blue-800 transition-colors"
+                                        >
+                                            Click here to view required documents
+                                        </button>
+                                    </div>
+                                )}
+
+                                {/* Document List View */}
+                                {showDocList && (
+                                    <div className="space-y-3 max-h-[300px] overflow-y-auto pr-2 custom-scrollbar">
+                                        {isReqDocsLoading ? (
+                                            <div className="flex flex-col items-center justify-center py-10 gap-3">
+                                                <Loader2 className="animate-spin text-blue-500" />
+                                                <span className="text-xs text-slate-400 italic">Fetching requirements...</span>
+                                            </div>
+                                        ) : requiredDocsList.length > 0 ? (
+                                            requiredDocsList.map((doc, idx) => (
+                                                <div key={idx} className="flex items-center justify-between p-4 bg-slate-50 border border-slate-100 rounded-2xl group hover:bg-white hover:border-blue-200 transition-all">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="p-2.5 bg-white rounded-xl shadow-sm border border-slate-100 group-hover:text-blue-600">
+                                                            <FileText size={18} />
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-sm font-bold text-slate-700">{doc.project_name}</p>
+                                                        </div>
                                                     </div>
                                                 </div>
+                                            ))
+                                        ) : (
+                                            <div className="text-center py-10">
+                                                <p className="text-xs text-slate-400 italic">No documents found.</p>
                                             </div>
-                                        ))
-                                    ) : (
-                                        <div className="text-center py-10">
-                                            <p className="text-xs text-slate-400 italic">No documents found.</p>
-                                        </div>
-                                    )}
-                                </div>
-                            )}
+                                        )}
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </main>
+                )
+            }
+        </main >
     );
 };
 
