@@ -87,7 +87,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
     };
 
     const handleUploadClick = (doc: any) => {
-        setActiveDoc(doc?.project_id);
+        setActiveDoc(doc);
         setIsModalOpen(true);
     };
     const [projects, setProjects] = useState<Project[]>([]);
@@ -199,6 +199,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
             setUploadedDocsStatus([]);
         }
     }, [appType]);
+
     const handleAddTenant = () => {
         if (!tenantForm.tenantName || !tenantForm.tenantGstn || !tenantForm.tenantPan || !tenantForm.tenantActivity) {
             alert("Please fill all tenant details before adding.");
@@ -249,6 +250,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
             setIsLoadingProjects(false);
         }
     }
+
     useEffect(() => {
         if (appType) {
             getRequiredDocumetListByProjectID(appType);

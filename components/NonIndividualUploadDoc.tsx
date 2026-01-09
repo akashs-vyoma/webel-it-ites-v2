@@ -17,15 +17,21 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { useSearchParams } from 'next/navigation';
 
-const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void, docId: string }> = ({ isWizard, onClose, docId }) => {
+const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void, docId: any }> = ({ isWizard, onClose, docId }) => {
+    const searchParams = useSearchParams();
+
+    const dcid = searchParams.get("dcid") || docId.project_id;
+    const dcnm = searchParams.get("dcnm") || docId.project_name;
+
     const [showModal, setShowModal] = useState(false);
 
     const [formData, setFormData] = useState({
         DocumentOwnership: '',
         DocValidity: '50',
         ApplicationID: '0',
-        DocTypeID: docId || '0',
+        DocTypeID: dcid || '0',
         DocFileSize: '',
         fileToUpload: null,
         UDINNumber: '',
@@ -145,16 +151,16 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
                         </div>
 
                         {/* 3. Select Document Type */}
-                        <div>
+                        {/* <div>
                             <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
                                 Select Document Type <span className="text-red-500 text-md">*</span>
                             </label>
                             <div className="relative">
                                 <select
                                     value={formData.DocTypeID}
-                                    disabled={!!docId}
+                                    disabled={!!dcid}
                                     onChange={(e) => setFormData({ ...formData, DocTypeID: e.target.value })}
-                                    className={`w-full border ${docId ? "disabled:bg-gray-50 disabled:text-gray-500" : ""} border-gray-300 rounded-lg text-sm px-4 py-3 outline-none focus:border-blue-500 focus:text-blue-700 bg-white text-slate-700 font-medium appearance-none transition-colors cursor-pointer`}>
+                                    className={`w-full border ${dcid ? "disabled:bg-gray-50 disabled:text-gray-500" : ""} border-gray-300 rounded-lg text-sm px-4 py-3 outline-none focus:border-blue-500 focus:text-blue-700 bg-white text-slate-700 font-medium appearance-none transition-colors cursor-pointer`}>
                                     <option value="1">Project Report</option>
                                     <option value="2">MOA (Memorandum of Association)</option>
                                     <option value="3">IT Return</option>
@@ -177,6 +183,17 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
                                     <svg className="w-4 h-4 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                                 </div>
                             </div>
+                        </div> */}
+                        <div>
+                            <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wider">
+                                Document Type <span className="text-red-500 text-md">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                value={dcnm || ""}
+                                disabled={true}
+                                className="w-full border border-gray-200 bg-gray-50 rounded-lg px-4 py-3 outline-none text-gray-500 font-medium h-[46px]"
+                            />
                         </div>
 
                         {/* 4. Document Description */}
