@@ -1,7 +1,7 @@
 import React from 'react';
 import { Eye } from 'lucide-react';
 import { assetConfig } from './asset-config';
-
+import Image from 'next/image';
 const About: React.FC = () => {
   return (
     <section id="about" className="py-20 bg-white">
@@ -25,14 +25,19 @@ const About: React.FC = () => {
               West Bengal Electronics Industry Development Corporation Limited was incorporated on 4th February, 1974 to shape the Electronics Industry in West Bengal. Being the nodal agency of the West Bengal Government for promoting IT and Electronics industries has over the years adapted to the changing requirements of the IT and ITeS industries. With the ever-evolving nature of IT/ITeS and Electronics industry, WBEIDCL has worked towards providing an adaptive eco-system by a host of proactive initiatives.
             </p>
           </div>
-          <div className="relative h-64 md:h-80 w-full rounded-2xl overflow-hidden shadow-xl group">
-            <img
-              src={`${assetConfig}/IT_Infra.jpeg`}
-              alt="WBEIDCL Office"
-              className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-700"
-            />
-            <div className="absolute inset-0 bg-blue-900/20 group-hover:bg-transparent transition-colors duration-300"></div>
-          </div>
+         
+
+
+<div className="relative h-64 md:h-80 w-full rounded-2xl overflow-hidden shadow-xl group">
+  <Image
+    src={`${assetConfig}/IT_Infra.jpeg`}
+    alt="WBEIDCL Office"
+    fill
+    className="object-cover group-hover:scale-105 transition-transform duration-700"
+    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+  />
+  <div className="absolute inset-0 bg-blue-900/20 group-hover:bg-transparent transition-colors duration-300"></div>
+</div>
         </div>
 
         {/* Vision Card */}

@@ -11,7 +11,7 @@ import {
     ChevronRight
 } from 'lucide-react';
 import { assetConfig } from './asset-config';
-
+import Image from 'next/image';
 const CompanyDashboard: React.FC = () => {
     return (
         <main className="relative z-10 min-h-screen selection:bg-cyan-200 selection:text-blue-900">

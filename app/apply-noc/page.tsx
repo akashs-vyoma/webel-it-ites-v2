@@ -15,10 +15,10 @@ export default function WizardPage() {
     const [category, setCategory] = useState("");
     const [applicationType, setApplicationType] = useState("");
     const [applicationNo, setApplicationNo] = useState("");
-    const childRef = useRef<any>(null); // Added ref for API trigger
+    const childRef = useRef<any>(null); 
     const totalSteps = 6;
 
-    // Navigation logic
+
     const steps = [
         { id: 1, label: "Create Application", icon: ClipboardEdit },
         { id: 2, label: "Document", icon: FileUp },
@@ -34,7 +34,7 @@ export default function WizardPage() {
             const result = await childRef.current?.submitApplication();
             
             if (result && result.status === 0) {
-                // Success: set Application No from API response
+                
                 setApplicationNo(result.data.application_no);
                 setApplicationType(localStorage.getItem("application-type") || "");
                 setCurrentStep((prev) => Math.min(prev + 1, totalSteps));

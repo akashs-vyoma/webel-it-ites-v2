@@ -15,6 +15,8 @@ import {
 } from 'lucide-react';
 import { assetConfig } from './asset-config';
 import { callAPI } from './apis/commonAPIs';
+import Image from 'next/image';
+import DashboardImg from '@/public/7127980.jpg';
 
 interface DashboardData {
     totalUploadedDoc: number;
@@ -129,12 +131,18 @@ const UserDashboard: React.FC = () => {
                                 <div className="absolute inset-0 bg-gradient-to-br from-cyan-500/5 via-transparent to-blue-600/5"></div>
                             </div>
                             <div className="relative z-10 h-full flex items-center justify-center p-4 lg:p-8">
-                                <div className="w-full max-w-md rounded-2xl overflow-hidden">
-                                    <img
-                                        src={`${assetConfig}/7127980.jpg`}
-                                        alt="Dashboard Illustration"
-                                        className="w-full h-auto object-contain drop-shadow-xl transition-all duration-700 group-hover:scale-105"
-                                    />
+                                <div className="relative z-10 h-full flex items-center justify-center p-4 lg:p-8">
+                                    <div className="w-full max-w-md rounded-2xl overflow-hidden">
+                                        <Image
+                                            src={DashboardImg}
+                                            alt="Dashboard Illustration"
+                                            width={500}
+                                            height={500}
+                                            className="w-full h-auto object-contain drop-shadow-xl transition-all duration-700 group-hover:scale-105"
+                                            sizes="(max-width: 768px) 100vw, 448px"
+
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>

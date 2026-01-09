@@ -101,6 +101,9 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
         setActiveDoc(doc);
         setIsModalOpen(true);
     };
+    
+    const [coApplicantList, setCoApplicantList] = useState<any[]>([]);
+
     const [projects, setProjects] = useState<Project[]>([]);
     const [isLoadingProjects, setIsLoadingProjects] = useState(false);
     const [role, setRole] = useState("");
@@ -119,105 +122,125 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
     const toNull = (value: any) =>
         value === "" || value === undefined ? null : value;
 
-    // --- API IMPLEMENTATION ---
     useImperativeHandle(ref, () => ({
         submitApplication: async () => {
-            // Basic Validation
+          
             if (!appType) { Swal.fire("Required", "Please select application type", "warning"); return null; }
             if (!formData.name || !formData.pan || !formData.phone) { Swal.fire("Required", "Please fill name, PAN and phone", "warning"); return null; }
             if (formData.phone.length !== 10) { Swal.fire("Invalid", "Phone number must be 10 digits", "warning"); return null; }
 
-            const body = {
-                "application_details": {
-                    "project_id": parseInt(appType),
-                    "company_or_person_name": formData.name,
-                    "company_or_person_pan": formData.pan,
-                    "company_gst_no_or_aadhaar_no": formData.gstin || "",
-                    "company_or_person_registered_address": formData.address,
-                    "company_or_person_registration_no": formData.v_reg || "",
-                    "registered_area_in_sqft": parseFloat(formData.rentable_area) || 0,
-                    "tenant_gst_no": tenantList[0]?.tenantGstn || "",
-                    "tenant_pan_no": tenantList[0]?.tenantPan || "",
-                    "tenant_name": tenantList[0]?.tenantName || "",
-                    "tenant_activity": tenantList[0]?.tenantActivity || "",
-                    "building_area_in_sqft": parseFloat(formData.building_area) || 0,
-                    "commercial_area_on_rent_in_sqft": parseFloat(formData.comm_area) || 0,
-                    "user_type_id": role === "company" ? 1 : 2,
-                    "renting_floor": formData.floor_no || "",
-                    "renting_plot_no": formData.plot_no || "",
-                    "renting_address_block": formData.block_no || "",
-                    "renting_space_no": formData.space_no || "",
-                    "renting_from_month": formData.ag_from || "",
-                    "renting_to_month": formData.ag_to || "",
-                    "tax_service_authority_id": parseInt(formData.tax_auth_id) || 0,
-                    "tax_addressof_premises": formData.tax_addr || "",
-                    "tax_total_space_used_by_applicant": formData.tax_space || "",
-                    "tax_break_up_of_builtup_space": formData.tax_breakup || "",
-                    "tax_desc_of_ites_operation": formData.tax_desc || "",
-                    "tax_total_used_for_ites_activities": formData.tax_ites_total || "",
-                    "tlease_applicant_name": "",
-                    "tlease_application_ref_no": "",
-                    "tlease_application_ref_date": "",
-                    "tlease_mobile_no": "",
-                    "tlease_email": "",
-                    "tlease_transfer_permission_letter_issued_to": "",
-                    "tlease_built_up_space_area": "",
-                    "tlease_address": "",
-                    "tlease_transfer_fee_paid": 0,
-                    "tlease_payment_date": "",
-                    "tlease_payment_ref": "",
-                    "tlease_webel_ref_no": "",
-                    "tlease_webel_ref_date": "",
-                    "mortgage_applicant_name": "",
-                    "mortgage_address": "",
-                    "mortgage_application_ref_no": "",
-                    "mortgage_application_ref_date": "",
-                    "mortgage_mobile_no": "",
-                    "mortgage_email": "",
-                    "mortgage_noc_letter_issued_to": "",
-                    "mortgage_built_up_space_area": "",
-                    "mortgage_schedule_of_the_property": "",
-                    "mortgage_name_of_bank": "",
-                    "mortgage_address_of_bank": "",
-                    "mortgage_loan_amount": 0,
-                    "mortgage_transfer_fee_paid": 0,
-                    "mortgage_payment_date": "",
-                    "mortgage_payment_ref": "",
-                    "mortgage_webel_ref_no": "",
-                    "mortgage_webel_ref_date": "",
-                    "in_application_id": 0,
-                    "company_or_person_contact_no": formData.phone,
-                    "company_or_person_email_id": formData.email,
-                    "dprvet_site_address": formData.site_address || "",
-                    "renting_old_noc_no": formData.old_noc || "",
-                    "renting_old_noc_date": formData.old_noc_date || "",
-                    "renting_old_agreement_from_date": formData.old_ag_from || "",
-                    "renting_old_agreement_to_date": formData.old_ag_to || "",
-                    "renting_amount_paid_till": parseFloat(formData.amt_paid) || 0,
-                    "renting_last_payment_date": "",
-                    "renting_renewal_from_date": formData.renewal_from || "",
-                    "renting_renewal_to_date": formData.renewal_to || "",
-                    // "application_id": 0,
-                    "application_no": ""
-                },
-                "lst_cosigner_details": [{
-                    // "application_id": 0,
-                    "cosigner_name": formData.v_name,
-                    "cosigner_contact_no": formData.v_phone,
-                    "cosigner_reg_no": formData.v_reg,
-                    "cosigner_role": verifierRole,
-                    "cosigner_statement": formData.v_statement || "",
-                    "cosigner_sign_status": "PENDING",
-                    "udin_token": ""
-                }],
-                "lst_coapplicant_details": [],
-                "entry_user_id": parseInt(localStorage.getItem("user_id") || "1"),
-                "owner_id": parseInt(localStorage.getItem("owner_id") || "1")
-            };
-            
+           const body = {
+    "application_details": {
+        "project_id": parseInt(appType) || 0,
+        "company_or_person_name": formData.name || "",
+        "company_or_person_pan": formData.pan || "",
+        "company_gst_no_or_aadhaar_no": formData.gstin || "",
+        "company_or_person_registered_address": formData.address || "",
+        "company_or_person_registration_no": formData.v_reg || "",
+        "registered_area_in_sqft": parseFloat(formData.rentable_area) || 0,
+        "tenant_gst_no": tenantList[0]?.tenantGstn || "",
+        "tenant_pan_no": tenantList[0]?.tenantPan || "",
+        "tenant_name": tenantList[0]?.tenantName || "",
+        "tenant_activity": tenantList[0]?.tenantActivity || "",
+        "building_area_in_sqft": parseFloat(formData.building_area) || 0,
+        "commercial_area_on_rent_in_sqft": parseFloat(formData.comm_area) || 0,
+        "user_type_id": role === "company" ? 1 : 2,
+        "renting_floor": formData.floor_no || "",
+        "renting_plot_no": formData.plot_no || "",
+        "renting_address_block": formData.block_no || "",
+        "renting_space_no": formData.space_no || "",
+        "renting_from_month": formData.ag_from || "",
+        "renting_to_month": formData.ag_to || "",
+        "tax_service_authority_id": parseInt(formData.tax_auth_id) || 0,
+        "tax_addressof_premises": formData.tax_addr || "",
+        "tax_total_space_used_by_applicant": formData.tax_space || "",
+        "tax_break_up_of_builtup_space": formData.tax_breakup || "",
+        "tax_desc_of_ites_operation": formData.tax_desc || "",
+        "tax_total_used_for_ites_activities": formData.tax_ites_total || "",
+        
+        // Transfer Lease Fields
+        "tlease_applicant_name": formData.name || "",
+        "tlease_application_ref_no": formData.tlease_ref_no || "",
+        "tlease_application_ref_date": formData.tlease_ref_date || "",
+        "tlease_mobile_no": formData.phone || "",
+        "tlease_email": formData.email || "",
+        "tlease_transfer_permission_letter_issued_to": tenantList[0]?.tenantName || "",
+        "tlease_built_up_space_area": formData.comm_area || "",
+        "tlease_address": formData.tax_addr || "",
+        "tlease_transfer_fee_paid": parseFloat(formData.tlease_fee) || 0,
+        "tlease_payment_date": formData.tlease_pay_date || "",
+        "tlease_payment_ref": formData.tlease_pay_ref || "",
+        "tlease_webel_ref_no": formData.tlease_webel_no || "",
+        "tlease_webel_ref_date": formData.tlease_webel_date || "",
+
+        // Mortgage Fields
+        "mortgage_applicant_name": formData.name || "",
+        "mortgage_address": formData.address || "",
+        "mortgage_application_ref_no": formData.mort_ref_no || "",
+        "mortgage_application_ref_date": formData.mort_ref_date || "",
+        "mortgage_mobile_no": formData.phone || "",
+        "mortgage_email": formData.email || "",
+        "mortgage_noc_letter_issued_to": formData.bank_name || "",
+        "mortgage_built_up_space_area": formData.rentable_area || "",
+        "mortgage_schedule_of_the_property": formData.property_schedule || "",
+        "mortgage_name_of_bank": formData.bank_name || "",
+        "mortgage_address_of_bank": formData.bank_address || "",
+        "mortgage_loan_amount": parseFloat(formData.loan_amount) || 0,
+        "mortgage_transfer_fee_paid": parseFloat(formData.mort_fee) || 0,
+        "mortgage_payment_date": formData.mort_pay_date || "",
+        "mortgage_payment_ref": formData.mort_pay_ref || "",
+        "mortgage_webel_ref_no": formData.mort_webel_no || "",
+        "mortgage_webel_ref_date": formData.mort_webel_date || "",
+
+        "in_application_id": 0,
+        "company_or_person_contact_no": formData.phone || "",
+        "company_or_person_email_id": formData.email || "",
+        "dprvet_site_address": formData.site_address || "",
+        "renting_old_noc_no": formData.old_noc || "",
+        "renting_old_noc_date": formData.old_noc_date || "",
+        "renting_old_agreement_from_date": formData.old_ag_from || "",
+        "renting_old_agreement_to_date": formData.old_ag_to || "",
+        "renting_amount_paid_till": parseFloat(formData.amt_paid) || 0,
+        "renting_last_payment_date": formData.last_payment_date || "",
+        "renting_renewal_from_date": formData.renewal_from || "",
+        "renting_renewal_to_date": formData.renewal_to || ""
+    },
+    "lst_cosigner_details": [
+        {
+            "application_id": 0,
+            "cosigner_name": formData.v_name || "",
+            "cosigner_contact_no": formData.v_phone || "",
+            "cosigner_reg_no": formData.v_reg || "",
+            "cosigner_role": verifierRole || "",
+            "cosigner_statement": formData.v_statement || "",
+            "cosigner_sign_status": "1", // Matching example '1'
+            "udin_token": formData.udin || ""
+        }
+    ],
+    "lst_coapplicant_details": coApplicantList?.length > 0 ? coApplicantList.map(co => ({
+        "application_id": 0,
+        "applicant_name": co.name || "",
+        "applicant_pan": co.pan || "",
+        "applicant_gst_or_aadhaar": co.gst_aadhaar || "",
+        "applicant_mobile_no": co.mobile || "",
+        "applicant_address": co.address || ""
+    })) : [],
+    "entry_user_id": parseInt(localStorage.getItem("user_id") || "1"),
+    "owner_id": parseInt(localStorage.getItem("owner_id") || "1")
+};
             try {
                 const result = await callAPI('/application/SetApplicationDetailsV9', body);
-                return result;
+                if (result && result.status === 0 && result.data) {
+                const appId = result.data.application_id || result.data.in_application_id;
+                const appNo = result.data.application_no;
+
+                if (appId) localStorage.setItem("application_id", appId.toString());
+                if (appNo) localStorage.setItem("application_no", appNo.toString());
+                
+                console.log("Application Saved Locally:", { appId, appNo });
+            }
+
+            return result;
             } catch (error) {
                 console.error("API Call failed", error);
                 Swal.fire("Error", "Server connection failed", "error");
