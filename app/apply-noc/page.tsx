@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import CreateApplicationForm from '@/components/ApplyNOC';
 import { ArrowLeft, BadgeCheck, Check, ClipboardEdit, CreditCard, FileCheck, FileUp, ListChecks, Send, Users } from 'lucide-react';
 import DocumentUploadHeader from '@/components/ApplicationDocument';
@@ -15,6 +15,7 @@ export default function WizardPage() {
     const [category, setCategory] = useState("");
     const [applicationType, setApplicationType] = useState("");
     const [applicationNo, setApplicationNo] = useState("");
+    const childRef = useRef<any>(null); // Added ref for API trigger
     const totalSteps = 6;
 
     // Navigation logic
@@ -27,13 +28,24 @@ export default function WizardPage() {
         { id: 6, label: "Payment", icon: CreditCard }
     ];
 
-    const nextStep = () => {
+    const nextStep = async () => {
         if (currentStep === 1) {
-            setApplicationNo("AP/DPRITVET/432/20240105050148");
-            setApplicationType(localStorage.getItem("application-type") || "");
-            setCurrentStep((prev) => Math.min(prev + 1, totalSteps))
-        } else if (currentStep === 2 && category === "SINGLE") setCurrentStep(4);
-        else setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
+            
+            const result = await childRef.current?.submitApplication();
+            
+            if (result && result.status === 0) {
+                // Success: set Application No from API response
+                setApplicationNo(result.data.application_no);
+                setApplicationType(localStorage.getItem("application-type") || "");
+                setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
+            } else if (result) {
+                Swal.fire("Error", result.message || "Something went wrong", "error");
+            }
+        } else if (currentStep === 2 && category === "SINGLE") {
+            setCurrentStep(4);
+        } else {
+            setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
+        }
     };
 
     const prevStep = () => {
@@ -54,7 +66,7 @@ export default function WizardPage() {
     const renderStep = () => {
         switch (currentStep) {
             case 1:
-                return <CreateApplicationForm category={category} setCategory={setCategory} />;
+                return <CreateApplicationForm ref={childRef} category={category} setCategory={setCategory} />;
             case 2:
                 return <DocumentUploadHeader applicationNo={applicationNo} applicationType={applicationType} category={category} isWizard={true} />;
             case 3:
@@ -81,8 +93,6 @@ export default function WizardPage() {
                     const isActive = currentStep === step.id;
                     const isCompleted = currentStep > step.id;
 
-                    // Logic to calculate if the line to the right should be colored
-                    // This looks ahead to see if the next visible step is completed or active
                     const isNextStepReached = currentStep > step.id;
 
                     return (
@@ -101,17 +111,16 @@ export default function WizardPage() {
                             )}
 
                             <div className="flex flex-col items-center relative z-10">
-                                {/* The Icon Circle */}
                                 <div className={`
-                    w-12 h-12 rounded-full flex items-center justify-center 
-                    transition-all duration-500 border-2 
-                    ${isActive
+                                    w-12 h-12 rounded-full flex items-center justify-center 
+                                    transition-all duration-500 border-2 
+                                    ${isActive
                                         ? 'bg-white border-blue-600 text-blue-600 ring-4 ring-blue-50 shadow-sm'
                                         : isCompleted
                                             ? 'bg-blue-600 border-blue-600 text-white'
                                             : 'bg-white border-gray-200 text-gray-400'
                                     }
-                `}>
+                                `}>
                                     {isCompleted ? (
                                         <Check size={22} strokeWidth={3} className="animate-in zoom-in duration-300" />
                                     ) : (
@@ -123,18 +132,17 @@ export default function WizardPage() {
                                     )}
                                 </div>
 
-                                {/* Label Container */}
                                 <div className="mt-3 flex flex-col items-center">
                                     <span className={`
-                        text-[11px] uppercase tracking-wider font-bold transition-colors duration-300
-                        ${isActive ? 'text-blue-600' : isCompleted ? 'text-gray-900' : 'text-gray-400'}
-                    `}>
+                                        text-[11px] uppercase tracking-wider font-bold transition-colors duration-300
+                                        ${isActive ? 'text-blue-600' : isCompleted ? 'text-gray-900' : 'text-gray-400'}
+                                    `}>
                                         Step {step.id > 3 && category === "SINGLE" ? step.id - 1 : index + 1}
                                     </span>
                                     <span className={`
-                        text-sm font-medium transition-colors duration-300
-                        ${isActive ? 'text-gray-900' : 'text-gray-500'}
-                    `}>
+                                        text-sm font-medium transition-colors duration-300
+                                        ${isActive ? 'text-gray-900' : 'text-gray-500'}
+                                    `}>
                                         {step.label}
                                     </span>
                                 </div>

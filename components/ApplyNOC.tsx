@@ -32,6 +32,7 @@ import {
     DialogContent,
 } from "@/components/ui/dialog";
 import { callAPI } from './apis/commonAPIs';
+import Swal from 'sweetalert2';
 
 // --- DOCUMENT LOOKUP TABLE ---
 const APPLICATION_DOCUMENTS: Record<string, string[]> = {
@@ -73,19 +74,29 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
     // --- API DATA STATE ---
     const [formData, setFormData] = useState<any>({
         name: "", pan: "", gstin: "", address: "", email: "", phone: "",
-        site_address: "", rentable_area: 0, space_no: "", floor_no: "",
-        plot_no: "", block_no: "", building_area: 0, comm_area: 0,
+        site_address: "", rentable_area: "", space_no: "", floor_no: "",
+        plot_no: "", block_no: "", building_area: "", comm_area: "",
         ag_from: "", ag_to: "", old_noc: "", old_noc_date: "",
-        old_ag_from: "", old_ag_to: "", amt_paid: 0, renewal_from: "", renewal_to: "",
+        old_ag_from: "", old_ag_to: "", amt_paid: "", renewal_from: "", renewal_to: "",
         tax_auth_id: 0, tax_addr: "", tax_space: "", tax_breakup: "", tax_desc: "", tax_ites_total: "",
-        v_name: "", v_phone: "", v_reg: ""
+        v_name: "", v_phone: "", v_reg: "", v_statement: ""
     });
 
-    const updateField = (key: string, value: any) => {
-        console.log(formData);
-        setFormData((prev: any) => ({ ...prev, [key]: value }));
-    };
-
+    // --- STRICT INPUT VALIDATION HELPERS ---
+  const updateField = (key: string, value: any) => {
+    let val = value;
+    if (key === 'phone' || key === 'v_phone') {
+        // Keep only digits, limit to 10
+        val = value.replace(/\D/g, '').slice(0, 10);
+    } else if (key === 'pan') {
+        // Uppercase, limit to 10
+        val = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+    } else if (key === 'gstin') {
+        // Uppercase, limit to 15
+        val = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15);
+    }
+    setFormData((prev: any) => ({ ...prev, [key]: val }));
+};
     const handleUploadClick = (doc: any) => {
         setActiveDoc(doc);
         setIsModalOpen(true);
@@ -108,65 +119,115 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
     const toNull = (value: any) =>
         value === "" || value === undefined ? null : value;
 
+    // --- API IMPLEMENTATION ---
     useImperativeHandle(ref, () => ({
         submitApplication: async () => {
+            // Basic Validation
+            if (!appType) { Swal.fire("Required", "Please select application type", "warning"); return null; }
+            if (!formData.name || !formData.pan || !formData.phone) { Swal.fire("Required", "Please fill name, PAN and phone", "warning"); return null; }
+            if (formData.phone.length !== 10) { Swal.fire("Invalid", "Phone number must be 10 digits", "warning"); return null; }
+
             const body = {
                 "application_details": {
                     "project_id": parseInt(appType),
                     "company_or_person_name": formData.name,
                     "company_or_person_pan": formData.pan,
-                    "company_gst_no_or_aadhaar_no": formData.gstin,
+                    "company_gst_no_or_aadhaar_no": formData.gstin || "",
                     "company_or_person_registered_address": formData.address,
-                    "company_or_person_registration_no": formData.v_reg,
-                    "registered_area_in_sqft": parseFloat(formData.rentable_area),
+                    "company_or_person_registration_no": formData.v_reg || "",
+                    "registered_area_in_sqft": parseFloat(formData.rentable_area) || 0,
                     "tenant_gst_no": tenantList[0]?.tenantGstn || "",
                     "tenant_pan_no": tenantList[0]?.tenantPan || "",
                     "tenant_name": tenantList[0]?.tenantName || "",
                     "tenant_activity": tenantList[0]?.tenantActivity || "",
-                    "building_area_in_sqft": parseFloat(formData.building_area),
-                    "commercial_area_on_rent_in_sqft": parseFloat(formData.comm_area),
+                    "building_area_in_sqft": parseFloat(formData.building_area) || 0,
+                    "commercial_area_on_rent_in_sqft": parseFloat(formData.comm_area) || 0,
                     "user_type_id": role === "company" ? 1 : 2,
-                    "renting_floor": formData.floor_no,
-                    "renting_plot_no": formData.plot_no,
-                    "renting_address_block": formData.block_no,
-                    "renting_space_no": formData.space_no,
-                    "renting_from_month": formData.ag_from,
-                    "renting_to_month": formData.ag_to,
-                    "tax_service_authority_id": formData.tax_auth_id,
-                    "tax_addressof_premises": formData.tax_addr,
-                    "tax_total_space_used_by_applicant": formData.tax_space,
-                    "tax_break_up_of_builtup_space": formData.tax_breakup,
-                    "tax_desc_of_ites_operation": formData.tax_desc,
-                    "tax_total_used_for_ites_activities": formData.tax_ites_total,
+                    "renting_floor": formData.floor_no || "",
+                    "renting_plot_no": formData.plot_no || "",
+                    "renting_address_block": formData.block_no || "",
+                    "renting_space_no": formData.space_no || "",
+                    "renting_from_month": formData.ag_from || "",
+                    "renting_to_month": formData.ag_to || "",
+                    "tax_service_authority_id": parseInt(formData.tax_auth_id) || 0,
+                    "tax_addressof_premises": formData.tax_addr || "",
+                    "tax_total_space_used_by_applicant": formData.tax_space || "",
+                    "tax_break_up_of_builtup_space": formData.tax_breakup || "",
+                    "tax_desc_of_ites_operation": formData.tax_desc || "",
+                    "tax_total_used_for_ites_activities": formData.tax_ites_total || "",
+                    "tlease_applicant_name": "",
+                    "tlease_application_ref_no": "",
+                    "tlease_application_ref_date": "",
+                    "tlease_mobile_no": "",
+                    "tlease_email": "",
+                    "tlease_transfer_permission_letter_issued_to": "",
+                    "tlease_built_up_space_area": "",
+                    "tlease_address": "",
+                    "tlease_transfer_fee_paid": 0,
+                    "tlease_payment_date": "",
+                    "tlease_payment_ref": "",
+                    "tlease_webel_ref_no": "",
+                    "tlease_webel_ref_date": "",
+                    "mortgage_applicant_name": "",
+                    "mortgage_address": "",
+                    "mortgage_application_ref_no": "",
+                    "mortgage_application_ref_date": "",
+                    "mortgage_mobile_no": "",
+                    "mortgage_email": "",
+                    "mortgage_noc_letter_issued_to": "",
+                    "mortgage_built_up_space_area": "",
+                    "mortgage_schedule_of_the_property": "",
+                    "mortgage_name_of_bank": "",
+                    "mortgage_address_of_bank": "",
+                    "mortgage_loan_amount": 0,
+                    "mortgage_transfer_fee_paid": 0,
+                    "mortgage_payment_date": "",
+                    "mortgage_payment_ref": "",
+                    "mortgage_webel_ref_no": "",
+                    "mortgage_webel_ref_date": "",
                     "in_application_id": 0,
                     "company_or_person_contact_no": formData.phone,
                     "company_or_person_email_id": formData.email,
-                    "dprvet_site_address": formData.site_address,
-                    "renting_old_noc_no": formData.old_noc,
-                    "renting_old_noc_date": formData.old_noc_date,
-                    "renting_old_agreement_from_date": formData.old_ag_from,
-                    "renting_old_agreement_to_date": formData.old_ag_to,
-                    "renting_amount_paid_till": parseFloat(formData.amt_paid),
-                    "application_id": 0
+                    "dprvet_site_address": formData.site_address || "",
+                    "renting_old_noc_no": formData.old_noc || "",
+                    "renting_old_noc_date": formData.old_noc_date || "",
+                    "renting_old_agreement_from_date": formData.old_ag_from || "",
+                    "renting_old_agreement_to_date": formData.old_ag_to || "",
+                    "renting_amount_paid_till": parseFloat(formData.amt_paid) || 0,
+                    "renting_last_payment_date": "",
+                    "renting_renewal_from_date": formData.renewal_from || "",
+                    "renting_renewal_to_date": formData.renewal_to || "",
+                    // "application_id": 0,
+                    "application_no": ""
                 },
                 "lst_cosigner_details": [{
+                    // "application_id": 0,
                     "cosigner_name": formData.v_name,
                     "cosigner_contact_no": formData.v_phone,
                     "cosigner_reg_no": formData.v_reg,
                     "cosigner_role": verifierRole,
-                    "cosigner_sign_status": "PENDING"
+                    "cosigner_statement": formData.v_statement || "",
+                    "cosigner_sign_status": "PENDING",
+                    "udin_token": ""
                 }],
                 "lst_coapplicant_details": [],
                 "entry_user_id": parseInt(localStorage.getItem("user_id") || "1"),
                 "owner_id": parseInt(localStorage.getItem("owner_id") || "1")
             };
-            return await callAPI('/application/SetApplicationDetailsV9', body);
+            
+            try {
+                const result = await callAPI('/application/SetApplicationDetailsV9', body);
+                return result;
+            } catch (error) {
+                console.error("API Call failed", error);
+                Swal.fire("Error", "Server connection failed", "error");
+                return null;
+            }
         }
     }));
 
     const fetchUploadedDocumentStatus = async (applicationTypeID: any) => {
         try {
-            // Get values from localStorage or defaults
             const ownerID = parseInt(localStorage.getItem("owner_id") || "1");
             const role = localStorage.getItem("role");
             const userTypeID = role === "company" ? 1 : 2;
@@ -178,8 +239,6 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
             };
 
             const result = await callAPI('/application/GetUploadedDocumentDetailsByApplicationTypeIDV1', body);
-
-
             if (result && result.data) {
                 setUploadedDocsStatus(result.data);
             } else {
@@ -190,6 +249,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
             setUploadedDocsStatus([]);
         }
     };
+
     useEffect(() => {
         if (appType) {
             getRequiredDocumetListByProjectID(appType);
@@ -325,52 +385,52 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
 
                     <div className="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
 
-                        {role === "company" && <InputGroupGSTIN label="GSTIN of the company" icon={<CreditCard size={18} />} placeholder="GST Number" required onChange={(e) => updateField('gstin', e.target.value)} />}
-                        <InputGroup label={`PAN Number of the ${role}`} icon={<CreditCard size={18} />} placeholder="PAN Number" required onChange={(e) => updateField('pan', e.target.value)} />
-                        <InputGroup label={`Name of the ${role}`} icon={<User size={18} />} placeholder="Name" required onChange={(e) => updateField('name', e.target.value)} />
-                        <InputGroup label={`Phone Number of the ${role}`} icon={<Phone size={18} />} placeholder="Phone Number" required onChange={(e) => updateField('phone', e.target.value)} />
-                        <InputGroup label={`Email of the ${role}`} icon={<Mail size={18} />} placeholder="Email" onChange={(e) => updateField('email', e.target.value)} />
+                        {role === "company" && <InputGroupGSTIN label="GSTIN of the company" icon={<CreditCard size={18} />} placeholder="GST Number" required value={formData.gstin} onChange={(e) => updateField('gstin', e.target.value)} />}
+                        <InputGroup label={`PAN Number of the ${role}`} icon={<CreditCard size={18} />} placeholder="PAN Number" required value={formData.pan} onChange={(e) => updateField('pan', e.target.value)} />
+                        <InputGroup label={`Name of the ${role}`} icon={<User size={18} />} placeholder="Name" required value={formData.name} onChange={(e) => updateField('name', e.target.value)} />
+                        <InputGroup label={`Phone Number of the ${role}`} icon={<Phone size={18} />} placeholder="Phone Number" required value={formData.phone} onChange={(e) => updateField('phone', e.target.value)} />
+                        <InputGroup label={`Email of the ${role}`} icon={<Mail size={18} />} placeholder="Email" value={formData.email} onChange={(e) => updateField('email', e.target.value)} />
                         <div className="md:col-span-2">
-                            <InputGroup label={`Registered Address of the ${role}`} icon={<MapPin size={18} />} placeholder="Registered Address" required onChange={(e) => updateField('address', e.target.value)} />
+                            <InputGroup label={`Registered Address of the ${role}`} icon={<MapPin size={18} />} placeholder="Registered Address" required value={formData.address} onChange={(e) => updateField('address', e.target.value)} />
                         </div>
 
                         {isVetting && (
                             <div className="md:col-span-2">
-                                <InputGroup label="Site Address" icon={<MapPin size={18} />} placeholder="Site Address" required onChange={(e) => updateField('site_address', e.target.value)} />
+                                <InputGroup label="Site Address" icon={<MapPin size={18} />} placeholder="Site Address" required value={formData.site_address} onChange={(e) => updateField('site_address', e.target.value)} />
                             </div>
                         )}
 
                         {(isRenting || isRenewal) && (
                             <>
-                                <InputGroup label="Rentable Area in Sqft (Super Built Up Area)" icon={<Maximize size={18} />} placeholder="Area (in Sqft)" required onChange={(e) => updateField('rentable_area', e.target.value)} />
-                                <InputGroup label="Space Number" icon={<Layers size={18} />} placeholder="Space No." required onChange={(e) => updateField('space_no', e.target.value)} />
-                                <InputGroup label="Floor No." icon={<Building size={18} />} placeholder="Floor No." required onChange={(e) => updateField('floor_no', e.target.value)} />
-                                <InputGroup label="Plot No." icon={<Hash size={18} />} placeholder="Plot No." required onChange={(e) => updateField('plot_no', e.target.value)} />
-                                <InputGroup label="Block No." icon={<Building size={18} />} placeholder="Block No." onChange={(e) => updateField('block_no', e.target.value)} />
+                                <InputGroup label="Rentable Area in Sqft (Super Built Up Area)" icon={<Maximize size={18} />} placeholder="Area (in Sqft)" required value={formData.rentable_area} onChange={(e) => updateField('rentable_area', e.target.value)} />
+                                <InputGroup label="Space Number" icon={<Layers size={18} />} placeholder="Space No." required value={formData.space_no} onChange={(e) => updateField('space_no', e.target.value)} />
+                                <InputGroup label="Floor No." icon={<Building size={18} />} placeholder="Floor No." required value={formData.floor_no} onChange={(e) => updateField('floor_no', e.target.value)} />
+                                <InputGroup label="Plot No." icon={<Hash size={18} />} placeholder="Plot No." required value={formData.plot_no} onChange={(e) => updateField('plot_no', e.target.value)} />
+                                <InputGroup label="Block No." icon={<Building size={18} />} placeholder="Block No." value={formData.block_no} onChange={(e) => updateField('block_no', e.target.value)} />
                             </>
                         )}
 
                         {isRenewal && (
                             <>
-                                <InputGroup label="Old NOC No. / Application No." icon={<FileText size={18} />} placeholder="Old NOC No." required onChange={(e) => updateField('old_noc', e.target.value)} />
-                                <InputGroup label="Old NOC Date" icon={<Calendar size={18} />} type="date" required onChange={(e) => updateField('old_noc_date', e.target.value)} />
-                                <InputGroup label="Old Agreement Tenure (Effective From)" icon={<Calendar size={18} />} type="date" required onChange={(e) => updateField('old_ag_from', e.target.value)} />
-                                <InputGroup label="Old Agreement End Date" icon={<Calendar size={18} />} type="date" required onChange={(e) => updateField('old_ag_to', e.target.value)} />
-                                <InputGroup label="Amount Paid till (Rs.)" icon={<DollarSign size={18} />} placeholder="Amount Paid..." required onChange={(e) => updateField('amt_paid', e.target.value)} />
-                                <InputGroup label="Renewal From Date" icon={<Calendar size={18} />} type="date" required onChange={(e) => updateField('renewal_from', e.target.value)} />
-                                <InputGroup label="Renewal To Date" icon={<Calendar size={18} />} type="date" required onChange={(e) => updateField('renewal_to', e.target.value)} />
+                                <InputGroup label="Old NOC No. / Application No." icon={<FileText size={18} />} placeholder="Old NOC No." required value={formData.old_noc} onChange={(e) => updateField('old_noc', e.target.value)} />
+                                <InputGroup label="Old NOC Date" icon={<Calendar size={18} />} type="date" required value={formData.old_noc_date} onChange={(e) => updateField('old_noc_date', e.target.value)} />
+                                <InputGroup label="Old Agreement Tenure (Effective From)" icon={<Calendar size={18} />} type="date" required value={formData.old_ag_from} onChange={(e) => updateField('old_ag_from', e.target.value)} />
+                                <InputGroup label="Old Agreement End Date" icon={<Calendar size={18} />} type="date" required value={formData.old_ag_to} onChange={(e) => updateField('old_ag_to', e.target.value)} />
+                                <InputGroup label="Amount Paid till (Rs.)" icon={<DollarSign size={18} />} placeholder="Amount Paid..." required value={formData.amt_paid} onChange={(e) => updateField('amt_paid', e.target.value)} />
+                                <InputGroup label="Renewal From Date" icon={<Calendar size={18} />} type="date" required value={formData.renewal_from} onChange={(e) => updateField('renewal_from', e.target.value)} />
+                                <InputGroup label="Renewal To Date" icon={<Calendar size={18} />} type="date" required value={formData.renewal_to} onChange={(e) => updateField('renewal_to', e.target.value)} />
                                 <InputGroup label="Total Payment made" icon={<DollarSign size={18} />} placeholder="Total Payment" required />
                             </>
                         )}
 
                         {(isRenting || isRenewal) && (
                             <>
-                                <InputGroup label="Agreement Tenure (Effective From)" icon={<Calendar size={18} />} type="date" required onChange={(e) => updateField('ag_from', e.target.value)} />
-                                {isRenting && <InputGroup label="Agreement End Date" icon={<Calendar size={18} />} type="date" required onChange={(e) => updateField('ag_to', e.target.value)} />}
+                                <InputGroup label="Agreement Tenure (Effective From)" icon={<Calendar size={18} />} type="date" required value={formData.ag_from} onChange={(e) => updateField('ag_from', e.target.value)} />
+                                {isRenting && <InputGroup label="Agreement End Date" icon={<Calendar size={18} />} type="date" required value={formData.ag_to} onChange={(e) => updateField('ag_to', e.target.value)} />}
 
-                                <InputGroup label="Building Area in Sqft (Super Built-Up Area)" icon={<Maximize size={18} />} placeholder="Building Area In Sqft" required onChange={(e) => updateField('building_area', e.target.value)} />
+                                <InputGroup label="Building Area in Sqft (Super Built-Up Area)" icon={<Maximize size={18} />} placeholder="Building Area In Sqft" required value={formData.building_area} onChange={(e) => updateField('building_area', e.target.value)} />
                                 <div className="md:col-span-2">
-                                    <InputGroup label="Commercial Area On Rent (Other than IT/ITeS Activity)" icon={<Maximize size={18} />} placeholder="Commercial Area On Rent In Sqft" onChange={(e) => updateField('comm_area', e.target.value)} />
+                                    <InputGroup label="Commercial Area On Rent (Other than IT/ITeS Activity)" icon={<Maximize size={18} />} placeholder="Commercial Area On Rent In Sqft" value={formData.comm_area} onChange={(e) => updateField('comm_area', e.target.value)} />
                                 </div>
                                 <p className="md:col-span-2 text-[10px] text-slate-600 font-bold italic mt-[-10px]">
                                     Permission fees will be charged @Rs.3/sqft. till the expiry of the Rental Agreement/Surrender of the space by the tenant
@@ -392,19 +452,19 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
                                         label="Tenant GSTN No." icon={<Hash size={18} />}
                                         placeholder="Enter GSTN" required
                                         value={tenantForm.tenantGstn}
-                                        onChange={(e) => setTenantForm((prev) => ({ ...prev, tenantGstn: e.target.value }))}
+                                        onChange={(e) => setTenantForm((prev) => ({ ...prev, tenantGstn: e.target.value.toUpperCase().slice(0, 15) }))}
                                     />
                                     <InputGroup
                                         label="Tenant PAN No." icon={<CreditCard size={18} />}
                                         placeholder="Enter PAN" required
                                         value={tenantForm.tenantPan}
-                                        onChange={(e) => setTenantForm((prev) => ({ ...prev, tenantPan: e.target.value }))}
+                                        onChange={(e) => setTenantForm((prev) => ({ ...prev, tenantPan: e.target.value.toUpperCase().slice(0, 10) }))}
                                     />
                                     <InputGroup
                                         label="Tenant Phone No." icon={<PhoneCall size={18} />}
                                         placeholder="Enter Phone" required
                                         value={tenantForm.tenantPhone}
-                                        onChange={(e) => setTenantForm((prev) => ({ ...prev, tenantPhone: e.target.value }))}
+                                        onChange={(e) => setTenantForm((prev) => ({ ...prev, tenantPhone: e.target.value.replace(/\D/g, '').slice(0, 10) }))}
                                     />
 
                                     <div className="flex flex-col gap-1.5">
@@ -486,7 +546,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
 
                         {(isRenting || isRenewal) && (
                             <div className="space-y-6 md:col-span-2">
-                                {/* Tenant Input Form */}
+                                {/* Verifier Input Form */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 border rounded-xl bg-slate-50/50">
 
                                     <div className="flex flex-col gap-1.5">
@@ -513,16 +573,19 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
                                     <InputGroup
                                         label="Verifier Name" icon={<User size={18} />}
                                         placeholder="Enter Name" required
+                                        value={formData.v_name}
                                         onChange={(e) => updateField('v_name', e.target.value)}
                                     />
                                     <InputGroup
                                         label="Verifier Phone No." icon={<PhoneCall size={18} />}
                                         placeholder="Enter Phone" required
+                                        value={formData.v_phone}
                                         onChange={(e) => updateField('v_phone', e.target.value)}
                                     />
                                     <InputGroup
                                         label="Registration No." icon={<Hash size={18} />}
                                         placeholder="Enter Registration No."
+                                        value={formData.v_reg}
                                         onChange={(e) => updateField('v_reg', e.target.value)}
                                     />
                                 </div>
@@ -531,24 +594,26 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
 
                         {isTax && (
                             <>
-                                <InputGroup label="Rentable Area In Sqft (Super Built-Up Area)" icon={<Maximize size={18} />} placeholder="Area (In Sqft)" required onChange={(e) => updateField('rentable_area', e.target.value)} />
+                                <InputGroup label="Rentable Area In Sqft (Super Built-Up Area)" icon={<Maximize size={18} />} placeholder="Area (In Sqft)" required value={formData.rentable_area} onChange={(e) => updateField('rentable_area', e.target.value)} />
                                 <div className="flex flex-col gap-1.5">
                                     <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">Tax Service Authority <span className="text-red-500">*</span></label>
                                     <div className="relative">
-                                        <select className="w-full h-10 px-3 pr-10 rounded-lg border border-slate-300 text-sm font-bold outline-none appearance-none bg-white" onChange={(e) => updateField('tax_auth_id', e.target.value)}>
-                                            <option>Select Tax Service Authority</option>
+                                        <select className="w-full h-10 px-3 pr-10 rounded-lg border border-slate-300 text-sm font-bold outline-none appearance-none bg-white" value={formData.tax_auth_id} onChange={(e) => updateField('tax_auth_id', e.target.value)}>
+                                            <option value={0}>Select Tax Service Authority</option>
+                                            <option value={1}>NDITA</option>
+                                            <option value={2}>BMC</option>
                                         </select>
                                         <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
                                             <ChevronDown size={16} />
                                         </div>
                                     </div>
                                 </div>
-                                <InputGroup label="Address of Premises/Building/Plot of Land" icon={<MapPin size={18} />} placeholder="Address" required onChange={(e) => updateField('tax_addr', e.target.value)} />
-                                <InputGroup label="Total space used by the applicant/tenant" icon={<Maximize size={18} />} placeholder="Total space" required onChange={(e) => updateField('tax_space', e.target.value)} />
-                                <InputGroup label="Break up of built up space vis-à-vis number of occupant company" icon={<Layers size={18} />} placeholder="Break up details" required onChange={(e) => updateField('tax_breakup', e.target.value)} />
-                                <InputGroup label="Description of IT / ITES operation of the occupant" icon={<Activity size={18} />} placeholder="Description" required onChange={(e) => updateField('tax_desc', e.target.value)} />
+                                <InputGroup label="Address of Premises/Building/Plot of Land" icon={<MapPin size={18} />} placeholder="Address" required value={formData.tax_addr} onChange={(e) => updateField('tax_addr', e.target.value)} />
+                                <InputGroup label="Total space used by the applicant/tenant" icon={<Maximize size={18} />} placeholder="Total space" required value={formData.tax_space} onChange={(e) => updateField('tax_space', e.target.value)} />
+                                <InputGroup label="Break up of built up space vis-à-vis number of occupant company" icon={<Layers size={18} />} placeholder="Break up details" required value={formData.tax_breakup} onChange={(e) => updateField('tax_breakup', e.target.value)} />
+                                <InputGroup label="Description of IT / ITES operation of the occupant" icon={<Activity size={18} />} placeholder="Description" required value={formData.tax_desc} onChange={(e) => updateField('tax_desc', e.target.value)} />
                                 <div className="md:col-span-2">
-                                    <InputGroup label="Total used for IT/ITeS activities" icon={<Building size={18} />} placeholder="Total used" required onChange={(e) => updateField('tax_ites_total', e.target.value)} />
+                                    <InputGroup label="Total used for IT/ITeS activities" icon={<Building size={18} />} placeholder="Total used" required value={formData.tax_ites_total} onChange={(e) => updateField('tax_ites_total', e.target.value)} />
                                 </div>
                             </>
                         )}
@@ -639,7 +704,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-0">
                     <div className='w-full max-w-screen max-h-screen overflow-y-auto rounded-xl'>
-                        <NonIndividualUploadDoc docId={activeDoc} isWizard={true} onClose={() => setIsModalOpen(false)} />
+                        <NonIndividualUploadDoc docId={activeDoc} isWizard={true} onClose={() => {setIsModalOpen(false); fetchUploadedDocumentStatus(appType);}} />
                     </div>
                 </div>
             )}
@@ -680,7 +745,7 @@ const InputGroup: React.FC<InputGroupProps> = ({ label, icon, placeholder, requi
     );
 };
 
-const InputGroupGSTIN: React.FC<InputGroupProps> = ({ label, icon, placeholder, required, type = "text", onChange }) => {
+const InputGroupGSTIN: React.FC<InputGroupProps> = ({ label, icon, placeholder, required, type = "text", value, onChange }) => {
     return (
         <div className="flex flex-col gap-1.5">
             <label className="text-xs font-bold text-slate-700 uppercase tracking-wide">
@@ -693,6 +758,7 @@ const InputGroupGSTIN: React.FC<InputGroupProps> = ({ label, icon, placeholder, 
                 <input
                     type={type}
                     placeholder={placeholder}
+                    value={value}
                     onChange={onChange}
                     className="flex-1 px-3 text-sm font-bold outline-none h-full bg-white text-slate-800 placeholder:text-slate-400"
                 />
