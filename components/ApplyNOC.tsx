@@ -34,7 +34,7 @@ import {
 import { callAPI } from './apis/commonAPIs';
 import Swal from 'sweetalert2';
 
-// --- DOCUMENT LOOKUP TABLE ---
+
 const APPLICATION_DOCUMENTS: Record<string, string[]> = {
     "DPR of IT & ITeS - Vetting - SINGLE PARTY": ["Balance Sheet", "IT Return", "MOA", "Project Report"],
     "NOC for Renting Out Leased property - SINGLE PARTY": ["Trade License of Tenant", "MOA", "Agreement with Tenant", "Mother Deed with Webel"],
@@ -45,8 +45,6 @@ const APPLICATION_DOCUMENTS: Record<string, string[]> = {
     "Renewal of NOC Renting out Leased Property - SINGLE PARTY": ["Last Invoice issued by Webel", "Old NOC", "Renewal Deed", "Original Deed", "Trade License of Tenant", "MOA", "Agreement with Tenant", "Mother Deed with Webel"],
     "Renewal of NOC Renting out Leased Property - MULTI PARTY": ["Last Invoice issued by Webel", "Old NOC", "Renewal Deed", "Original Deed", "Trade License of Tenant", "MOA", "Agreement with Tenant", "Mother Deed with Webel"]
 };
-
-// --- DROPDOWN OPTIONS ---
 const TENANT_ACTIVITY_OPTIONS = [
     "IT&ITes Activity",
     "Non IT&ITes Activity (Commercial-Resturant Activity Only)",
