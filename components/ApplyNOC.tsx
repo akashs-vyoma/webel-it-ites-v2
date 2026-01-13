@@ -69,7 +69,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
     const [activeDoc, setActiveDoc] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
-    // --- API DATA STATE ---
+ 
     const [formData, setFormData] = useState<any>({
         name: "", pan: "", gstin: "", address: "", email: "", phone: "",
         site_address: "", rentable_area: "", space_no: "", floor_no: "",
