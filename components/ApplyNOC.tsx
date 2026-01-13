@@ -118,12 +118,30 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
     });
     const [userData, setUserData] = useState<any>(null);
 
-    useEffect(() => {
-        const userData_end = atob(localStorage.getItem("enData") || "");
-        const userData = JSON.parse(userData_end);
+ useEffect(() => {
+    try {
+        // 1. Get and decode the data
+        const rawData = localStorage.getItem("enData");
+        if (!rawData) return;
+
+        const userData = JSON.parse(atob(rawData));
+        
         setRole(userData?.role || "");
         setUserData(userData);
-    }, []);
+
+        setFormData(prev => ({
+            ...prev,
+            name: userData.account_name || prev.name,
+            phone: userData.phone || prev.phone,
+            address: userData.address || prev.address,
+          
+            email: userData.email || prev.email 
+        }));
+
+    } catch (error) {
+        console.error("Error decoding user data:", error);
+    }
+}, []);
 
     const toNull = (value: any) =>
         value === "" || value === undefined ? null : value;
