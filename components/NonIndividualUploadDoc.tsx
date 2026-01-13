@@ -20,7 +20,21 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
     const dcid = searchParams.get("dcid") || docId.project_id;
     const dcnm = searchParams.get("dcnm") || docId.project_name;
 
-    const [showModal, setShowModal] = useState(true);
+    const [showModal, setShowModal] = useState(false);
+
+    useEffect(() => {
+        const aadhaarAuthFlag_enc = localStorage.getItem("ad_auth");
+        const aadhaarAuthFlag = atob(aadhaarAuthFlag_enc || "");
+        console.log("aadhaarAuthFlag", aadhaarAuthFlag);
+
+
+        if (aadhaarAuthFlag == "1") {
+            setShowModal(false);
+        } else {
+            setShowModal(true);
+        }
+
+    }, [])
 
     const [formData, setFormData] = useState({
         DocumentOwnership: '',
@@ -36,7 +50,7 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
         DocRemarks: '',
     });
 
-    // --- Upload Logic Implementation ---
+
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 

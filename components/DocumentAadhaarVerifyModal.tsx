@@ -1,12 +1,13 @@
 "use client";
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { Eye } from 'lucide-react';
+import { Eye, EyeOff, Info, Loader2, CheckCircle } from 'lucide-react';
+import { callAPI } from './apis/commonAPIs';
 import Swal from 'sweetalert2';
 
 const DocumentAadhaarVerifyModal = ({ showModal, setShowModal }: { showModal: boolean, setShowModal: (showModal: boolean) => void }) => {
@@ -14,55 +15,45 @@ const DocumentAadhaarVerifyModal = ({ showModal, setShowModal }: { showModal: bo
     const [isLoadingSent, setIsLoadingSent] = useState(false);
     const [isLoadingVerify, setIsLoadingVerify] = useState(false);
 
+    const [aadhaarNumber, setAadhaarNumber] = useState("");
+    const [otp, setOtp] = useState("");
+    const [isConsentGiven, setIsConsentGiven] = useState(false);
+    const [otpSent, setOtpSent] = useState(false);
+    const [isVerified, setIsVerified] = useState(false);
+    const [showAadhaar, setShowAadhaar] = useState(false);
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+
     const handleSendOtp = async () => {
         try {
+            setError("");
+            setSuccess("");
             if (!isConsentGiven) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Consent Required',
-                    text: 'Please check the consent box before verifying.',
-                    confirmButtonColor: '#1F51FF'
-                });
+                setError("Please check the consent box before verifying.");
                 return;
             }
             if (aadhaarNumber.length === 12) {
                 setIsLoadingSent(true);
-                const result = await callAPI("/udin/individualRegisterAndSendOtp", { aadhaar_number: aadhaarNumber });
-                if (result.status == 0) {
-                    localStorage.setItem("token", result.data.token);
-                    localStorage.setItem("trans_id", result.data.trans_id);
+                const storedToken = localStorage.getItem("authToken") || "";
+
+                const result = await callAPI("/udin/requestAadhaarOtp", {
+                    aadhaar_number: aadhaarNumber,
+                    token: storedToken
+                });
+
+                if (result.status == 0 || result.status == "0") {
+                    localStorage.setItem("trans_id", result.data.transId);
                     setOtpSent(true);
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'OTP Sent',
-                        text: `OTP sent to registered mobile linked with Aadhaar: ${aadhaarNumber}`,
-                        confirmButtonColor: '#1F51FF'
-                    });
+                    setSuccess(`OTP sent to aadhaar linked with mobile no.`);
                 } else {
-                    // Handle "Already Registered" or other API errors
-                    Swal.fire({
-                        icon: result.message?.toLowerCase().includes('already') ? 'info' : 'error',
-                        title: result.message?.toLowerCase().includes('already') ? 'Registered' : 'Error',
-                        text: result.message,
-                        confirmButtonColor: '#1F51FF'
-                    });
+                    setError(result.message || "Failed to send OTP");
                 }
             } else {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Input',
-                    text: 'Please enter a valid 12-digit Aadhaar number',
-                    confirmButtonColor: '#1F51FF'
-                });
+                setError("Please enter a valid 12-digit Aadhaar number");
             }
         } catch (error) {
             console.error('Error sending OTP:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Failed to send OTP. Please try again later.',
-                confirmButtonColor: '#1F51FF'
-            });
+            setError("Failed to send OTP. Please try again later.");
         } finally {
             setIsLoadingSent(false);
         }
@@ -70,57 +61,51 @@ const DocumentAadhaarVerifyModal = ({ showModal, setShowModal }: { showModal: bo
 
     const handleVerifyOtp = async () => {
         try {
-            setIsLoadingVerify(true);
+            setError("");
+            setSuccess("");
             if (otp?.length > 0) {
                 if (!isConsentGiven) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Consent Required',
-                        text: 'Please check the consent box before verifying.',
-                        confirmButtonColor: '#1F51FF'
-                    });
+                    setError("Please check the consent box before verifying.");
                     return;
                 }
 
-                const token = localStorage.getItem("token");
-                const trans_id = localStorage.getItem("trans_id");
-                const result = await callAPI("/udin/individualRegisterValidateAadhaarOtp", { otp, token, trans_id });
+                setIsLoadingVerify(true);
+                const storedToken = localStorage.getItem("authToken") || "";
+                const trans_id = localStorage.getItem("trans_id") || "";
 
-                if (result.status == 0) {
-                    setIsVerified(true); // Update button state
+                const result = await callAPI("/udin/validateAadhaarOtp", {
+                    trans_id: trans_id,
+                    otp_num: otp,
+                    aadhaar_num: aadhaarNumber,
+                    upload_type: "udin",
+                    token: storedToken
+                });
+
+                if (result.status == 0 || result.status == "0") {
+                    localStorage.removeItem("trans_id");
+                    localStorage.setItem("ad_auth", btoa("1"));
+                    setShowModal(false);
                     Swal.fire({
                         icon: 'success',
-                        title: 'Verified!',
-                        text: 'OTP verified successfully',
-                        confirmButtonColor: '#10B981'
+                        title: 'Success',
+                        text: 'Aadhaar has been authenticated successfully',
+                        showConfirmButton: false,
+                        timer: 1500
                     });
                 } else {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Verification Failed',
-                        text: result.message,
-                        confirmButtonColor: '#1F51FF'
-                    });
+                    setError(result.message || "Verification Failed");
                 }
             } else {
-                Swal.fire({
-                    icon: 'warning',
-                    text: 'Please enter the OTP',
-                    confirmButtonColor: '#1F51FF'
-                });
+                setError("Please enter the OTP");
             }
         } catch (error) {
             console.error('Error verifying OTP:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Error',
-                text: 'Failed to verify OTP. Please try again later.',
-                confirmButtonColor: '#1F51FF'
-            });
+            setError("Failed to verify OTP. Please try again later.");
         } finally {
             setIsLoadingVerify(false);
         }
     };
+
     return (
         <Dialog open={showModal} onOpenChange={setShowModal}>
             <DialogContent className="sm:max-w-lg p-0 gap-0 overflow-hidden bg-white rounded-xl shadow-2xl border-0">
@@ -130,13 +115,25 @@ const DocumentAadhaarVerifyModal = ({ showModal, setShowModal }: { showModal: bo
                     <div className="flex justify-between items-center">
                         <DialogTitle className="text-white text-lg font-medium">Verify your Aadhaar Number</DialogTitle>
                         <button onClick={() => setShowModal(false)} className="text-white/80 hover:text-white">
-
                         </button>
                     </div>
                 </DialogHeader>
 
                 {/* Modal Body */}
                 <div className="p-8 space-y-6">
+                    {/* Message Displays */}
+                    {error && (
+                        <div className="text-red-500 text-sm p-3 border border-red-200 bg-red-50 rounded-lg flex justify-center items-center gap-2">
+                            <Info size={18} />
+                            {error}
+                        </div>
+                    )}
+                    {success && (
+                        <div className="text-emerald-600 text-sm p-3 border border-emerald-200 bg-emerald-50 rounded-lg flex justify-center items-center gap-2">
+                            <CheckCircle size={18} />
+                            {success}
+                        </div>
+                    )}
 
                     {/* Aadhaar Input Group */}
                     <div>
@@ -153,27 +150,66 @@ const DocumentAadhaarVerifyModal = ({ showModal, setShowModal }: { showModal: bo
                             {/* Input Field */}
                             <div className="relative flex-1 bg-white">
                                 <input
-                                    type="text"
+                                    type={showAadhaar ? "text" : "password"}
                                     placeholder="Enter 12-digit number"
+                                    value={aadhaarNumber}
+                                    onChange={(e) => setAadhaarNumber(e.target.value.replace(/\D/g, '').slice(0, 12))}
+                                    disabled={otpSent}
                                     className="w-full h-full bg-white px-3 pr-10 text-sm outline-none text-gray-700 placeholder-gray-400"
                                 />
-                                <button className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors">
-                                    <Eye size={18} />
+                                <button
+                                    onClick={() => setShowAadhaar(!showAadhaar)}
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 transition-colors"
+                                >
+                                    {showAadhaar ? <EyeOff size={18} /> : <Eye size={18} />}
                                 </button>
                             </div>
 
                             {/* Send OTP Button */}
-                            <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 text-sm font-medium shrink-0 transition-colors">
-                                Send OTP
+                            <button
+                                onClick={handleSendOtp}
+                                disabled={isLoadingSent || otpSent}
+                                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-5 text-sm font-medium shrink-0 transition-colors flex items-center gap-2"
+                            >
+                                {isLoadingSent && <Loader2 className="h-4 w-4 animate-spin" />}
+                                {otpSent ? "Sent" : "Send OTP"}
                             </button>
                         </div>
                     </div>
+
+                    {/* OTP Input Section (Visible after OTP is sent) */}
+                    {otpSent && (
+                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                            <label className="block text-sm font-bold text-gray-700 mb-2">
+                                Enter OTP <span className="text-red-500">*</span>
+                            </label>
+                            <div className="flex gap-3">
+                                <input
+                                    type="text"
+                                    placeholder="Enter 6-digit OTP"
+                                    value={otp}
+                                    onChange={(e) => setOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                    className="flex-1 h-11 border border-gray-300 rounded-lg px-4 text-sm focus:border-blue-500 outline-none"
+                                />
+                                <button
+                                    onClick={handleVerifyOtp}
+                                    disabled={isLoadingVerify || isVerified}
+                                    className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white px-8 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
+                                >
+                                    {isLoadingVerify && <Loader2 className="h-4 w-4 animate-spin" />}
+                                    {isVerified ? "Verified" : "Verify OTP"}
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     {/* Consent Checkbox */}
                     <div className="flex items-start gap-3">
                         <input
                             type="checkbox"
                             id="aadhaar-consent"
+                            checked={isConsentGiven}
+                            onChange={(e) => setIsConsentGiven(e.target.checked)}
                             className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-0 cursor-pointer accent-blue-600"
                         />
                         <div className="text-xs text-gray-600 text-justify leading-relaxed">
@@ -199,7 +235,6 @@ const DocumentAadhaarVerifyModal = ({ showModal, setShowModal }: { showModal: bo
                                 {showMore ? "Read Less" : "Read More"}
                             </span>
                         </div>
-
                     </div>
                 </div>
 
@@ -217,4 +252,4 @@ const DocumentAadhaarVerifyModal = ({ showModal, setShowModal }: { showModal: bo
     )
 }
 
-export default DocumentAadhaarVerifyModal
+export default DocumentAadhaarVerifyModal;
