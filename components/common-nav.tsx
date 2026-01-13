@@ -28,12 +28,27 @@ const CommonNav = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const router = useRouter();
 
-    useEffect(() => {
-        const userData_end = atob(localStorage.getItem("enData") || "");
-        const userData = JSON.parse(userData_end);
-        setIsLoggedin(userData?.isLogin || "0")
-    }, [])
+ useEffect(() => {
+    try {
+        const storedData = localStorage.getItem("enData");
+        
+        if (storedData) {
+            const decodedString = atob(storedData);
+            
+            
+            if (decodedString) {
+                const userData = JSON.parse(decodedString);
+                setIsLoggedin(userData?.isLogin || "0");
+            }
+        } else {
+            setIsLoggedin("0");
+        }
+    } catch (error) {
 
+        console.error("Error parsing user data:", error);
+        setIsLoggedin("0");
+    }
+}, []);
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
     return (
@@ -41,7 +56,6 @@ const CommonNav = () => {
             {/* Pitch White Backdrop Layer with Neon Blue Bottom Glow */}
             <div className="absolute inset-0 bg-white/95 backdrop-blur-xl border-b border-cyan-100 shadow-[0_4px_25px_rgba(6,182,212,0.15)]"></div>
 
-            {/* Main content container */}
             <div className="relative px-4 sm:px-6 lg:px-8 py-3">
                 <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-4">
 
