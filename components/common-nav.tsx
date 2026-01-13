@@ -29,8 +29,9 @@ const CommonNav = () => {
     const router = useRouter();
 
     useEffect(() => {
-        const isLogin = localStorage.getItem("isLogin")
-        setIsLoggedin(isLogin || "0")
+        const userData_end = atob(localStorage.getItem("enData") || "");
+        const userData = JSON.parse(userData_end);
+        setIsLoggedin(userData?.isLogin || "0")
     }, [])
 
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);

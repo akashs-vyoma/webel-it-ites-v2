@@ -25,7 +25,7 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
     const dcid = searchParams.get("dcid") || docId.project_id;
     const dcnm = searchParams.get("dcnm") || docId.project_name;
 
-    const [showModal, setShowModal] = useState(false);
+    const [showModal, setShowModal] = useState(true);
 
     const [formData, setFormData] = useState({
         DocumentOwnership: '',

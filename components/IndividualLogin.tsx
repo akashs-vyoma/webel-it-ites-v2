@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
-import { Smartphone, Key, ShieldCheck, ChevronRight, User, Building2, Sparkles, Lock } from 'lucide-react';
+import { Smartphone, Key, ShieldCheck, ChevronRight, User, Building2, Sparkles, Lock, Loader2 } from 'lucide-react';
 import { useRouter } from "next/navigation";
 
 
@@ -130,8 +130,10 @@ const IndividualLogin: React.FC = () => {
                         localStorage.setItem("authToken", result.data.token);
                         setAccounts(result?.data?.udin_profile_details?.accounts);
                         if (result?.data?.udin_profile_details?.accounts?.length == 1) {
-                            setSelectedRole(result?.data?.udin_profile_details?.accounts?.[0]?.account_type === 'INDIVIDUAL' ? 'individual' : 'company');
-                            setAccountName(result?.data?.udin_profile_details?.accounts?.[0]?.account_name);
+                            console.log(result?.data?.udin_profile_details?.accounts[0]);
+                            setSelectedAccount(result?.data?.udin_profile_details?.accounts[0]);
+                            setSelectedRole(result?.data?.udin_profile_details?.accounts[0]?.account_type === 'INDIVIDUAL' ? 'individual' : 'company');
+                            setAccountName(result?.data?.udin_profile_details?.accounts[0]?.account_name);
                         }
                         setShowRoleModal(true);
                     });
@@ -171,13 +173,10 @@ const IndividualLogin: React.FC = () => {
 
     const handleSubmit = () => {
         if (typeof window !== 'undefined') {
-            localStorage.setItem("role", selectedRole);
-            localStorage.setItem("account_name", accountName);
-            localStorage.setItem("phone", selectedAccount?.phone);
-            localStorage.setItem("address", selectedAccount?.address);
-            localStorage.setItem("user_id", selectedAccount?.user_id);
-            localStorage.setItem("owner_id", selectedAccount?.owner_id);
-            localStorage.setItem("isLogin", "1");
+            let encData_str = JSON.stringify({ ...selectedAccount, photo_base64: null, role: selectedRole, isLogin: "1" });
+            let encData = btoa(encData_str);
+
+            localStorage.setItem("enData", encData);
         }
         setShowRoleModal(false);
         router.push("/user-dashboard");
@@ -233,7 +232,7 @@ const IndividualLogin: React.FC = () => {
                             {/* Aadhaar Input */}
                             <div className="mb-6 animate-fade-in-up" style={{ animationDelay: '0.1s', opacity: 0, animationFillMode: 'forwards' }}>
                                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-3 ml-1">
-                                    Aadhar Number
+                                    Aadhaar Number
                                 </label>
                                 <div className="input-modern relative group">
                                     <div className="relative flex items-center bg-white border-2 border-slate-200 rounded-2xl overflow-hidden shadow-sm group-focus-within:border-indigo-500 transition-all duration-300">
@@ -256,7 +255,7 @@ const IndividualLogin: React.FC = () => {
                                                 disabled={sendingOtp}
                                                 className="btn-primary cursor-pointer m-2 px-3 h-10 bg-blue-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-lg"
                                             >
-                                                {sendingOtp ? 'Sending...' : 'Send OTP'}
+                                                {sendingOtp ? <Loader2 className='animate-spin' size={16} strokeWidth={3} /> : 'Send OTP'}
                                             </button>
                                         )}
                                     </div>
@@ -289,8 +288,7 @@ const IndividualLogin: React.FC = () => {
                                                 disabled={verifyingOtp}
                                                 className="btn-secondary m-2 px-6 h-10 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-sm font-bold rounded-xl flex items-center gap-1.5"
                                             >
-                                                {verifyingOtp ? 'Verifying...' : 'Verify'}
-                                                <ChevronRight size={16} strokeWidth={3} />
+                                                {verifyingOtp ? <Loader2 className='animate-spin' size={16} strokeWidth={3} /> : 'Verify'}
                                             </button>
                                         </div>
                                     </div>
@@ -342,7 +340,7 @@ const IndividualLogin: React.FC = () => {
                                     <div className="flex-1">
                                         <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider mb-2">Quick Guide</h4>
                                         <p className="text-xs text-slate-700">
-                                            Enter your Aadhar number and tap <span className="font-bold">"Send OTP"</span>. Once received, click <span className="font-bold">"Verify"</span> to continue.
+                                            Enter your Aadhaar number and tap <span className="font-bold">"Send OTP"</span>. Once received, click <span className="font-bold">"Verify"</span> to continue.
                                         </p>
                                     </div>
                                 </div>
@@ -374,7 +372,6 @@ const IndividualLogin: React.FC = () => {
                                     setSelectedRole(account?.account_type === 'INDIVIDUAL' ? 'individual' : 'company');
                                     setAccountName(account?.account_name);
                                     setSelectedAccount(account);
-                                    console.log(account?.account_name);
                                 }}
                                 className={`group cursor-pointer transition-all duration-300 ${selectedRole === (account?.account_type === 'INDIVIDUAL' ? 'individual' : 'company') ? 'scale-[1.02]' : ''}`}
                             >

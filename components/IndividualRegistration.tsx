@@ -1,6 +1,6 @@
 "use client"
 import React, { useState } from 'react';
-import { Eye, EyeOff, Fingerprint, KeyRound, ArrowRight, ShieldCheck, Sparkles, PenSquare, CheckCircle2 } from 'lucide-react';
+import { Eye, EyeOff, Fingerprint, KeyRound, ArrowRight, ShieldCheck, Sparkles, PenSquare, CheckCircle2, Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import Swal from 'sweetalert2'; // Added SweetAlert2
 import CommonCard from './common-card';
@@ -14,53 +14,14 @@ const IndividualRegistration: React.FC = () => {
   const [showAadhaar, setShowAadhaar] = useState(false);
   const [isConsentGiven, setIsConsentGiven] = useState(false);
   const [readMore, setReadMore] = useState(false);
+  const [isLoadingSent, setIsLoadingSent] = useState(false);
+  const [isLoadingVerify, setIsLoadingVerify] = useState(false);
 
   const shortText = "I hereby state that I have no objection in authenticating myself on Unique Document Identification Number (UDIN) portal * with Aadhaar based authentication system and *give my consent to providing my Aadhaar number, Biometric and/or One-Time Password (OTP) data for Aadhaar based authentication for the Unique Document Identification Number (UDIN) Portal access ...";
   const expandedText = "I hereby state that I have no objection in authenticating myself on Unique Document Identification Number (UDIN) portal * with Aadhaar based authentication system and *give my consent to providing my Aadhaar number, Biometric and/or One-Time Password (OTP) data for Aadhaar based authentication for the Unique Document Identification Number (UDIN) Portal access. I understand that the Aadhaar number, Biometrics and/ or OTP I provide for authentication shall be used for authenticating my identity and the Department of Information Technology & Electronics Government of West Bengal shall ensure security and confidentiality of my personal identity data provided for the purpose of Aadhaar based authentication.";
 
   const handleSendOtp = async () => {
-    if (!isConsentGiven) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Consent Required',
-        text: 'Please check the consent box before verifying.',
-        confirmButtonColor: '#1F51FF'
-      });
-      return;
-    }
-    if (aadhaarNumber.length === 12) {
-      const result = await callAPI("/udin/individualRegisterAndSendOtp", { aadhaar_number: aadhaarNumber });
-      if (result.status == 0) {
-        localStorage.setItem("token", result.data.token);
-        localStorage.setItem("trans_id", result.data.trans_id);
-        setOtpSent(true);
-        Swal.fire({
-          icon: 'success',
-          title: 'OTP Sent',
-          text: `OTP sent to registered mobile linked with Aadhaar: ${aadhaarNumber}`,
-          confirmButtonColor: '#1F51FF'
-        });
-      } else {
-        // Handle "Already Registered" or other API errors
-        Swal.fire({
-          icon: result.message?.toLowerCase().includes('already') ? 'info' : 'error',
-          title: result.message?.toLowerCase().includes('already') ? 'Registered' : 'Error',
-          text: result.message,
-          confirmButtonColor: '#1F51FF'
-        });
-      }
-    } else {
-      Swal.fire({
-        icon: 'error',
-        title: 'Invalid Input',
-        text: 'Please enter a valid 12-digit Aadhaar number',
-        confirmButtonColor: '#1F51FF'
-      });
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    if (otp?.length > 0) {
+    try {
       if (!isConsentGiven) {
         Swal.fire({
           icon: 'warning',
@@ -70,32 +31,100 @@ const IndividualRegistration: React.FC = () => {
         });
         return;
       }
-      const token = localStorage.getItem("token");
-      const trans_id = localStorage.getItem("trans_id");
-      const result = await callAPI("/udin/individualRegisterValidateAadhaarOtp", { otp, token, trans_id });
-      
-      if (result.status == 0) {
-        setIsVerified(true); // Update button state
-        Swal.fire({
-          icon: 'success',
-          title: 'Verified!',
-          text: 'OTP verified successfully',
-          confirmButtonColor: '#10B981'
-        });
+      if (aadhaarNumber.length === 12) {
+        setIsLoadingSent(true);
+        const result = await callAPI("/udin/individualRegisterAndSendOtp", { aadhaar_number: aadhaarNumber });
+        if (result.status == 0) {
+          localStorage.setItem("token", result.data.token);
+          localStorage.setItem("trans_id", result.data.trans_id);
+          setOtpSent(true);
+          Swal.fire({
+            icon: 'success',
+            title: 'OTP Sent',
+            text: `OTP sent to registered mobile linked with Aadhaar: ${aadhaarNumber}`,
+            confirmButtonColor: '#1F51FF'
+          });
+        } else {
+          // Handle "Already Registered" or other API errors
+          Swal.fire({
+            icon: result.message?.toLowerCase().includes('already') ? 'info' : 'error',
+            title: result.message?.toLowerCase().includes('already') ? 'Registered' : 'Error',
+            text: result.message,
+            confirmButtonColor: '#1F51FF'
+          });
+        }
       } else {
         Swal.fire({
           icon: 'error',
-          title: 'Verification Failed',
-          text: result.message,
+          title: 'Invalid Input',
+          text: 'Please enter a valid 12-digit Aadhaar number',
           confirmButtonColor: '#1F51FF'
         });
       }
-    } else {
+    } catch (error) {
+      console.error('Error sending OTP:', error);
       Swal.fire({
-        icon: 'warning',
-        text: 'Please enter the OTP',
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to send OTP. Please try again later.',
         confirmButtonColor: '#1F51FF'
       });
+    } finally {
+      setIsLoadingSent(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    try {
+      setIsLoadingVerify(true);
+      if (otp?.length > 0) {
+        if (!isConsentGiven) {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Consent Required',
+            text: 'Please check the consent box before verifying.',
+            confirmButtonColor: '#1F51FF'
+          });
+          return;
+        }
+
+        const token = localStorage.getItem("token");
+        const trans_id = localStorage.getItem("trans_id");
+        const result = await callAPI("/udin/individualRegisterValidateAadhaarOtp", { otp, token, trans_id });
+
+        if (result.status == 0) {
+          setIsVerified(true); // Update button state
+          Swal.fire({
+            icon: 'success',
+            title: 'Verified!',
+            text: 'OTP verified successfully',
+            confirmButtonColor: '#10B981'
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Verification Failed',
+            text: result.message,
+            confirmButtonColor: '#1F51FF'
+          });
+        }
+      } else {
+        Swal.fire({
+          icon: 'warning',
+          text: 'Please enter the OTP',
+          confirmButtonColor: '#1F51FF'
+        });
+      }
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to verify OTP. Please try again later.',
+        confirmButtonColor: '#1F51FF'
+      });
+    } finally {
+      setIsLoadingVerify(false);
     }
   };
 
@@ -144,15 +173,11 @@ const IndividualRegistration: React.FC = () => {
                 {!otpSent && (
                   <button
                     onClick={handleSendOtp}
+                    disabled={isLoadingSent}
                     className="h-10 px-4 bg-[#1F51FF] hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-[0_4px_12px_rgba(31,81,255,0.3)] transition-all active:scale-95 whitespace-nowrap"
                   >
-                    Send OTP
+                    {isLoadingSent ? <Loader2 className='animate-spin' size={16} strokeWidth={3} /> : 'Send OTP'}
                   </button>
-                )}
-                {isVerified && (
-                    <div className="pr-2 text-green-500">
-                        <CheckCircle2 size={24} />
-                    </div>
                 )}
               </div>
             </div>
@@ -182,15 +207,13 @@ const IndividualRegistration: React.FC = () => {
 
                 <button
                   onClick={handleVerifyOtp}
-                  disabled={isVerified}
-                  className={`mr-2 h-10 px-6 text-sm font-bold rounded-xl transition-all flex items-center gap-1.5 ${
-                    isVerified 
-                    ? 'bg-green-500 text-white cursor-default' 
+                  disabled={isVerified || isLoadingVerify}
+                  className={`mr-2 h-10 px-6 text-sm font-bold rounded-xl transition-all flex items-center gap-1.5 ${isVerified
+                    ? 'bg-green-500 text-white cursor-default'
                     : 'bg-[#1F51FF] hover:bg-blue-700 text-white shadow-[0_4px_12px_rgba(31,81,255,0.3)] active:scale-95'
-                  }`}
+                    }`}
                 >
-                  {isVerified ? 'Verified' : 'Verify'}
-                  {isVerified ? <ShieldCheck size={16} strokeWidth={3} /> : <ArrowRight size={16} strokeWidth={3} />}
+                  {isLoadingVerify ? <Loader2 className='animate-spin' size={16} strokeWidth={3} /> : "Verify"}
                 </button>
               </div>
             </div>

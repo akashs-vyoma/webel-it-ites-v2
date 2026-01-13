@@ -1,9 +1,9 @@
 "use client";
 import React, { useRef, useState, useEffect } from 'react';
 // Added missing icons for the new UI snippet
-import { 
-    PlusCircle, CheckCircle2, ChevronDown, Info, Eye, Trash2, 
-    Search, FileCheck, Plus, FileText, AlertCircle, ChevronRight, Loader2, X 
+import {
+    PlusCircle, CheckCircle2, ChevronDown, Info, Eye, Trash2,
+    Search, FileCheck, Plus, FileText, AlertCircle, ChevronRight, Loader2, X
 } from 'lucide-react';
 import { callAPI } from './apis/commonAPIs';
 import NonIndividualUploadDoc from './NonIndividualUploadDoc';
@@ -12,7 +12,7 @@ import NonIndividualUploadDoc from './NonIndividualUploadDoc';
 
 const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: string, applicationType?: string, category?: string }> = ({ isWizard = false, applicationNo = "", applicationType = "", category = "" }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
-    
+
     // NEW STATES FOR REQUIRED DOCUMENTS MODAL
     const [isReqDocModalOpen, setIsReqDocModalOpen] = useState(false);
     const [requiredDocsList, setRequiredDocsList] = useState<any[]>([]);
@@ -36,6 +36,15 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
 
     const [searchTermUDIN, setSearchTermUDIN] = useState("");
     const [searchTermApp, setSearchTermApp] = useState("");
+    const [userData, setUserData] = useState<any>(null);
+    const [role, setRole] = useState<string>("");
+
+    useEffect(() => {
+        const userData_end = atob(localStorage.getItem("enData") || "");
+        const userData = JSON.parse(userData_end);
+        setRole(userData?.role || "");
+        setUserData(userData);
+    }, []);
 
     // NEW API CALL: Fetch Required Documents
     const fetchRequiredDocs = async () => {
@@ -46,8 +55,8 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
         setIsReqDocModalOpen(true);
         setIsReqDocsLoading(true);
         try {
-            const result = await callAPI("/application/GetAllProjectDocByProjectID", { 
-                "projectID": parseInt(selectedProjectID) 
+            const result = await callAPI("/application/GetAllProjectDocByProjectID", {
+                "projectID": parseInt(selectedProjectID)
             });
             if (result.status === 0) {
                 setRequiredDocsList(result.data);
@@ -59,7 +68,7 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
         }
     };
 
-    
+
     useEffect(() => {
         const fetchProjects = async () => {
             try {
@@ -84,7 +93,7 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
         const fetchApps = async () => {
             setIsAppsLoading(true);
             try {
-                const result = await callAPI("/application/GetApplicationNumber", { "entryUser": 1, "projectID": parseInt(selectedProjectID) });
+                const result = await callAPI("/application/GetApplicationNumber", { "entryUser": userData?.user_id, "projectID": parseInt(selectedProjectID) });
                 if (result.status === 0) setApplications(result.data);
                 const app = result.data.find((a: any) => a.applicationNumber == applicationNo);
                 setSelectedAppID(app?.applicationId.toString() || "");
@@ -135,14 +144,14 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
         setIsLinking(true);
         try {
             const result = await callAPI("/application/SetAssignUploadedDocByApplicationID", {
-                "application_id": 85,
+                "application_id": parseInt(selectedAppID),
                 "doc_id": doc.docId,
                 "application_no": appDetail.applicationNumber,
                 "quotation_id": "",
                 "udin_no": doc.udinNo,
                 "application_amount": 0,
                 "pay_mode": "ONLINE",
-                "entry_user_id": 1
+                "entry_user_id": userData?.user_id
             });
             if (result.status === 0) await fetchApplicationDetails();
         } catch (err) { console.error(err); } finally { setIsLinking(false); }
@@ -155,14 +164,14 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
         setIsLinking(true);
         try {
             const result = await callAPI("/application/SetAssignUploadedDocByApplicationID", {
-                "application_id": 85,
+                "application_id": parseInt(selectedAppID),
                 "doc_id": targetDoc.applicationDocID,
                 "application_no": appDetail.applicationNumber,
                 "quotation_id": targetDoc.quotationID || "",
                 "udin_no": appDetail.udinNumber,
                 "application_amount": targetDoc.documentAmount || 0,
                 "pay_mode": "ONLINE",
-                "entry_user_id": 1
+                "entry_user_id": userData?.user_id
             });
             if (result.status === 0) await fetchApplicationDetails();
         } catch (err) { console.error(err); } finally { setIsLinking(false); }
@@ -185,18 +194,18 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
 
     return (
         <div className="w-full max-w-screen mx-auto p-4 flex flex-col font-sans antialiased">
-            
+
             {/* REQUIRED DOCUMENTS MODAL OVERLAY */}
             {isReqDocModalOpen && (
                 <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
                     <div className="w-full max-w-md relative">
-                        <button 
+                        <button
                             onClick={() => setIsReqDocModalOpen(false)}
                             className="absolute -top-10 right-0 text-white hover:text-slate-300 flex items-center gap-1 text-sm font-bold"
                         >
                             <X size={20} /> Close
                         </button>
-                        
+
                         {/* THE EXTRACTED UI COMPONENT */}
                         <div className="h-fit bg-white rounded-xl shadow-2xl overflow-hidden border border-slate-100">
                             <div className="bg-gradient-to-r from-blue-600 to-cyan-500 p-4">
@@ -210,29 +219,27 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
                                     </div>
                                 ) : isReqDocsLoading ? (
                                     <div className="bg-white rounded-lg p-3 shadow-sm border border-slate-200 flex justify-center items-center gap-2 h-16">
-                                        <Loader2 className='animate-spin text-slate-500' /> 
+                                        <Loader2 className='animate-spin text-slate-500' />
                                         <span className="text-xs text-slate-400 italic">Loading...</span>
                                     </div>
                                 ) : (
                                     <div className="max-h-[500px] overflow-y-auto flex flex-col gap-3 pr-1 custom-scrollbar">
                                         {requiredDocsList?.map((doc: any, idx: number) => {
                                             // Dynamic check: Is this required doc already in the application details?
-                                            const isUploaded = appDetail?.documents.some(d => 
+                                            const isUploaded = appDetail?.documents.some(d =>
                                                 d.documentName.toLowerCase().includes(doc.project_name.toLowerCase())
                                             );
 
                                             return (
                                                 <div
                                                     key={idx}
-                                                    className={`group relative bg-white rounded-xl p-4 border transition-all duration-200 ${
-                                                        isUploaded ? 'border-green-100 bg-green-50/30' : 'border-slate-200'
-                                                    }`}
+                                                    className={`group relative bg-white rounded-xl p-4 border transition-all duration-200 ${isUploaded ? 'border-green-100 bg-green-50/30' : 'border-slate-200'
+                                                        }`}
                                                 >
                                                     <div className="flex items-center justify-between">
                                                         <div className="flex items-center gap-4">
-                                                            <div className={`p-2.5 rounded-lg transition-colors ${
-                                                                isUploaded ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'
-                                                            }`}>
+                                                            <div className={`p-2.5 rounded-lg transition-colors ${isUploaded ? 'bg-green-100 text-green-600' : 'bg-slate-100 text-slate-500'
+                                                                }`}>
                                                                 <FileText size={20} />
                                                             </div>
                                                             <div>
@@ -313,8 +320,8 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
                                 <h2 className="text-blue-600 font-extrabold text-lg uppercase">Already Uploaded Documents In UDIN For {selectedProjectName}</h2>
                                 {/* UPDATED TRIGGER: Click to View now calls fetchRequiredDocs */}
                                 <p className="text-[11px] text-slate-400 mt-1 italic">
-                                    * View required documents 
-                                    <span 
+                                    * View required documents
+                                    <span
                                         onClick={fetchRequiredDocs}
                                         className="text-blue-500 cursor-pointer font-bold underline ml-1"
                                     >

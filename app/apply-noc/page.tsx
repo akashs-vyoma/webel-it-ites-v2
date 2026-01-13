@@ -15,7 +15,7 @@ export default function WizardPage() {
     const [category, setCategory] = useState("");
     const [applicationType, setApplicationType] = useState("");
     const [applicationNo, setApplicationNo] = useState("");
-    const childRef = useRef<any>(null); 
+    const childRef = useRef<any>(null);
     const totalSteps = 6;
 
 
@@ -30,12 +30,12 @@ export default function WizardPage() {
 
     const nextStep = async () => {
         if (currentStep === 1) {
-            
+
             const result = await childRef.current?.submitApplication();
-            
+
             if (result && result.status === 0) {
-                
-                setApplicationNo(result.data.application_no);
+
+                setApplicationNo(result?.data?.application_no);
                 setApplicationType(localStorage.getItem("application-type") || "");
                 setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
             } else if (result) {

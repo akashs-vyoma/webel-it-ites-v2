@@ -42,12 +42,14 @@ const UserDashboard: React.FC = () => {
     const [showDocList, setShowDocList] = useState(false);
 
     useEffect(() => {
-        setAccountName(localStorage.getItem('account_name') || '');
+        const userData_end = atob(localStorage.getItem("enData") || "");
+        const userData = JSON.parse(userData_end);
+        setAccountName(userData?.account_name || '');
         const fetchDashboardDetails = async () => {
             try {
                 const result = await callAPI('/user/GetDashboardDetails', {
-                    "ownerID": parseInt(localStorage.getItem("owner_id") || "1"),
-                    "userTypeID": parseInt(localStorage.getItem("user_type_id") || "1")
+                    "ownerID": parseInt(userData?.owner_id || "1"),
+                    "userTypeID": parseInt(userData?.user_type_id || "1")
                 });
 
                 if (result.status === 0) {

@@ -81,25 +81,25 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
     });
 
     // --- STRICT INPUT VALIDATION HELPERS ---
-  const updateField = (key: string, value: any) => {
-    let val = value;
-    if (key === 'phone' || key === 'v_phone') {
-        // Keep only digits, limit to 10
-        val = value.replace(/\D/g, '').slice(0, 10);
-    } else if (key === 'pan') {
-        // Uppercase, limit to 10
-        val = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
-    } else if (key === 'gstin') {
-        // Uppercase, limit to 15
-        val = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15);
-    }
-    setFormData((prev: any) => ({ ...prev, [key]: val }));
-};
+    const updateField = (key: string, value: any) => {
+        let val = value;
+        if (key === 'phone' || key === 'v_phone') {
+            // Keep only digits, limit to 10
+            val = value.replace(/\D/g, '').slice(0, 10);
+        } else if (key === 'pan') {
+            // Uppercase, limit to 10
+            val = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 10);
+        } else if (key === 'gstin') {
+            // Uppercase, limit to 15
+            val = value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 15);
+        }
+        setFormData((prev: any) => ({ ...prev, [key]: val }));
+    };
     const handleUploadClick = (doc: any) => {
         setActiveDoc(doc);
         setIsModalOpen(true);
     };
-    
+
     const [coApplicantList, setCoApplicantList] = useState<any[]>([]);
 
     const [projects, setProjects] = useState<Project[]>([]);
@@ -116,129 +116,137 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
         tenantPhone: '',
         tenantActivity: ''
     });
+    const [userData, setUserData] = useState<any>(null);
+
+    useEffect(() => {
+        const userData_end = atob(localStorage.getItem("enData") || "");
+        const userData = JSON.parse(userData_end);
+        setRole(userData?.role || "");
+        setUserData(userData);
+    }, []);
 
     const toNull = (value: any) =>
         value === "" || value === undefined ? null : value;
 
     useImperativeHandle(ref, () => ({
         submitApplication: async () => {
-          
+
             if (!appType) { Swal.fire("Required", "Please select application type", "warning"); return null; }
             if (!formData.name || !formData.pan || !formData.phone) { Swal.fire("Required", "Please fill name, PAN and phone", "warning"); return null; }
             if (formData.phone.length !== 10) { Swal.fire("Invalid", "Phone number must be 10 digits", "warning"); return null; }
 
-           const body = {
-    "application_details": {
-        "project_id": parseInt(appType) || 0,
-        "company_or_person_name": formData.name || "",
-        "company_or_person_pan": formData.pan || "",
-        "company_gst_no_or_aadhaar_no": formData.gstin || "",
-        "company_or_person_registered_address": formData.address || "",
-        "company_or_person_registration_no": formData.v_reg || "",
-        "registered_area_in_sqft": parseFloat(formData.rentable_area) || 0,
-        "tenant_gst_no": tenantList[0]?.tenantGstn || "",
-        "tenant_pan_no": tenantList[0]?.tenantPan || "",
-        "tenant_name": tenantList[0]?.tenantName || "",
-        "tenant_activity": tenantList[0]?.tenantActivity || "",
-        "building_area_in_sqft": parseFloat(formData.building_area) || 0,
-        "commercial_area_on_rent_in_sqft": parseFloat(formData.comm_area) || 0,
-        "user_type_id": role === "company" ? 1 : 2,
-        "renting_floor": formData.floor_no || "",
-        "renting_plot_no": formData.plot_no || "",
-        "renting_address_block": formData.block_no || "",
-        "renting_space_no": formData.space_no || "",
-        "renting_from_month": formData.ag_from || "",
-        "renting_to_month": formData.ag_to || "",
-        "tax_service_authority_id": parseInt(formData.tax_auth_id) || 0,
-        "tax_addressof_premises": formData.tax_addr || "",
-        "tax_total_space_used_by_applicant": formData.tax_space || "",
-        "tax_break_up_of_builtup_space": formData.tax_breakup || "",
-        "tax_desc_of_ites_operation": formData.tax_desc || "",
-        "tax_total_used_for_ites_activities": formData.tax_ites_total || "",
-        
-        // Transfer Lease Fields
-        "tlease_applicant_name": formData.name || "",
-        "tlease_application_ref_no": formData.tlease_ref_no || "",
-        "tlease_application_ref_date": formData.tlease_ref_date || "",
-        "tlease_mobile_no": formData.phone || "",
-        "tlease_email": formData.email || "",
-        "tlease_transfer_permission_letter_issued_to": tenantList[0]?.tenantName || "",
-        "tlease_built_up_space_area": formData.comm_area || "",
-        "tlease_address": formData.tax_addr || "",
-        "tlease_transfer_fee_paid": parseFloat(formData.tlease_fee) || 0,
-        "tlease_payment_date": formData.tlease_pay_date || "",
-        "tlease_payment_ref": formData.tlease_pay_ref || "",
-        "tlease_webel_ref_no": formData.tlease_webel_no || "",
-        "tlease_webel_ref_date": formData.tlease_webel_date || "",
+            const body = {
+                "application_details": {
+                    "project_id": parseInt(appType) || 0,
+                    "company_or_person_name": formData.name || "",
+                    "company_or_person_pan": formData.pan || "",
+                    "company_gst_no_or_aadhaar_no": formData.gstin || "",
+                    "company_or_person_registered_address": formData.address || "",
+                    "company_or_person_registration_no": formData.v_reg || "",
+                    "registered_area_in_sqft": parseFloat(formData.rentable_area) || 0,
+                    "tenant_gst_no": tenantList[0]?.tenantGstn || "",
+                    "tenant_pan_no": tenantList[0]?.tenantPan || "",
+                    "tenant_name": tenantList[0]?.tenantName || "",
+                    "tenant_activity": tenantList[0]?.tenantActivity || "",
+                    "building_area_in_sqft": parseFloat(formData.building_area) || 0,
+                    "commercial_area_on_rent_in_sqft": parseFloat(formData.comm_area) || 0,
+                    "user_type_id": role === "company" ? 1 : 2,
+                    "renting_floor": formData.floor_no || "",
+                    "renting_plot_no": formData.plot_no || "",
+                    "renting_address_block": formData.block_no || "",
+                    "renting_space_no": formData.space_no || "",
+                    "renting_from_month": formData.ag_from || "",
+                    "renting_to_month": formData.ag_to || "",
+                    "tax_service_authority_id": parseInt(formData.tax_auth_id) || 0,
+                    "tax_addressof_premises": formData.tax_addr || "",
+                    "tax_total_space_used_by_applicant": formData.tax_space || "",
+                    "tax_break_up_of_builtup_space": formData.tax_breakup || "",
+                    "tax_desc_of_ites_operation": formData.tax_desc || "",
+                    "tax_total_used_for_ites_activities": formData.tax_ites_total || "",
 
-        // Mortgage Fields
-        "mortgage_applicant_name": formData.name || "",
-        "mortgage_address": formData.address || "",
-        "mortgage_application_ref_no": formData.mort_ref_no || "",
-        "mortgage_application_ref_date": formData.mort_ref_date || "",
-        "mortgage_mobile_no": formData.phone || "",
-        "mortgage_email": formData.email || "",
-        "mortgage_noc_letter_issued_to": formData.bank_name || "",
-        "mortgage_built_up_space_area": formData.rentable_area || "",
-        "mortgage_schedule_of_the_property": formData.property_schedule || "",
-        "mortgage_name_of_bank": formData.bank_name || "",
-        "mortgage_address_of_bank": formData.bank_address || "",
-        "mortgage_loan_amount": parseFloat(formData.loan_amount) || 0,
-        "mortgage_transfer_fee_paid": parseFloat(formData.mort_fee) || 0,
-        "mortgage_payment_date": formData.mort_pay_date || "",
-        "mortgage_payment_ref": formData.mort_pay_ref || "",
-        "mortgage_webel_ref_no": formData.mort_webel_no || "",
-        "mortgage_webel_ref_date": formData.mort_webel_date || "",
+                    // Transfer Lease Fields
+                    "tlease_applicant_name": formData.name || "",
+                    "tlease_application_ref_no": formData.tlease_ref_no || "",
+                    "tlease_application_ref_date": formData.tlease_ref_date || "",
+                    "tlease_mobile_no": formData.phone || "",
+                    "tlease_email": formData.email || "",
+                    "tlease_transfer_permission_letter_issued_to": tenantList[0]?.tenantName || "",
+                    "tlease_built_up_space_area": formData.comm_area || "",
+                    "tlease_address": formData.tax_addr || "",
+                    "tlease_transfer_fee_paid": parseFloat(formData.tlease_fee) || 0,
+                    "tlease_payment_date": formData.tlease_pay_date || "",
+                    "tlease_payment_ref": formData.tlease_pay_ref || "",
+                    "tlease_webel_ref_no": formData.tlease_webel_no || "",
+                    "tlease_webel_ref_date": formData.tlease_webel_date || "",
 
-        "in_application_id": 0,
-        "company_or_person_contact_no": formData.phone || "",
-        "company_or_person_email_id": formData.email || "",
-        "dprvet_site_address": formData.site_address || "",
-        "renting_old_noc_no": formData.old_noc || "",
-        "renting_old_noc_date": formData.old_noc_date || "",
-        "renting_old_agreement_from_date": formData.old_ag_from || "",
-        "renting_old_agreement_to_date": formData.old_ag_to || "",
-        "renting_amount_paid_till": parseFloat(formData.amt_paid) || 0,
-        "renting_last_payment_date": formData.last_payment_date || "",
-        "renting_renewal_from_date": formData.renewal_from || "",
-        "renting_renewal_to_date": formData.renewal_to || ""
-    },
-    "lst_cosigner_details": [
-        {
-            "application_id": 0,
-            "cosigner_name": formData.v_name || "",
-            "cosigner_contact_no": formData.v_phone || "",
-            "cosigner_reg_no": formData.v_reg || "",
-            "cosigner_role": verifierRole || "",
-            "cosigner_statement": formData.v_statement || "",
-            "cosigner_sign_status": "1", // Matching example '1'
-            "udin_token": formData.udin || ""
-        }
-    ],
-    "lst_coapplicant_details": coApplicantList?.length > 0 ? coApplicantList.map(co => ({
-        "application_id": 0,
-        "applicant_name": co.name || "",
-        "applicant_pan": co.pan || "",
-        "applicant_gst_or_aadhaar": co.gst_aadhaar || "",
-        "applicant_mobile_no": co.mobile || "",
-        "applicant_address": co.address || ""
-    })) : [],
-    "entry_user_id": parseInt(localStorage.getItem("user_id") || "1"),
-    "owner_id": parseInt(localStorage.getItem("owner_id") || "1")
-};
+                    // Mortgage Fields
+                    "mortgage_applicant_name": formData.name || "",
+                    "mortgage_address": formData.address || "",
+                    "mortgage_application_ref_no": formData.mort_ref_no || "",
+                    "mortgage_application_ref_date": formData.mort_ref_date || "",
+                    "mortgage_mobile_no": formData.phone || "",
+                    "mortgage_email": formData.email || "",
+                    "mortgage_noc_letter_issued_to": formData.bank_name || "",
+                    "mortgage_built_up_space_area": formData.rentable_area || "",
+                    "mortgage_schedule_of_the_property": formData.property_schedule || "",
+                    "mortgage_name_of_bank": formData.bank_name || "",
+                    "mortgage_address_of_bank": formData.bank_address || "",
+                    "mortgage_loan_amount": parseFloat(formData.loan_amount) || 0,
+                    "mortgage_transfer_fee_paid": parseFloat(formData.mort_fee) || 0,
+                    "mortgage_payment_date": formData.mort_pay_date || "",
+                    "mortgage_payment_ref": formData.mort_pay_ref || "",
+                    "mortgage_webel_ref_no": formData.mort_webel_no || "",
+                    "mortgage_webel_ref_date": formData.mort_webel_date || "",
+
+                    "in_application_id": 0,
+                    "company_or_person_contact_no": formData.phone || "",
+                    "company_or_person_email_id": formData.email || "",
+                    "dprvet_site_address": formData.site_address || "",
+                    "renting_old_noc_no": formData.old_noc || "",
+                    "renting_old_noc_date": formData.old_noc_date || "",
+                    "renting_old_agreement_from_date": formData.old_ag_from || "",
+                    "renting_old_agreement_to_date": formData.old_ag_to || "",
+                    "renting_amount_paid_till": parseFloat(formData.amt_paid) || 0,
+                    "renting_last_payment_date": formData.last_payment_date || "",
+                    "renting_renewal_from_date": formData.renewal_from || "",
+                    "renting_renewal_to_date": formData.renewal_to || ""
+                },
+                "lst_cosigner_details": [
+                    {
+                        "application_id": 0,
+                        "cosigner_name": formData.v_name || "",
+                        "cosigner_contact_no": formData.v_phone || "",
+                        "cosigner_reg_no": formData.v_reg || "",
+                        "cosigner_role": verifierRole || "",
+                        "cosigner_statement": formData.v_statement || "",
+                        "cosigner_sign_status": "1", // Matching example '1'
+                        "udin_token": formData.udin || ""
+                    }
+                ],
+                "lst_coapplicant_details": coApplicantList?.length > 0 ? coApplicantList.map(co => ({
+                    "application_id": 0,
+                    "applicant_name": co.name || "",
+                    "applicant_pan": co.pan || "",
+                    "applicant_gst_or_aadhaar": co.gst_aadhaar || "",
+                    "applicant_mobile_no": co.mobile || "",
+                    "applicant_address": co.address || ""
+                })) : [],
+                "entry_user_id": parseInt(userData?.user_id || "1"),
+                "owner_id": parseInt(userData?.owner_id || "1")
+            };
             try {
                 const result = await callAPI('/application/SetApplicationDetailsV9', body);
                 if (result && result.status === 0 && result.data) {
-                const appId = result.data.application_id || result.data.in_application_id;
-                const appNo = result.data.application_no;
+                    const appId = result.data.application_id || result.data.in_application_id;
+                    const appNo = result.data.application_no;
 
-                if (appId) localStorage.setItem("application_id", appId.toString());
-                if (appNo) localStorage.setItem("application_no", appNo.toString());
-                
-                console.log("Application Saved Locally:", { appId, appNo });
-            }
+                    if (appId) localStorage.setItem("application_id", appId.toString());
+                    if (appNo) localStorage.setItem("application_no", appNo.toString());
 
-            return result;
+                    console.log("Application Saved Locally:", { appId, appNo });
+                }
+
+                return result;
             } catch (error) {
                 console.error("API Call failed", error);
                 Swal.fire("Error", "Server connection failed", "error");
@@ -249,8 +257,8 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
 
     const fetchUploadedDocumentStatus = async (applicationTypeID: any) => {
         try {
-            const ownerID = parseInt(localStorage.getItem("owner_id") || "1");
-            const role = localStorage.getItem("role");
+            const ownerID = parseInt(userData?.owner_id || "1");
+            const role = userData?.role;
             const userTypeID = role === "company" ? 1 : 2;
 
             const body = {
@@ -309,8 +317,6 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
     };
 
     useEffect(() => {
-        const loginType = localStorage.getItem("role");
-        if (loginType) setRole(loginType);
         if (category) {
             fetchProjects();
             localStorage.setItem("category", category);
@@ -725,7 +731,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-0">
                     <div className='w-full max-w-screen max-h-screen overflow-y-auto rounded-xl'>
-                        <NonIndividualUploadDoc docId={activeDoc} isWizard={true} onClose={() => {setIsModalOpen(false); fetchUploadedDocumentStatus(appType);}} />
+                        <NonIndividualUploadDoc docId={activeDoc} isWizard={true} onClose={() => { setIsModalOpen(false); fetchUploadedDocumentStatus(appType); }} />
                     </div>
                 </div>
             )}

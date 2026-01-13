@@ -16,7 +16,7 @@ export default function WizardPage() {
     const [applicationType, setApplicationType] = useState("");
     const [applicationNo, setApplicationNo] = useState("");
     const totalSteps = 6;
-    
+
     // Ref to access the API call inside CreateApplicationForm
     const formRef = useRef<any>(null);
 
@@ -36,10 +36,10 @@ export default function WizardPage() {
                 try {
                     // Triggering the API call implemented in the child component
                     const result = await formRef.current.submitApplication();
-                    
+
                     if (result?.status === "Success" || result?.statusCode === 200) {
                         // Use application no from API if available, otherwise fallback
-                        setApplicationNo(result?.data?.application_no || "AP/DPRITVET/432/20240105050148");
+                        setApplicationNo(result?.data?.application_no || "");
                         setApplicationType(localStorage.getItem("application-type") || "");
                         setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
                     } else {
@@ -184,21 +184,21 @@ export default function WizardPage() {
                 {currentStep < totalSteps ? (
                     <SubmitButton onClick={() => nextStep()} label="Submit & Continue" />
                 ) : (
-                 <button
-                    onClick={() =>
-                        Swal.fire({
-                            title: 'Payment Successful 🎉',
-                            text: 'Wizard completed successfully!',
-                            icon: 'success',
-                            confirmButtonText: 'Done',
-                            confirmButtonColor: '#06b6d4',
-                        })
-                    }
-                    className="cursor-pointer bg-gradient-to-r from-emerald-600 to-cyan-500 hover:from-cyan-700 hover:to-emerald-600 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2 active:scale-95"
-                >
-                    <BadgeCheck size={18} />
-                    Pay & Complete
-                </button>
+                    <button
+                        onClick={() =>
+                            Swal.fire({
+                                title: 'Payment Successful 🎉',
+                                text: 'Wizard completed successfully!',
+                                icon: 'success',
+                                confirmButtonText: 'Done',
+                                confirmButtonColor: '#06b6d4',
+                            })
+                        }
+                        className="cursor-pointer bg-gradient-to-r from-emerald-600 to-cyan-500 hover:from-cyan-700 hover:to-emerald-600 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2 active:scale-95"
+                    >
+                        <BadgeCheck size={18} />
+                        Pay & Complete
+                    </button>
                 )}
             </div>
         </div>
