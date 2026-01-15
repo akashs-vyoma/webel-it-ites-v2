@@ -2,24 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import { Eye, X, ChevronDown, FileText, Info } from 'lucide-react';
 import { callAPI } from './apis/commonAPIs';
-import DPRDeclarationLetter from './Declarations/views/dpr/single/dpr-declaration-single';
-import RentingSingleOwnerDeclaration from './Declarations/views/renting/normal/single/renting-single-declaration';
-import { data as DPRDeclarationLetterDummyData } from '@/components/Declarations/dummy-data/dpr/single/dpr_declaration_single'
-import { data as RentingSingleOwnerDeclarationDummyData } from '@/components/Declarations/dummy-data/renting/normal/single/renting_single_declaration'
-import TaxExemptionDeclaration from './Declarations/views/tax-exemption/single/te-declaration-single';
-import { data as TaxExemptionDeclarationDummyData } from '@/components/Declarations/dummy-data/tax-exemption/single/te_declaration_single'
-import MultiPartyDeclaration from './Declarations/views/dpr/multi/dpr-declaration-multi';
-import {data as MultiPartyDeclarationDummyData} from "@/components/Declarations/dummy-data/dpr/multi/dpr_declaration_multi"
-import MultiOwnerDeclaration from './Declarations/views/renting/renewal/multi/renting-renewal-multi-owner-declaration';
-import {data as MultiOwnerDeclarationDummyData} from "@/components/Declarations/dummy-data/renting/renewal/multi/renting_renewal_multi_owner_declaration"
-import FinalNOCExemption from './Declarations/views/tax-exemption/multi/te-final-multi';
-import{data as FinalNOCExemptionDummyData} from "@/components/Declarations/dummy-data/tax-exemption/multi/te_final_multi"
-import RentingRenewalSingleDeclaration from './Declarations/views/renting/renewal/single/renting-renewal-single-party-declaration';
-import { data as RentingRenewalSingleDeclarationDummyData } from '@/components/Declarations/dummy-data/renting/renewal/single/renting_renewal_single_party_declaration'
-import RentingRenewalMultiOwnerDeclaration from './Declarations/views/renting/renewal/multi/renting-renewal-multi-owner-declaration';
-import { data as RentingRenewalMultiOwnerDeclarationDummyData } from '@/components/Declarations/dummy-data/renting/renewal/multi/renting_renewal_multi_owner_declaration'
-
-
 
 // --- OPTIONS DATA ---
 // const applicationTypes = [
@@ -73,29 +55,6 @@ const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicatio
     useEffect(() => {
         setIsBothSelected(selectedType !== applicationTypes[0] && selectedNumber !== "Select Application Number");
     }, [selectedType, selectedNumber]);
-
-    const renderDeclaraionLetter = () => {
-        switch (selectedType) {
-            case "1":
-                return <DPRDeclarationLetter data={DPRDeclarationLetterDummyData} />;
-            case "4":
-                return <RentingSingleOwnerDeclaration data={RentingSingleOwnerDeclarationDummyData} />;
-            case "5":
-                return <TaxExemptionDeclaration data={TaxExemptionDeclarationDummyData} />;
-            case "7":
-                return <MultiPartyDeclaration data={MultiPartyDeclarationDummyData} />;
-            case "8":
-                return <MultiOwnerDeclaration data={MultiOwnerDeclarationDummyData} />;
-            case "9":
-                return <FinalNOCExemption data={FinalNOCExemptionDummyData} />;
-            case "10":
-                return <RentingRenewalSingleDeclaration data={RentingRenewalSingleDeclarationDummyData} />;
-            case "11":
-                return <RentingRenewalMultiOwnerDeclaration data={RentingRenewalMultiOwnerDeclarationDummyData} />;
-            default:
-                return null;
-        }
-    };
 
     return (
         <>
@@ -195,12 +154,43 @@ const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicatio
                             {/* Letter Header - UPDATED COLOR TO MATCH SELECTION HEADER */}
                             <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 py-2 text-center relative overflow-hidden">
                                 <div className="absolute inset-0 gradient-shimmer pointer-events-none opacity-30"></div>
-                                <h3 className="text-white text-xs font-bold uppercase tracking-widest relative z-10">Declaration Letter</h3>
+                                <h3 className="text-white text-xs font-bold uppercase tracking-widest relative z-10">NOC Declaration Letter</h3>
                             </div>
 
                             {/* Letter Content (Scrollable) */}
                             <div className="p-8 max-h-[500px] overflow-y-auto text-[13px] text-slate-800 leading-relaxed custom-scrollbar">
-                                {renderDeclaraionLetter()}
+                                <div className="space-y-6">
+                                    <p className="font-semibold">Date: {new Date().toISOString().split('T')[0]} {new Date().toLocaleTimeString()}</p>
+                                    <p><span className="font-bold">Subject:</span> <span className="underline italic">Declaration Letter for {selectedType}, Application Number: {selectedNumber}</span></p>
+
+                                    <p>Respected Sir,</p>
+
+                                    <p>I am authorized representative of Company <span className="font-bold uppercase">VYOMA INNOVUS GLOBAL PRIVATE LIMITED</span>, hereby submits the following documents (as indicated by UDIN numbers) for {selectedType}.</p>
+
+                                    {/* Document Table */}
+                                    <div className="w-64 border rounded-md overflow-hidden">
+                                        <div className="flex bg-blue-700 text-white text-[10px] font-bold py-1 px-3">
+                                            <div className="flex-1 border-r border-white/20">Document Type</div>
+                                            <div className="flex-1 pl-3">Udin Number</div>
+                                        </div>
+                                        <div className="flex py-2 px-3 border-b text-[11px]">
+                                            <div className="flex-1 font-bold">Project Report</div>
+                                            <div className="flex-1 pl-3 font-medium">24-C-CA001176-P-1704179071921</div>
+                                        </div>
+                                        <div className="flex py-2 px-3 text-[11px]">
+                                            <div className="flex-1 font-bold">Project Report</div>
+                                            <div className="flex-1 pl-3 font-medium">24-C-CA001176-P-1704286132845</div>
+                                        </div>
+                                    </div>
+
+                                    <p className="text-justify">On behalf as duly authorised & having competence to do so on behalf of <span className="font-bold">VYOMA INNOVUS GLOBAL PRIVATE LIMITED</span>, I declare that the Project Report as submitted above, is covered under IT & ITeS activities as notified by IT&E dept. vide notification 845-IT/O/117/2013 dated 12.7.2023 (UDIN: <span className="font-bold">23-GCA001177-O-1692009699994</span>). I shall indemnify and hold the state harmless, including all associated costs in case of any miss-representation.</p>
+
+                                    <p>I also understand that any kind of miss-representation will invite legal action as per law.</p>
+
+                                    <div className="pt-4">
+                                        <p className="font-bold uppercase underline">DEBISWARI BAG</p>
+                                    </div>
+                                </div>
                             </div>
 
                             {/* Letter Footer Action - UPDATED COLOR */}

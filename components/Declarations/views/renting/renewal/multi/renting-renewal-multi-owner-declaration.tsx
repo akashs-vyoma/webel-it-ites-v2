@@ -18,7 +18,7 @@ interface DeclarationLetterProps {
   };
 }
 
-const MultiOwnerDeclaration: React.FC<DeclarationLetterProps> = ({ data }) => {
+const RentingRenewalMultiOwnerDeclaration: React.FC<DeclarationLetterProps> = ({ data }) => {
   return (
     <div className="bg-gray-200 min-h-screen flex justify-center py-10 px-4 print:p-0 print:bg-white">
       {/* Main Page Container (A4 Size) */}
@@ -129,4 +129,4 @@ const MultiOwnerDeclaration: React.FC<DeclarationLetterProps> = ({ data }) => {
   );
 };
 
-export default MultiOwnerDeclaration;
+export default RentingRenewalMultiOwnerDeclaration;

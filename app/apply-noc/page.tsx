@@ -18,7 +18,14 @@ export default function WizardPage() {
     const childRef = useRef<any>(null);
     const totalSteps = 6;
 
-
+    const skipStep = () => {
+        // Logic to handle skipping Step 3 if Category is SINGLE
+        if (currentStep === 2 && category === "SINGLE") {
+            setCurrentStep(4);
+        } else {
+            setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
+        }
+    };
     const steps = [
         { id: 1, label: "Create Application", icon: ClipboardEdit },
         { id: 2, label: "Document", icon: FileUp },
@@ -162,32 +169,45 @@ export default function WizardPage() {
                 <button
                     onClick={prevStep}
                     disabled={currentStep === 1}
-                    className="flex items-center gap-2 px-6 py-2 bg-white rounded-lg disabled:opacity-50 hover:bg-gray-100 transition-colors hover:shadow-md hover:shadow-gray-200 cursor-pointer"
+                    className="flex items-center gap-2 px-6 py-2 bg-white rounded-lg disabled:opacity-50 hover:bg-gray-100 transition-colors cursor-pointer"
                 >
                     <ArrowLeft size={18} />
                     Previous
                 </button>
 
-                {currentStep < totalSteps ? (
-                    <SubmitButton onClick={() => nextStep()} label="Submit & Continue" />
-                ) : (
-                    <button
-                        onClick={() =>
-                            Swal.fire({
+                {/* NEW: Action Group */}
+                <div className="flex gap-3">
+                    {/* Skip Button: Only shows if not on the last step */}
+
+                    {currentStep < totalSteps ? (
+                        <SubmitButton onClick={() => nextStep()} label="Submit & Continue" />
+                    ) : (
+                        <button
+                            onClick={() => Swal.fire({
                                 title: 'Payment Successful 🎉',
                                 text: 'Wizard completed successfully!',
                                 icon: 'success',
                                 confirmButtonText: 'Done',
                                 confirmButtonColor: '#06b6d4',
                             })
-                        }
-                        className="cursor-pointer bg-gradient-to-r from-emerald-600 to-cyan-500 hover:from-cyan-700 hover:to-emerald-600 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2 active:scale-95"
-                    >
-                        <BadgeCheck size={18} />
-                        Pay & Complete
-                    </button>
-                )}
+                            }
+                            className="cursor-pointer bg-gradient-to-r from-emerald-600 to-cyan-500 text-white px-8 py-2.5 rounded-lg font-bold shadow-md flex items-center gap-2"
+                        >
+                            <BadgeCheck size={18} />
+                            Pay & Complete
+                        </button>
+                    )}
+                    {currentStep < totalSteps && (
+                        <button
+                            onClick={skipStep}
+                            className="px-6 py-2 text-gray-500 hover:text-gray-800 font-medium transition-all cursor-pointer underline decoration-gray-300 underline-offset-4"
+                        >
+                            Skip Step
+                        </button>
+                    )}
+                </div>
             </div>
         </div>
     );
+
 }
