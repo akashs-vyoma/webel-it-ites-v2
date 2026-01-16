@@ -18,11 +18,11 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
     const [requiredDocsList, setRequiredDocsList] = useState<any[]>([]);
     const [isReqDocsLoading, setIsReqDocsLoading] = useState(false);
 
-    const [projects, setProjects] = useState<Project[]>([]);
+    const [projects, setProjects] = useState<any[]>([]);
     const [selectedProjectID, setSelectedProjectID] = useState<string>("");
     const [selectedProjectName, setSelectedProjectName] = useState<string>("");
 
-    const [applications, setApplications] = useState<ApplicationNumber[]>([]);
+    const [applications, setApplications] = useState<any[]>([]);
     const [selectedAppID, setSelectedAppID] = useState<string>("");
 
     const [isProjectsLoading, setIsProjectsLoading] = useState(true);
@@ -31,8 +31,8 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
     const [isTable2Loading, setIsTable2Loading] = useState(false);
     const [isLinking, setIsLinking] = useState(false);
 
-    const [udinDocs, setUdinDocs] = useState<UDINDocument[]>([]);
-    const [appDetail, setAppDetail] = useState<AppDetailData | null>(null);
+    const [udinDocs, setUdinDocs] = useState<any[]>([]);
+    const [appDetail, setAppDetail] = useState<any | null>(null);
 
     const [searchTermUDIN, setSearchTermUDIN] = useState("");
     const [searchTermApp, setSearchTermApp] = useState("");

@@ -15,6 +15,7 @@ import {
 import { useSearchParams } from 'next/navigation';
 import DocumentAadhaarVerifyModal from './DocumentAadhaarVerifyModal';
 import { uploadDocumentAPI } from './apis/commonAPIs';
+import Swal from 'sweetalert2';
 
 const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void, docId: any }> = ({ isWizard, onClose, docId }) => {
     const searchParams = useSearchParams();
@@ -33,7 +34,6 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
         const userData_end = atob(userData_enc || "");
         const userData_dec = JSON.parse(userData_end);
         setUserData(userData_dec);
-        console.log("aadhaarAuthFlag", aadhaarAuthFlag);
 
 
         if (aadhaarAuthFlag == "1") {
@@ -104,26 +104,59 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
                 doc_name: formData.DocName,
                 doc_file_name: selectedFile?.name || "",
                 doc_remarks: formData.DocRemarks,
-                doc_desc: formData.DocDesc,
+                doc_description: formData.DocDesc,
                 entry_user_id: userData?.user_id || "",
             }
 
-            console.log("docDetails", docDetails);
-
-
             const result = await uploadDocumentAPI('/udinDocument/udinDocumentUpload', selectedFile, docDetails);
-            console.log("result", result);
 
             if (result.status == 0) {
-                alert("Document uploaded successfully");
-                if (isWizard) onClose();
+                Swal.fire({
+                    icon: "success",
+                    title: "Uploaded!",
+                    text: `${dcnm} document uploaded successfully`,
+                    showConfirmButton: true,
+                    timer: 2500
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        if (isWizard) {
+                            onClose()
+                        };
+                    }
+                });
 
             } else {
-                alert(result.message);
+                if (result?.message?.includes("Invalid API token")) {
+                    localStorage.removeItem("ad_auth");
+                    Swal.fire({
+                        icon: "error",
+                        title: "Session Expired.",
+                        text: "Aadhaar authentication expired. Please verify Aadhaar again.",
+                        showConfirmButton: true,
+                        // timer: 2500
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            setShowModal(true);
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Failed to upload document",
+                        text: result?.message?.split(". ")[0],
+                        showConfirmButton: true,
+                        timer: 2500
+                    });
+                }
             }
         } catch (error) {
             console.log("error", error);
-            alert("Something went wrong");
+            Swal.fire({
+                icon: "error",
+                title: "Failed to upload.",
+                text: "Something went wrong, Please try again later.",
+                showConfirmButton: true,
+            });
         } finally {
             setIsLoading(false);
         }

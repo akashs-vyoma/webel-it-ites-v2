@@ -182,7 +182,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
                     commercial_area_on_rent_in_sqft: Number(formData.comm_area) || 0,
 
                     // Integer
-                    user_type_id: Number(role === "company" ? 1 : 2),
+                    user_type_id: Number(userData?.user_type_id || "5"),
 
                     // Renting
                     renting_floor: formData.floor_no || "",
@@ -322,12 +322,13 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
         } catch (error) {
             console.error("Error fetching uploaded document status:", error);
             setUploadedDocsStatus([]);
+        } finally {
+            setReloadRequiredDocs(false);
         }
     };
 
     useEffect(() => {
         if (appType && reloadRequiredDocs) {
-            setReloadRequiredDocs(false);
             getRequiredDocumetListByProjectID(appType);
             fetchUploadedDocumentStatus(appType);
         } else {
