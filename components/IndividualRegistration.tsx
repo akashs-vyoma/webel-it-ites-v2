@@ -1,13 +1,15 @@
 "use client"
 import React, { useState } from 'react';
-import { Eye, EyeOff, Fingerprint, KeyRound, ArrowRight, ShieldCheck, Sparkles, PenSquare, CheckCircle2, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Fingerprint, KeyRound, ArrowRight, ShieldCheck, Sparkles, PenSquare, CheckCircle2, Loader2, Phone } from 'lucide-react';
 import Link from 'next/link';
 import Swal from 'sweetalert2'; // Added SweetAlert2
 import CommonCard from './common-card';
 import { callAPI } from './apis/commonAPIs';
+import router from 'next/router';
 
 const IndividualRegistration: React.FC = () => {
   const [aadhaarNumber, setAadhaarNumber] = useState('');
+  const [phone, setPhone] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [isVerified, setIsVerified] = useState(false); // New state for verification status
   const [otp, setOtp] = useState('');
@@ -94,19 +96,38 @@ const IndividualRegistration: React.FC = () => {
 
         if (result.status == 0) {
           setIsVerified(true); // Update button state
-          Swal.fire({
-            icon: 'success',
-            title: 'Verified!',
-            text: 'OTP verified successfully',
-            confirmButtonColor: '#10B981'
+
+          const response = await callAPI("/udin/individualCreateProfile", {
+            "user_type": 5,
+            "aadhaar_no": aadhaarNumber,
+            "trans_id": result?.data?.trans_id,
+            "phone": phone,
+            "aadhaar_full_name": result?.data?.udin_profile_details?.fullName,
+            "token": result?.data?.token
           });
-        } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'Verification Failed',
-            text: result.message,
-            confirmButtonColor: '#1F51FF'
-          });
+
+          if (response.status == 0) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Registered!',
+              text: `You have been successfully registered.`,
+              confirmButtonColor: '#10B981',
+              confirmButtonText: 'Go to Login',
+              showCancelButton: false,
+              showCloseButton: false,
+            }).then((result) => {
+              if (result.isConfirmed) {
+                router.push('/individual-sign-in');
+              }
+            });
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Verification Failed',
+              text: result.message,
+              confirmButtonColor: '#1F51FF'
+            });
+          }
         }
       } else {
         Swal.fire({
@@ -169,14 +190,37 @@ const IndividualRegistration: React.FC = () => {
                     <PenSquare size={18} />
                   </button>
                 )}
+              </div>
+            </div>
+          </div>
 
-                {!otpSent && (
-                  <button
-                    onClick={handleSendOtp}
-                    disabled={isLoadingSent}
-                    className="h-10 px-4 bg-[#1F51FF] hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-[0_4px_12px_rgba(31,81,255,0.3)] transition-all active:scale-95 whitespace-nowrap"
-                  >
-                    {isLoadingSent ? <Loader2 className='animate-spin' size={16} strokeWidth={3} /> : 'Send OTP'}
+          {/* Phone Input Group */}
+          <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+            <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">
+              Phone Number
+            </label>
+
+            <div className={`group relative flex items-center h-[56px] bg-white border-2 rounded-2xl overflow-hidden shadow-sm transition-all duration-300 ${isVerified ? 'border-green-200 bg-green-50/30' : 'border-slate-200 focus-within:border-[#1F51FF] focus-within:shadow-[0_4px_20px_rgba(31,81,255,0.1)]'}`}>
+              <div className={`pl-4 pr-3 transition-colors duration-300 ${isVerified ? 'text-green-500' : 'text-slate-400 group-focus-within:text-[#1F51FF]'}`}>
+                <Phone size={20} strokeWidth={2.5} />
+              </div>
+
+              <input
+                type="text"
+                value={phone}
+                disabled={otpSent || isVerified}
+                onChange={(e) => {
+                  const val = e.target.value.replace(/\D/g, '');
+                  if (val.length <= 10) setPhone(val);
+                }}
+                className="flex-1 disabled:opacity-70 h-full bg-transparent outline-none text-base font-semibold text-slate-900 placeholder:text-slate-400 placeholder:font-medium tracking-wide"
+                placeholder="Enter Phone Number"
+              />
+
+              <div className="flex items-center gap-2 pr-2">
+                {(otpSent && !isVerified) && (
+                  <button onClick={() => setOtpSent(false)} className="p-2 text-slate-400 hover:text-[#1F51FF] transition-colors rounded-full hover:bg-blue-50">
+                    <PenSquare size={18} />
                   </button>
                 )}
               </div>
@@ -220,7 +264,7 @@ const IndividualRegistration: React.FC = () => {
           )}
 
           {/* Consent Checkbox */}
-          <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
+          {(!otpSent && !isVerified) && <div className="bg-slate-50 rounded-2xl p-4 border border-slate-100 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200">
             <div className="flex items-start gap-3">
               <div className="relative flex items-center pt-0.5">
                 <input
@@ -246,6 +290,18 @@ const IndividualRegistration: React.FC = () => {
                 </a>
               </label>
             </div>
+          </div>}
+
+          <div className="flex justify-center">
+            {!otpSent && !isVerified && (
+              <button
+                onClick={handleSendOtp}
+                disabled={isLoadingSent}
+                className="h-10 px-4 cursor-pointer bg-[#1F51FF] hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-[0_4px_12px_rgba(31,81,255,0.3)] transition-all active:scale-95 whitespace-nowrap"
+              >
+                {isLoadingSent ? <Loader2 className='animate-spin' size={16} strokeWidth={3} /> : 'Send OTP'}
+              </button>
+            )}
           </div>
 
           {/* Sign In Link */}

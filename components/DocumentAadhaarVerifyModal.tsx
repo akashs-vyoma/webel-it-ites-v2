@@ -172,7 +172,7 @@ const DocumentAadhaarVerifyModal = ({ showModal, setShowModal }: { showModal: bo
                                 className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-5 text-sm font-medium shrink-0 transition-colors flex items-center gap-2"
                             >
                                 {isLoadingSent && <Loader2 className="h-4 w-4 animate-spin" />}
-                                {otpSent ? "Sent" : "Send OTP"}
+                                {otpSent ? "Sent" : isLoadingSent ? "Sending..." : "Send OTP"}
                             </button>
                         </div>
                     </div>
@@ -197,7 +197,7 @@ const DocumentAadhaarVerifyModal = ({ showModal, setShowModal }: { showModal: bo
                                     className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-emerald-400 text-white px-8 rounded-lg text-sm font-medium transition-colors flex items-center gap-2"
                                 >
                                     {isLoadingVerify && <Loader2 className="h-4 w-4 animate-spin" />}
-                                    {isVerified ? "Verified" : "Verify OTP"}
+                                    {isVerified ? "Verified" : isLoadingVerify ? "Verifying..." : "Verify OTP"}
                                 </button>
                             </div>
                         </div>

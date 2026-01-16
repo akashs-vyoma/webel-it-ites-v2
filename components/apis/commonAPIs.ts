@@ -9,3 +9,27 @@ export const callAPI = async (url: string, body: any) => {
     const result = await response.json();
     return result;
 }
+
+export const uploadDocumentAPI = async (
+  url: string,
+  file: File,
+  docDetails: any
+) => {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('docDetials', JSON.stringify(docDetails));
+
+  const response = await fetch(`${BASE_URL}${url}`, {
+    method: 'POST',
+    headers: {
+      accept: '*/*',
+    },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Upload failed with status ${response.status}`);
+  }
+
+  return await response.json();
+};

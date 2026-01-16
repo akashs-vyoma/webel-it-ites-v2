@@ -9,22 +9,30 @@ import {
     ShieldCheck,
     X,
     CheckCircle2,
-    Trash2
+    Trash2,
+    Loader2
 } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import DocumentAadhaarVerifyModal from './DocumentAadhaarVerifyModal';
+import { uploadDocumentAPI } from './apis/commonAPIs';
 
 const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void, docId: any }> = ({ isWizard, onClose, docId }) => {
     const searchParams = useSearchParams();
 
     const dcid = searchParams.get("dcid") || docId.project_id;
     const dcnm = searchParams.get("dcnm") || docId.project_name;
-
+    const [userData, setUserData] = useState<any>(null);
     const [showModal, setShowModal] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+
 
     useEffect(() => {
         const aadhaarAuthFlag_enc = localStorage.getItem("ad_auth");
         const aadhaarAuthFlag = atob(aadhaarAuthFlag_enc || "");
+        const userData_enc = localStorage.getItem("enData");
+        const userData_end = atob(userData_enc || "");
+        const userData_dec = JSON.parse(userData_end);
+        setUserData(userData_dec);
         console.log("aadhaarAuthFlag", aadhaarAuthFlag);
 
 
@@ -71,8 +79,55 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
     }, []);
 
 
-    const handleUploadClick = () => {
+    const handleUploadClick = async () => {
         fileInputRef.current?.click();
+    };
+
+    const handleUdinAPICall = async () => {
+        try {
+            setIsLoading(true);
+
+            if (!selectedFile) {
+                alert("Please select a file");
+                return;
+            };
+            const token = localStorage.getItem('authToken');
+            const docDetails = {
+                token: token,
+                user_type: userData?.user_type_id || "5",
+                doc_type_id: formData.DocTypeID,
+                doc_type: dcnm,
+                owner_id: userData?.user_id || "",
+                ownership: "SELF",
+                doc_validity: formData.DocValidity,
+                doc_visibility: "PUBLIC",
+                doc_name: formData.DocName,
+                doc_file_name: selectedFile?.name || "",
+                doc_remarks: formData.DocRemarks,
+                doc_desc: formData.DocDesc,
+                entry_user_id: userData?.user_id || "",
+            }
+
+            console.log("docDetails", docDetails);
+
+
+            const result = await uploadDocumentAPI('/udinDocument/udinDocumentUpload', selectedFile, docDetails);
+            console.log("result", result);
+
+            if (result.status == 0) {
+                alert("Document uploaded successfully");
+                if (isWizard) onClose();
+
+            } else {
+                alert(result.message);
+            }
+        } catch (error) {
+            console.log("error", error);
+            alert("Something went wrong");
+        } finally {
+            setIsLoading(false);
+        }
+
     };
 
     const handleRemoveFile = (e: React.MouseEvent) => {
@@ -304,11 +359,11 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
 
                     {/* Verify Button */}
                     <div className="mt-10 flex justify-center gap-6">
-                        <button className="cursor-pointer bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white text-sm font-semibold px-8 py-3 rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-2">
-                            <Upload size={18} />
-                            Upload Document
+                        <button onClick={handleUdinAPICall} disabled={isLoading} className="disabled:opacity-50 cursor-pointer bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white text-sm font-semibold px-8 py-3 rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-2">
+                            {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
+                            {isLoading ? "Uploading..." : "Upload Document"}
                         </button>
-                        {isWizard && <button onClick={onClose} className="cursor-pointer bg-gradient-to-r from-red-600 to-amber-500 hover:from-red-700 hover:to-amber-600 text-white text-sm font-semibold px-8 py-3 rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-2">
+                        {isWizard && <button onClick={onClose} disabled={isLoading} className="disabled:opacity-50 cursor-pointer bg-gradient-to-r from-red-600 to-amber-500 hover:from-red-700 hover:to-amber-600 text-white text-sm font-semibold px-8 py-3 rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-2">
                             <X size={18} />
                             Close
                         </button>}

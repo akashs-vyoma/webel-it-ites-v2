@@ -173,7 +173,7 @@ const IndividualLogin: React.FC = () => {
 
     const handleSubmit = () => {
         if (typeof window !== 'undefined') {
-            let encData_str = JSON.stringify({ ...selectedAccount, photo_base64: null, role: selectedRole, isLogin: "1" });
+            let encData_str = JSON.stringify({ ...selectedAccount, photo_base64: null, role: selectedRole, isLogin: "1", user_type_id: selectedRole == 'individual' ? '5' : '9' });
             let encData = btoa(encData_str);
 
             localStorage.setItem("enData", encData);

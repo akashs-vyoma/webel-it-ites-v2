@@ -28,27 +28,27 @@ const CommonNav = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const router = useRouter();
 
- useEffect(() => {
-    try {
-        const storedData = localStorage.getItem("enData");
-        
-        if (storedData) {
-            const decodedString = atob(storedData);
-            
-            
-            if (decodedString) {
-                const userData = JSON.parse(decodedString);
-                setIsLoggedin(userData?.isLogin || "0");
+    useEffect(() => {
+        try {
+            const storedData = localStorage.getItem("enData");
+
+            if (storedData) {
+                const decodedString = atob(storedData);
+
+                console.log("decodedString", decodedString);
+                if (decodedString) {
+                    const userData = JSON.parse(decodedString);
+                    setIsLoggedin(userData?.isLogin || "0");
+                }
+            } else {
+                setIsLoggedin("0");
             }
-        } else {
+        } catch (error) {
+
+            console.error("Error parsing user data:", error);
             setIsLoggedin("0");
         }
-    } catch (error) {
-
-        console.error("Error parsing user data:", error);
-        setIsLoggedin("0");
-    }
-}, []);
+    }, []);
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
     return (
@@ -91,7 +91,7 @@ const CommonNav = () => {
                             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-cyan-500 shadow-[0_0_10px_cyan] group-hover:w-3/4 transition-all duration-300 rounded-full"></div>
                         </Link>}
 
-                        {isLoggedin === "1" && (
+                        {isLoggedin == "1" && (
                             <>
                                 {/* My Documents Dropdown */}
                                 <div className="relative group">
@@ -233,7 +233,7 @@ const CommonNav = () => {
                         <Home size={18} className="text-cyan-500" /> Home
                     </Link>}
 
-                    {isLoggedin === "1" && (
+                    {isLoggedin == "1" && (
                         <div className="space-y-6 mt-4">
                             {/* Mobile Section: Documents */}
                             <div className="space-y-3">
