@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/dialog";
 import { callAPI } from './apis/commonAPIs';
 import Swal from 'sweetalert2';
+import moment from 'moment';
 
 
 const APPLICATION_DOCUMENTS: Record<string, string[]> = {
@@ -68,6 +69,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
     const [isLoadingRequiredDocs, setIsLoadingRequiredDocs] = useState(false);
     const [activeDoc, setActiveDoc] = useState<any>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [reloadRequiredDocs, setReloadRequiredDocs] = useState(true);
 
 
     const [formData, setFormData] = useState<any>({
@@ -147,6 +149,8 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
     useImperativeHandle(ref, () => ({
         submitApplication: async () => {
 
+            const isRequiredDocsUploaded = uploadedDocsStatus.every((doc: any) => doc?.is_uploaded);
+            if (!isRequiredDocsUploaded) { Swal.fire("Required", "Please upload all required documents", "warning"); return null; }
             if (!appType) { Swal.fire("Required", "Please select application type", "warning"); return null; }
             if (!formData.name || !formData.pan || !formData.phone) { Swal.fire("Required", "Please fill name, PAN and phone", "warning"); return null; }
             if (formData.phone.length !== 10) { Swal.fire("Invalid", "Phone number must be 10 digits", "warning"); return null; }
@@ -301,7 +305,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
         try {
             const ownerID = parseInt(userData?.owner_id || "1");
             const role = userData?.role;
-            const userTypeID = role === "company" ? 1 : 2;
+            const userTypeID = userData?.user_type_id || "5";
 
             const body = {
                 ownerID: ownerID || 1,
@@ -322,14 +326,15 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
     };
 
     useEffect(() => {
-        if (appType) {
+        if (appType && reloadRequiredDocs) {
+            setReloadRequiredDocs(false);
             getRequiredDocumetListByProjectID(appType);
             fetchUploadedDocumentStatus(appType);
         } else {
             setRequiredDocuments([]);
             setUploadedDocsStatus([]);
         }
-    }, [appType]);
+    }, [reloadRequiredDocs, appType]);
 
     const handleAddTenant = () => {
         if (!tenantForm.tenantName || !tenantForm.tenantGstn || !tenantForm.tenantPan || !tenantForm.tenantActivity) {
@@ -534,22 +539,22 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
                                             Tenant Activity <span className="text-red-500">*</span>
                                         </label>
                                         <div className="relative">
-    <select
-        className="w-full h-10 px-3 pr-10 rounded-lg border border-slate-300 text-sm font-bold outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-blue-400 bg-white"
-        value={tenantForm.tenantActivity}
-        onChange={(e) => setTenantForm((prev) => ({ ...prev, tenantActivity: e.target.value }))}
-    >
-        <option value="0">Select Tenant Activity</option>
-        {TENANT_ACTIVITY_OPTIONS.map((opt) => (
-            <option key={opt.id} value={opt.id}>
-                {opt.label}
-            </option>
-        ))}
-    </select>
-    <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
-        <ChevronDown size={16} className="text-slate-500" />
-    </div>
-</div>
+                                            <select
+                                                className="w-full h-10 px-3 pr-10 rounded-lg border border-slate-300 text-sm font-bold outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-blue-400 bg-white"
+                                                value={tenantForm.tenantActivity}
+                                                onChange={(e) => setTenantForm((prev) => ({ ...prev, tenantActivity: e.target.value }))}
+                                            >
+                                                <option value="0">Select Tenant Activity</option>
+                                                {TENANT_ACTIVITY_OPTIONS.map((opt) => (
+                                                    <option key={opt.id} value={opt.id}>
+                                                        {opt.label}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                                                <ChevronDown size={16} className="text-slate-500" />
+                                            </div>
+                                        </div>
                                     </div>
 
                                     <div className="md:col-span-2 flex justify-end">
@@ -704,9 +709,10 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
                             <div className="max-h-[600px] overflow-y-auto flex flex-col gap-3 pr-1 custom-scrollbar">
                                 {requiredDocuments?.map((doc: any, idx: number) => {
                                     const uploadInfo = uploadedDocsStatus?.find(
-                                        (u: any) => u.project_document_id === doc.project_document_id
+                                        (u: any) => u.docType == doc.project_name
                                     );
-                                    const isUploaded = uploadInfo?.is_uploaded === 1;
+                                    const isUploaded = uploadInfo?.is_uploaded == 1;
+                                    const uploadOn = uploadInfo?.uploadOn;
 
                                     return (
                                         <div
@@ -730,7 +736,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
                                                             {doc?.project_name}
                                                         </p>
                                                         <p className="text-xs text-slate-500 mt-0.5">
-                                                            {isUploaded ? 'Document is Available' : 'Document Not Available'}
+                                                            {isUploaded ? `Uploaded on ${moment(uploadOn).format('DD-MM-YYYY hh:mm A')}` : 'Document Not Available'}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -760,7 +766,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-0">
                     <div className='w-full max-w-screen max-h-screen overflow-y-auto rounded-xl'>
-                        <NonIndividualUploadDoc docId={activeDoc} isWizard={true} onClose={() => { setIsModalOpen(false); fetchUploadedDocumentStatus(appType); }} />
+                        <NonIndividualUploadDoc docId={activeDoc} isWizard={true} onClose={() => { setIsModalOpen(false); fetchUploadedDocumentStatus(appType); setReloadRequiredDocs(true); }} />
                     </div>
                 </div>
             )}
