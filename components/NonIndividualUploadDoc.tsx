@@ -79,7 +79,7 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
         fileInputRef.current?.click();
     };
 
-    const handleUdinAPICall = async () => {
+    const handleUdinDocUpload = async () => {
         try {
             setIsLoading(true);
 
@@ -388,7 +388,7 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
 
                     {/* Verify Button */}
                     <div className="mt-10 flex justify-center gap-6">
-                        <button onClick={handleUdinAPICall} disabled={isLoading} className="disabled:opacity-50 cursor-pointer bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white text-sm font-semibold px-8 py-3 rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-2">
+                        <button onClick={handleUdinDocUpload} disabled={isLoading} className="disabled:opacity-50 cursor-pointer bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white text-sm font-semibold px-8 py-3 rounded-lg shadow-md transition-all active:scale-95 flex items-center gap-2">
                             {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Upload size={18} />}
                             {isLoading ? "Uploading..." : "Upload Document"}
                         </button>
