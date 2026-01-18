@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react'
 import { useRouter } from "next/navigation";
+import { setCookie } from '@/utils/cookies';
 
 const OrganisationRegByGSTIN = () => {
     const [gstNumber, setGstNumber] = useState('');
@@ -28,9 +29,9 @@ const OrganisationRegByGSTIN = () => {
     const handleLogin = () => {
         if (otp.length > 0) {
             if (typeof window !== 'undefined') {
-                localStorage.setItem("role", "company");
-                localStorage.setItem("gstin", gstNumber);
-                localStorage.setItem("isLogin", "1");
+                setCookie("role", "company");
+                setCookie("gstin", gstNumber);
+                setCookie("isLogin", "1");
             }
             router.push("/company-dashboard");
         } else {
@@ -61,7 +62,7 @@ const OrganisationRegByGSTIN = () => {
                     className={`flex-1 border-y border-r border-gray-300 px-3 text-xs focus:outline-none focus:border-[#5b5fa3] transition-colors ${otpSent ? 'bg-gray-50 text-gray-500' : ''}`}
                 />
                 {/* Verify Button (Changes to 'Change' if OTP sent) */}
-                <button 
+                <button
                     onClick={otpSent ? handleChangeGst : handleVerifyGst}
                     className="bg-[#ffc107] hover:bg-yellow-500 text-black text-xs font-bold px-5 transition-colors rounded-r-sm min-w-[100px]"
                 >
@@ -72,7 +73,7 @@ const OrganisationRegByGSTIN = () => {
             {/* OTP Section - Appears only when otpSent is true */}
             {otpSent && (
                 <div className="animate-in fade-in slide-in-from-top-2 duration-300 mb-3">
-                     <label className="block text-xs font-bold text-gray-800 mb-1 mt-3">
+                    <label className="block text-xs font-bold text-gray-800 mb-1 mt-3">
                         Enter OTP <span className="text-red-500">*</span>
                     </label>
                     <div className="flex w-full h-9">
@@ -89,7 +90,7 @@ const OrganisationRegByGSTIN = () => {
                             className="flex-1 border-y border-r border-gray-300 px-3 text-xs focus:outline-none focus:border-[#5b5fa3] transition-colors tracking-widest"
                         />
                         {/* Login Button (Reusing your exact style) */}
-                        <button 
+                        <button
                             onClick={handleLogin}
                             className="bg-[#ffc107] hover:bg-yellow-500 text-black text-xs font-bold px-5 transition-colors rounded-r-sm min-w-[100px]"
                         >

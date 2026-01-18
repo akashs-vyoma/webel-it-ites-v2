@@ -9,6 +9,7 @@ import MultiOwnPropertyForm from '@/components/ApplyForMultipartyDeclaration';
 import PaymentCard from '@/components/InitPayment';
 import CoSignerApplication from '@/components/CoSignerApplication';
 import Swal from 'sweetalert2';
+import { getCookie } from '@/utils/cookies';
 
 export default function WizardPage() {
     const [currentStep, setCurrentStep] = useState(1);
@@ -43,7 +44,7 @@ export default function WizardPage() {
             if (result && result.status === 0) {
 
                 setApplicationNo(result?.data?.application_no);
-                setApplicationType(localStorage.getItem("application-type") || "");
+                setApplicationType(getCookie("application-type") || "");
                 setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
             } else if (result) {
                 Swal.fire("Error", result.message || "Something went wrong", "error");

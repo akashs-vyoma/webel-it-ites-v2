@@ -17,6 +17,7 @@ import { assetConfig } from './asset-config';
 import { callAPI } from './apis/commonAPIs';
 import Image from 'next/image';
 import DashboardImg from '@/public/7127980.jpg';
+import { useAuth } from '@/hooks/useAuth';
 
 interface DashboardData {
     totalUploadedDoc: number;
@@ -40,32 +41,32 @@ const UserDashboard: React.FC = () => {
     const [requiredDocsList, setRequiredDocsList] = useState<any[]>([]);
     const [isReqDocsLoading, setIsReqDocsLoading] = useState(false);
     const [showDocList, setShowDocList] = useState(false);
+    const { user, isAuthenticated } = useAuth();
+
+    const fetchDashboardDetails = async () => {
+        try {
+            const result = await callAPI('/user/GetDashboardDetails', {
+                "ownerID": parseInt(user?.owner_id || "1"),
+                "userTypeID": parseInt(user?.user_type_id || "1")
+            });
+
+            if (result.status === 0) {
+                setDashboardData(result.data);
+            } else {
+                console.error("API Error:", result.message);
+            }
+        } catch (error) {
+            console.error("Fetch Error:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const userData_end = atob(localStorage.getItem("enData") || "");
-        const userData = JSON.parse(userData_end);
-        setAccountName(userData?.account_name || '');
-        const fetchDashboardDetails = async () => {
-            try {
-                const result = await callAPI('/user/GetDashboardDetails', {
-                    "ownerID": parseInt(userData?.owner_id || "1"),
-                    "userTypeID": parseInt(userData?.user_type_id || "1")
-                });
-
-                if (result.status === 0) {
-                    setDashboardData(result.data);
-                } else {
-                    console.error("API Error:", result.message);
-                }
-            } catch (error) {
-                console.error("Fetch Error:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
+        if (!isAuthenticated) return;
+        setAccountName(user?.account_name || '');
         fetchDashboardDetails();
-    }, []);
+    }, [isAuthenticated]);
 
 
     const handleOpenAdvisory = async () => {
@@ -195,7 +196,7 @@ const UserDashboard: React.FC = () => {
                                             <p className="text-xs font-semibold text-blue-50 tracking-wide uppercase">Webel Services</p>
                                         </div>
                                         <h3 className="text-5xl xl:text-7xl font-bold mb-3 tracking-tighter drop-shadow-sm">
-                                            {isLoading ? "..." : dashboardData?.totalUploadedDoc ?? 0}
+                                            {isLoading ? <Loader2 className='animate-spin text-white/70 h-6 w-6' size={10} /> : dashboardData?.totalUploadedDoc ?? 0}
                                         </h3>
                                     </div>
                                     <div className="w-10 h-10 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center group-hover:scale-110 transition-all duration-300">
@@ -221,7 +222,7 @@ const UserDashboard: React.FC = () => {
                                             <p className="text-xs font-semibold text-slate-400 tracking-wide uppercase">Webel Services</p>
                                         </div>
                                         <h3 className="text-5xl xl:text-7xl font-bold mb-3 tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-cyan-100">
-                                            {isLoading ? "..." : dashboardData?.totalJointVentureCreatedCount ?? 0}
+                                            {isLoading ? <Loader2 className='animate-spin text-white/70 h-6 w-6' size={10} /> : dashboardData?.totalJointVentureCreatedCount ?? 0}
                                         </h3>
                                     </div>
                                     <div className="w-10 h-10 rounded-full bg-white/5 backdrop-blur-md flex items-center justify-center group-hover:scale-110 transition-all duration-300">

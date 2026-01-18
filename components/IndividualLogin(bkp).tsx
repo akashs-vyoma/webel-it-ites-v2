@@ -10,6 +10,7 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { setCookie } from '@/utils/cookies';
 
 const IndividualLogin: React.FC = () => {
     const [phoneNumber, setPhoneNumber] = useState('');
@@ -40,8 +41,8 @@ const IndividualLogin: React.FC = () => {
 
     const handleSubmit = () => {
         if (typeof window !== 'undefined') {
-            localStorage.setItem("role", selectedRole);
-            localStorage.setItem("isLogin", "1");
+            setCookie("role", selectedRole);
+            setCookie("isLogin", "1");
         }
         setShowRoleModal(false);
         router.push("/user-dashboard");

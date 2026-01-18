@@ -13,6 +13,8 @@ import {
 } from "@/components/ui/dialog";
 import { callAPI } from './apis/commonAPIs';
 import Swal from "sweetalert2";
+import { useAuth } from '@/hooks/useAuth';
+import { deleteCookie, getCookie, setCookie } from '@/utils/cookies';
 
 const IndividualLogin: React.FC = () => {
     const [aadhaarNumber, setAadhaarNumber] = useState('');
@@ -31,6 +33,8 @@ const IndividualLogin: React.FC = () => {
 
     // Timer state for Resend OTP (30 seconds)
     const [timer, setTimer] = useState(0);
+    const { setUserData } = useAuth();
+    const router = useRouter();
 
     // Countdown logic
     useEffect(() => {
@@ -60,7 +64,7 @@ const IndividualLogin: React.FC = () => {
                 const result = await callAPI("/udin/individualLoginAndSendOtp", { aadhaar_number: aadhaarNumber });
 
                 if (result.status == 0) {
-                    localStorage.setItem("token", result.data.token);
+                    setCookie("token", result.data.token)
                     setOtpSent(true);
                     setShowSwalAlert(true);
                     setTimer(60);
@@ -114,8 +118,9 @@ const IndividualLogin: React.FC = () => {
     const handleVerifyOtp = async () => {
         try {
             setVerifyingOtp(true);
-            if (otp.length > 0) {
-                const token = localStorage.getItem("token");
+            if (otp?.length > 0) {
+
+                const token = getCookie("token");
                 const result = await callAPI("/udin/individualLoginValidateAadhaarOtp", { aadhaar_number: aadhaarNumber, otp, token });
 
                 if (result.status == 0) {
@@ -126,8 +131,8 @@ const IndividualLogin: React.FC = () => {
                         text: "OTP verified successfully",
                         confirmButtonColor: "#06b6d4",
                     }).then(() => {
-                        localStorage.removeItem("token");
-                        localStorage.setItem("authToken", result.data.token);
+                        deleteCookie("token");
+                        setCookie("authToken", result.data.token);
                         setAccounts(result?.data?.udin_profile_details?.accounts);
                         if (result?.data?.udin_profile_details?.accounts?.length == 1) {
                             console.log(result?.data?.udin_profile_details?.accounts[0]);
@@ -169,15 +174,10 @@ const IndividualLogin: React.FC = () => {
         }
     };
 
-    const router = useRouter();
-
     const handleSubmit = () => {
-        if (typeof window !== 'undefined') {
-            let encData_str = JSON.stringify({ ...selectedAccount, photo_base64: null, role: selectedRole, isLogin: "1", user_type_id: selectedRole == 'individual' ? '5' : '9' });
-            let encData = btoa(encData_str);
-
-            localStorage.setItem("enData", encData);
-        }
+        const encData = { ...selectedAccount, photo_base64: null, role: selectedRole, user_type_id: selectedRole == 'individual' ? '5' : '9' };
+        setUserData(encData);
+        setCookie("isAuth", "1");
         setShowRoleModal(false);
         router.push("/user-dashboard");
     };

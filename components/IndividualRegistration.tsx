@@ -6,6 +6,7 @@ import Swal from 'sweetalert2'; // Added SweetAlert2
 import CommonCard from './common-card';
 import { callAPI } from './apis/commonAPIs';
 import router from 'next/router';
+import { getCookie, setCookie } from '@/utils/cookies';
 
 const IndividualRegistration: React.FC = () => {
   const [aadhaarNumber, setAadhaarNumber] = useState('');
@@ -37,8 +38,8 @@ const IndividualRegistration: React.FC = () => {
         setIsLoadingSent(true);
         const result = await callAPI("/udin/individualRegisterAndSendOtp", { aadhaar_number: aadhaarNumber });
         if (result.status == 0) {
-          localStorage.setItem("token", result.data.token);
-          localStorage.setItem("trans_id", result.data.trans_id);
+          setCookie("token", result.data.token);
+          setCookie("trans_id", result.data.trans_id);
           setOtpSent(true);
           Swal.fire({
             icon: 'success',
@@ -90,8 +91,8 @@ const IndividualRegistration: React.FC = () => {
           return;
         }
 
-        const token = localStorage.getItem("token");
-        const trans_id = localStorage.getItem("trans_id");
+        const token = getCookie("token");
+        const trans_id = getCookie("trans_id");
         const result = await callAPI("/udin/individualRegisterValidateAadhaarOtp", { otp, token, trans_id });
 
         if (result.status == 0) {

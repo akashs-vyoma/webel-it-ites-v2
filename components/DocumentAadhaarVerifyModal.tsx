@@ -9,6 +9,7 @@ import {
 import { Eye, EyeOff, Info, Loader2, CheckCircle } from 'lucide-react';
 import { callAPI } from './apis/commonAPIs';
 import Swal from 'sweetalert2';
+import { deleteCookie, getCookie, setCookie } from '@/utils/cookies';
 
 const DocumentAadhaarVerifyModal = ({ showModal, setShowModal }: { showModal: boolean, setShowModal: (showModal: boolean) => void }) => {
     const [showMore, setShowMore] = useState(false);
@@ -34,7 +35,7 @@ const DocumentAadhaarVerifyModal = ({ showModal, setShowModal }: { showModal: bo
             }
             if (aadhaarNumber.length === 12) {
                 setIsLoadingSent(true);
-                const storedToken = localStorage.getItem("authToken") || "";
+                const storedToken = getCookie("authToken") || "";
 
                 const result = await callAPI("/udin/requestAadhaarOtp", {
                     aadhaar_number: aadhaarNumber,
@@ -42,7 +43,7 @@ const DocumentAadhaarVerifyModal = ({ showModal, setShowModal }: { showModal: bo
                 });
 
                 if (result.status == 0 || result.status == "0") {
-                    localStorage.setItem("trans_id", result.data.transId);
+                    setCookie("trans_id", result.data.transId);
                     setOtpSent(true);
                     setSuccess(`OTP sent to aadhaar linked with mobile no.`);
                 } else {
@@ -70,8 +71,8 @@ const DocumentAadhaarVerifyModal = ({ showModal, setShowModal }: { showModal: bo
                 }
 
                 setIsLoadingVerify(true);
-                const storedToken = localStorage.getItem("authToken") || "";
-                const trans_id = localStorage.getItem("trans_id") || "";
+                const storedToken = getCookie("authToken") || "";
+                const trans_id = getCookie("trans_id") || "";
 
                 const result = await callAPI("/udin/validateAadhaarOtp", {
                     trans_id: trans_id,
@@ -82,15 +83,15 @@ const DocumentAadhaarVerifyModal = ({ showModal, setShowModal }: { showModal: bo
                 });
 
                 if (result.status == 0 || result.status == "0") {
-                    localStorage.removeItem("trans_id");
-                    localStorage.setItem("ad_auth", btoa("1"));
+                    deleteCookie("trans_id");
+                    setCookie("ad_auth", "1");
                     setShowModal(false);
                     Swal.fire({
                         icon: 'success',
                         title: 'Success',
                         text: 'Aadhaar has been authenticated successfully',
                         showConfirmButton: false,
-                        timer: 1500
+                        timer: 4500
                     });
                 } else {
                     setError(result.message || "Verification Failed");
@@ -108,14 +109,17 @@ const DocumentAadhaarVerifyModal = ({ showModal, setShowModal }: { showModal: bo
 
     return (
         <Dialog open={showModal} onOpenChange={setShowModal}>
-            <DialogContent className="sm:max-w-lg p-0 gap-0 overflow-hidden bg-white rounded-xl shadow-2xl border-0">
+            <DialogContent
+                onInteractOutside={(e) => e.preventDefault()}
+                onEscapeKeyDown={(e) => e.preventDefault()}
+                className="sm:max-w-lg p-0 gap-0 overflow-hidden bg-white rounded-xl shadow-2xl border-0 [&>button]:hidden">
 
                 {/* Modal Header */}
                 <DialogHeader className="bg-gradient-to-r from-blue-600 to-cyan-500 p-5 text-left">
                     <div className="flex justify-between items-center">
                         <DialogTitle className="text-white text-lg font-medium">Verify your Aadhaar Number</DialogTitle>
-                        <button onClick={() => setShowModal(false)} className="text-white/80 hover:text-white">
-                        </button>
+                        {/* <button onClick={() => setShowModal(false)} className="text-white/80 hover:text-white">
+                        </button> */}
                     </div>
                 </DialogHeader>
 
@@ -240,12 +244,12 @@ const DocumentAadhaarVerifyModal = ({ showModal, setShowModal }: { showModal: bo
 
                 {/* Modal Footer */}
                 <div className="p-5 border-t border-gray-100 flex justify-end">
-                    <button
+                    {/* <button
                         className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-2 rounded-lg font-medium transition-colors text-sm"
                         onClick={() => setShowModal(false)}
                     >
                         Cancel
-                    </button>
+                    </button> */}
                 </div>
             </DialogContent>
         </Dialog>

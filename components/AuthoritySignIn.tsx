@@ -3,18 +3,19 @@
 import React, { useState } from "react"
 import { Eye, EyeOff, Key, LogIn, Smartphone, User, ShieldCheck } from "lucide-react"
 import { useRouter } from "next/navigation";
+import { setCookie } from "@/utils/cookies";
 
 export default function DepartmentSignIn() {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
-  
+
   // Logic States
   const [phone, setPhone] = useState("")
   const [password, setPassword] = useState("")
   const [otp, setOtp] = useState("");
   const [otpSent, setOtpSent] = useState(false);
 
-  const router = useRouter(); 
+  const router = useRouter();
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword)
@@ -30,15 +31,15 @@ export default function DepartmentSignIn() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Logic for Super Admin
     if (isSuperAdmin) {
-        if (password.length > 0) {
-            proceedToDashboard();
-        } else {
-            alert("Please enter password");
-        }
-        return;
+      if (password.length > 0) {
+        proceedToDashboard();
+      } else {
+        alert("Please enter password");
+      }
+      return;
     }
 
     // Logic for Department User (OTP)
@@ -55,7 +56,7 @@ export default function DepartmentSignIn() {
 
   const proceedToDashboard = () => {
     if (typeof window !== 'undefined') {
-        localStorage.setItem("isAdminLogin", "1");
+      setCookie("isAdminLogin", "1");
     }
     router.push("/authority-dashboard");
   };
@@ -63,7 +64,7 @@ export default function DepartmentSignIn() {
   return (
     <div className="flex justify-center items-center min-h-screen p-4">
       <div className="w-full max-w-xl bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-200">
-        
+
         {/* Header */}
         <div className="bg-gradient-to-r from-indigo-600 to-violet-600 px-8 py-6">
           <div className="flex items-center gap-3">
@@ -89,7 +90,7 @@ export default function DepartmentSignIn() {
                 checked={isSuperAdmin}
                 onChange={(e) => {
                   setIsSuperAdmin(e.target.checked)
-                  setPassword("") 
+                  setPassword("")
                   setOtpSent(false)
                   setOtp("")
                 }}
@@ -116,7 +117,7 @@ export default function DepartmentSignIn() {
           </div>
 
           <form className="space-y-6" onSubmit={handleSubmit}>
-            
+
             {/* Phone Number Field */}
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
@@ -126,7 +127,7 @@ export default function DepartmentSignIn() {
                 <div className="bg-slate-50 w-12 flex items-center justify-center border-r border-slate-200">
                   {isSuperAdmin ? <User className="w-5 h-5 text-indigo-600" /> : <Smartphone className="w-5 h-5 text-indigo-600" />}
                 </div>
-                
+
                 <input
                   type="text"
                   placeholder="Enter registered mobile number"
@@ -139,7 +140,7 @@ export default function DepartmentSignIn() {
                 />
 
                 {!isSuperAdmin && !otpSent && (
-                  <button 
+                  <button
                     type="button"
                     onClick={handleSendOtp}
                     className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 text-sm font-bold transition-colors"
@@ -147,7 +148,7 @@ export default function DepartmentSignIn() {
                     Send OTP
                   </button>
                 )}
-              </div>  
+              </div>
             </div>
 
             {/* OTP Field - Appears in same form after clicking Send OTP */}
@@ -169,9 +170,9 @@ export default function DepartmentSignIn() {
                   />
                 </div>
                 <div className="mt-2 text-right">
-                    <button type="button" onClick={handleSendOtp} className="text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-transparent border-none p-0 cursor-pointer">
-                        Resend Code
-                    </button>
+                  <button type="button" onClick={handleSendOtp} className="text-xs font-bold text-indigo-600 hover:text-indigo-700 bg-transparent border-none p-0 cursor-pointer">
+                    Resend Code
+                  </button>
                 </div>
               </div>
             )}
@@ -207,7 +208,7 @@ export default function DepartmentSignIn() {
             {/* Final Submission Button */}
             {(isSuperAdmin || otpSent) && (
               <div className="pt-2 animate-in fade-in duration-300">
-                <button 
+                <button
                   type="submit"
                   className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]"
                 >
@@ -222,9 +223,9 @@ export default function DepartmentSignIn() {
         <div className="bg-amber-50 px-8 py-4 border-t border-amber-200">
           <div className="flex gap-2">
             <div className="mt-0.5">
-               <svg className="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-               </svg>
+              <svg className="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
             </div>
             <p className="text-amber-800 text-sm font-medium leading-relaxed">
               <span className="font-bold">Instruction:</span> Department Authorized users can log in by{" "}

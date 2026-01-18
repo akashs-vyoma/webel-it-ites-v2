@@ -13,25 +13,26 @@ import {
 import Image from 'next/image'
 import webelLogo from '@/components/images/webel-logo.png'
 import { useRouter } from 'next/navigation';
+import { deleteAllCookies } from '@/utils/cookies';
 
 const AdminNav = () => {
     const router = useRouter();
     const [isLoggedIn, setIsLoggedIn] = useState("0");
 
     const handleLogout = () => {
-        localStorage.clear();
+        deleteAllCookies();
         router.push("/");
     };
 
     useEffect(() => {
-        const isAdminLogin = localStorage.getItem("isAdminLogin");
+        const isAdminLogin = getCookie("isAdminLogin");
         setIsLoggedIn(isAdminLogin || "0");
         if (!isAdminLogin) {
             router.push("/authority-sign-in");
         }
     }, []);
 
-   
+
     const navItemClasses = "group relative flex items-center gap-2 px-4 xl:px-5 py-2.5 rounded-full text-sm font-bold text-slate-500 hover:text-cyan-600 transition-all duration-300 cursor-pointer";
     const hoverBubble = "absolute inset-0 bg-gradient-to-br from-cyan-50/0 to-blue-50/0 group-hover:from-cyan-50 group-hover:to-blue-50 rounded-full transition-all duration-300";
     const neonUnderline = "absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-cyan-500 shadow-[0_0_10px_cyan] group-hover:w-3/4 transition-all duration-300 rounded-full";

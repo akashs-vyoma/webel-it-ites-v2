@@ -16,33 +16,29 @@ import { useSearchParams } from 'next/navigation';
 import DocumentAadhaarVerifyModal from './DocumentAadhaarVerifyModal';
 import { uploadDocumentAPI } from './apis/commonAPIs';
 import Swal from 'sweetalert2';
+import { useAuth } from '@/hooks/useAuth';
+import { deleteCookie, getCookie } from '@/utils/cookies';
 
 const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void, docId: any }> = ({ isWizard, onClose, docId }) => {
     const searchParams = useSearchParams();
 
     const dcid = searchParams.get("dcid") || docId.project_id;
     const dcnm = searchParams.get("dcnm") || docId.project_name;
-    const [userData, setUserData] = useState<any>(null);
     const [showModal, setShowModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const { user, isAuthenticated, token } = useAuth();
 
 
     useEffect(() => {
-        const aadhaarAuthFlag_enc = localStorage.getItem("ad_auth");
-        const aadhaarAuthFlag = atob(aadhaarAuthFlag_enc || "");
-        const userData_enc = localStorage.getItem("enData");
-        const userData_end = atob(userData_enc || "");
-        const userData_dec = JSON.parse(userData_end);
-        setUserData(userData_dec);
-
-
-        if (aadhaarAuthFlag == "1") {
+        if (!isAuthenticated) return;
+        const aadhaarAuth = getCookie("ad_auth");
+        if (aadhaarAuth) {
             setShowModal(false);
         } else {
             setShowModal(true);
         }
 
-    }, [])
+    }, [isAuthenticated])
 
     const [formData, setFormData] = useState({
         DocumentOwnership: '',
@@ -69,14 +65,14 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
         }
     };
     useEffect(() => {
-        const authToken = localStorage.getItem('authToken');
-        if (!authToken) setShowModal(true);
+        if (!isAuthenticated) return;
+        if (!token) setShowModal(true);
         if (docId) document.body.style.overflow = "hidden";
 
         return () => {
             document.body.style.overflow = "";
         };
-    }, []);
+    }, [isAuthenticated]);
 
 
     const handleUploadClick = async () => {
@@ -91,13 +87,13 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
                 alert("Please select a file");
                 return;
             };
-            const token = localStorage.getItem('authToken');
+
             const docDetails = {
                 token: token,
-                user_type: userData?.user_type_id || "5",
+                user_type: user?.user_type_id || "5",
                 doc_type_id: formData.DocTypeID,
                 doc_type: dcnm,
-                owner_id: userData?.user_id || "",
+                owner_id: user?.user_id || "",
                 ownership: "SELF",
                 doc_validity: formData.DocValidity,
                 doc_visibility: "PUBLIC",
@@ -105,7 +101,7 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
                 doc_file_name: selectedFile?.name || "",
                 doc_remarks: formData.DocRemarks,
                 doc_description: formData.DocDesc,
-                entry_user_id: userData?.user_id || "",
+                entry_user_id: user?.user_id || "",
             }
 
             const result = await uploadDocumentAPI('/udinDocument/udinDocumentUpload', selectedFile, docDetails);
@@ -127,7 +123,7 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
 
             } else {
                 if (result?.message?.includes("Invalid API token")) {
-                    localStorage.removeItem("ad_auth");
+                    deleteCookie("ad_auth");
                     Swal.fire({
                         icon: "error",
                         title: "Session Expired.",

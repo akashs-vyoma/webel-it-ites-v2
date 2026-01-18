@@ -22,33 +22,14 @@ import {
 import Image from 'next/image'
 import webelLogo from '@/components/images/webel-logo.png'
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/useAuth';
+import { deleteAllCookies } from '@/utils/cookies';
 
 const CommonNav = () => {
-    const [isLoggedin, setIsLoggedin] = useState("0");
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const router = useRouter();
+    const { isAuthenticated } = useAuth();
 
-    useEffect(() => {
-        try {
-            const storedData = localStorage.getItem("enData");
-
-            if (storedData) {
-                const decodedString = atob(storedData);
-
-                console.log("decodedString", decodedString);
-                if (decodedString) {
-                    const userData = JSON.parse(decodedString);
-                    setIsLoggedin(userData?.isLogin || "0");
-                }
-            } else {
-                setIsLoggedin("0");
-            }
-        } catch (error) {
-
-            console.error("Error parsing user data:", error);
-            setIsLoggedin("0");
-        }
-    }, []);
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
     return (
@@ -73,7 +54,7 @@ const CommonNav = () => {
                     {/* Desktop Navigation Links (Hidden on mobile) */}
                     <div className="hidden lg:flex items-center gap-1 xl:gap-2">
                         {/* Home Link */}
-                        {isLoggedin === "1" ? <Link
+                        {isAuthenticated == "1" ? <Link
                             href="/user-dashboard"
                             className="group relative flex items-center gap-2 px-4 xl:px-5 py-2.5 rounded-full text-sm font-bold text-slate-500 hover:text-cyan-600 transition-all duration-300 cursor-pointer"
                         >
@@ -91,7 +72,7 @@ const CommonNav = () => {
                             <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-cyan-500 shadow-[0_0_10px_cyan] group-hover:w-3/4 transition-all duration-300 rounded-full"></div>
                         </Link>}
 
-                        {isLoggedin == "1" && (
+                        {isAuthenticated == "1" && (
                             <>
                                 {/* My Documents Dropdown */}
                                 <div className="relative group">
@@ -200,7 +181,7 @@ const CommonNav = () => {
                                 {/* Logout Button */}
                                 <button
                                     onClick={() => {
-                                        localStorage.clear()
+                                        deleteAllCookies()
                                         router.push("/")
                                     }}
                                     className="group relative flex items-center gap-2 px-4 xl:px-5 py-2.5 rounded-full text-sm font-bold text-slate-500 hover:text-cyan-600 transition-all duration-300 cursor-pointer ml-2"
@@ -227,13 +208,13 @@ const CommonNav = () => {
             {/* Mobile Sidebar Navigation */}
             <div className={`fixed inset-y-0 right-0 w-full max-w-xs bg-white/95 backdrop-blur-2xl shadow-2xl border-l border-cyan-100 transform ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 ease-in-out lg:hidden z-[55]`}>
                 <div className="flex flex-col h-full pt-20 pb-6 px-6 overflow-y-auto">
-                    {isLoggedin === "1" ? <Link href="/user-dashboard" className="flex items-center gap-3 py-4 text-slate-600 font-bold border-b border-slate-50" onClick={() => setIsMobileMenuOpen(false)}>
+                    {isAuthenticated == "1" ? <Link href="/user-dashboard" className="flex items-center gap-3 py-4 text-slate-600 font-bold border-b border-slate-50" onClick={() => setIsMobileMenuOpen(false)}>
                         <Home size={18} className="text-cyan-500" /> Home
                     </Link> : <Link href="/" className="flex items-center gap-3 py-4 text-slate-600 font-bold border-b border-slate-50" onClick={() => setIsMobileMenuOpen(false)}>
                         <Home size={18} className="text-cyan-500" /> Home
                     </Link>}
 
-                    {isLoggedin == "1" && (
+                    {isAuthenticated == "1" && (
                         <div className="space-y-6 mt-4">
                             {/* Mobile Section: Documents */}
                             <div className="space-y-3">
@@ -269,7 +250,7 @@ const CommonNav = () => {
                                         <RefreshCcw size={18} className="text-slate-400" /> History
                                     </Link>
                                     <button
-                                        onClick={() => { localStorage.clear(); router.push("/"); setIsMobileMenuOpen(false); }}
+                                        onClick={() => { deleteAllCookies(); router.push("/"); setIsMobileMenuOpen(false); }}
                                         className="flex items-center gap-3 p-3 mt-4 rounded-xl text-sm font-bold text-red-500 bg-red-50/50"
                                     >
                                         <LogOut size={18} /> Log Out

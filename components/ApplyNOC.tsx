@@ -34,6 +34,8 @@ import {
 import { callAPI } from './apis/commonAPIs';
 import Swal from 'sweetalert2';
 import moment from 'moment';
+import { setCookie } from '@/utils/cookies';
+import { useAuth } from '@/hooks/useAuth';
 
 
 const APPLICATION_DOCUMENTS: Record<string, string[]> = {
@@ -118,30 +120,26 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
         tenantPhone: '',
         tenantActivity: ''
     });
-    const [userData, setUserData] = useState<any>(null);
+    const { user, isAuthenticated } = useAuth();
 
     useEffect(() => {
         try {
-            const rawData = localStorage.getItem("enData");
-            if (!rawData) return;
+            if (!isAuthenticated) return;
 
-            const userData = JSON.parse(atob(rawData));
+            setRole(user?.role || "");
 
-            setRole(userData?.role || "");
-            setUserData(userData);
-
-            setFormData(prev => ({
+            setFormData((prev: any) => ({
                 ...prev,
-                name: userData.account_name || prev.name,
-                phone: userData.phone || prev.phone,
-                address: userData.address || prev.address,
-                email: userData.email || prev.email
+                name: user?.account_name || prev.name,
+                phone: user?.phone || prev.phone,
+                address: user?.address || prev.address,
+                email: user?.email || prev.email
             }));
 
         } catch (error) {
             console.error("Error decoding user data:", error);
         }
-    }, []);
+    }, [isAuthenticated]);
 
     const toNull = (value: any) =>
         value === "" || value === undefined ? null : value;
@@ -182,7 +180,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
                     commercial_area_on_rent_in_sqft: Number(formData.comm_area) || 0,
 
                     // Integer
-                    user_type_id: Number(userData?.user_type_id || "5"),
+                    user_type_id: Number(user?.user_type_id || "5"),
 
                     // Renting
                     renting_floor: formData.floor_no || "",
@@ -278,8 +276,8 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
                     : [],
 
                 // Integer
-                entry_user_id: Number(userData?.user_id) || 0,
-                owner_id: Number(userData?.owner_id) || 0
+                entry_user_id: Number(user?.user_id) || 0,
+                owner_id: Number(user?.owner_id) || 0
             };
 
             try {
@@ -288,8 +286,8 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
                     const appId = result.data.application_id || result.data.in_application_id;
                     const appNo = result.data.application_no;
 
-                    if (appId) localStorage.setItem("application_id", appId.toString());
-                    if (appNo) localStorage.setItem("application_no", appNo.toString());
+                    if (appId) setCookie("application_id", appId.toString());
+                    if (appNo) setCookie("application_no", appNo.toString());
                 }
 
                 return result;
@@ -303,15 +301,19 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
 
     const fetchUploadedDocumentStatus = async (applicationTypeID: any) => {
         try {
-            const ownerID = parseInt(userData?.owner_id || "1");
-            const role = userData?.role;
-            const userTypeID = userData?.user_type_id || "5";
+            console.log("user", user);
+
+            const ownerID = parseInt(user?.owner_id || user?.user_id);
+            const userTypeID = user?.user_type_id || "5";
 
             const body = {
                 ownerID: ownerID || 1,
                 userTypeID: userTypeID || 1,
                 applicationTypeID: parseInt(applicationTypeID)
             };
+
+            console.log("body", body);
+
 
             const result = await callAPI('/application/GetUploadedDocumentDetailsByApplicationTypeIDV1', body);
             if (result && result.data) {
@@ -328,14 +330,14 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
     };
 
     useEffect(() => {
-        if (appType && reloadRequiredDocs) {
+        if (appType) {
             getRequiredDocumetListByProjectID(appType);
             fetchUploadedDocumentStatus(appType);
         } else {
             setRequiredDocuments([]);
             setUploadedDocsStatus([]);
         }
-    }, [reloadRequiredDocs, appType]);
+    }, [appType]);
 
     const handleAddTenant = () => {
         if (!tenantForm.tenantName || !tenantForm.tenantGstn || !tenantForm.tenantPan || !tenantForm.tenantActivity) {
@@ -367,7 +369,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
     useEffect(() => {
         if (category) {
             fetchProjects();
-            localStorage.setItem("category", category);
+            setCookie("category", category);
         }
         else setProjects([]);
     }, [category]);
@@ -411,7 +413,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
                                     value={category}
                                     onChange={(e) => {
                                         setCategory(e.target.value);
-                                        localStorage.setItem("category", e.target.value);
+                                        setCookie("category", e.target.value);
                                     }}
                                     className="w-full h-11 pl-4 pr-10 rounded-lg bg-white text-slate-700 font-bold text-sm outline-none focus:ring-4 focus:ring-cyan-500/30 transition-shadow appearance-none cursor-pointer disabled:bg-slate-100"
                                 >
@@ -428,7 +430,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
                                     value={appType}
                                     onChange={(e) => {
                                         setAppType(e.target.value);
-                                        localStorage.setItem("application-type", e.target.value);
+                                        setCookie("application-type", e.target.value);
                                     }}
                                     disabled={isLoadingProjects}
                                     className="w-full h-11 pl-4 pr-10 rounded-lg bg-white text-slate-700 font-bold text-sm outline-none focus:ring-4 focus:ring-cyan-500/30 transition-shadow appearance-none cursor-pointer disabled:bg-slate-100"

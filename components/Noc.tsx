@@ -9,15 +9,18 @@ import { data as RentingSingleOwnerDeclarationDummyData } from '@/components/Dec
 import TaxExemptionDeclaration from './Declarations/views/tax-exemption/single/te-declaration-single';
 import { data as TaxExemptionDeclarationDummyData } from '@/components/Declarations/dummy-data/tax-exemption/single/te_declaration_single'
 import MultiPartyDeclaration from './Declarations/views/dpr/multi/dpr-declaration-multi';
-import {data as MultiPartyDeclarationDummyData} from "@/components/Declarations/dummy-data/dpr/multi/dpr_declaration_multi"
+import { data as MultiPartyDeclarationDummyData } from "@/components/Declarations/dummy-data/dpr/multi/dpr_declaration_multi"
 import MultiOwnerDeclaration from './Declarations/views/renting/renewal/multi/renting-renewal-multi-owner-declaration';
-import {data as MultiOwnerDeclarationDummyData} from "@/components/Declarations/dummy-data/renting/renewal/multi/renting_renewal_multi_owner_declaration"
+import { data as MultiOwnerDeclarationDummyData } from "@/components/Declarations/dummy-data/renting/renewal/multi/renting_renewal_multi_owner_declaration"
 import FinalNOCExemption from './Declarations/views/tax-exemption/multi/te-final-multi';
-import{data as FinalNOCExemptionDummyData} from "@/components/Declarations/dummy-data/tax-exemption/multi/te_final_multi"
+import { data as FinalNOCExemptionDummyData } from "@/components/Declarations/dummy-data/tax-exemption/multi/te_final_multi"
 import RentingRenewalSingleDeclaration from './Declarations/views/renting/renewal/single/renting-renewal-single-party-declaration';
 import { data as RentingRenewalSingleDeclarationDummyData } from '@/components/Declarations/dummy-data/renting/renewal/single/renting_renewal_single_party_declaration'
 import RentingRenewalMultiOwnerDeclaration from './Declarations/views/renting/renewal/multi/renting-renewal-multi-owner-declaration';
 import { data as RentingRenewalMultiOwnerDeclarationDummyData } from '@/components/Declarations/dummy-data/renting/renewal/multi/renting_renewal_multi_owner_declaration'
+import { useAuth } from '@/hooks/useAuth';
+import { getCookie } from '@/utils/cookies';
+import moment from 'moment';
 
 
 
@@ -38,10 +41,11 @@ const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicatio
     const [showModal, setShowModal] = useState(false);
     const [applicationTypes, setApplicationTypes] = useState([]);
     const [selectedType, setSelectedType] = useState("");
-    const [selectedNumber, setSelectedNumber] = useState("Select Application Number");
     const [isProjectsLoading, setIsProjectsLoading] = useState(true);
-    const [isBothSelected, setIsBothSelected] = useState(false);
     const [applications, setApplications] = useState([]);
+    const [applicationId, setApplicationId] = useState("");
+    const [applicationDetails, setApplicationDetails] = useState<any>(null);
+    const { user, isAuthenticated } = useAuth();
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -49,7 +53,8 @@ const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicatio
                 const result = await callAPI("/application/GetProjectDetailsByDeptID", { "departmentID": 1 });
                 if (result.status === 0) {
                     setApplicationTypes(result.data)
-                    applicationType && setSelectedType(applicationType);
+                    const appType = applicationType || getCookie("application-type");
+                    setSelectedType(appType);
                 };
             } catch (err) { console.error(err); }
             finally { setIsProjectsLoading(false); }
@@ -58,26 +63,55 @@ const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicatio
     }, []);
 
     useEffect(() => {
-        if (!selectedType) { setApplications([]); return; }
+        if (!selectedType || !isAuthenticated) { setApplications([]); return; }
 
         const fetchApps = async () => {
             try {
-                const result = await callAPI("/application/GetApplicationNumber", { "entryUser": 1, "projectID": parseInt(selectedType) });
+                const result = await callAPI("/application/GetApplicationNumber", { "entryUser": user?.user_id, "projectID": parseInt(selectedType) });
                 if (result.status === 0) setApplications(result.data);
-                applicationNo && setSelectedNumber(applicationNo);
+                const appNo = applicationNo || getCookie("application-no");
+                console.log("appNo", appNo);
+                const appId = result?.data?.find((app: any) => app?.applicationNumber?.toString() == appNo)?.applicationId || getCookie("application_id");
+                setApplicationId(appId?.toString() || "");
             } catch (err) { console.error(err); }
         };
         fetchApps();
-    }, [selectedType]);
+    }, [selectedType, isAuthenticated]);
 
     useEffect(() => {
-        setIsBothSelected(selectedType !== applicationTypes[0] && selectedNumber !== "Select Application Number");
-    }, [selectedType, selectedNumber]);
+        if (!applicationId) return;
+        const fetchApplicationDetailsByApplicationId = async () => {
+            try {
+                const result = await callAPI("/application/GetApplicationDetailsByApplicationID", { "applicationID": parseInt(applicationId) });
+                if (result?.status == 0) setApplicationDetails(result?.data);
+            } catch (err) { console.error(err); }
+        };
+        fetchApplicationDetailsByApplicationId();
+    }, [applicationId]);
 
     const renderDeclaraionLetter = () => {
+        if (!applicationDetails) return <p>No application data found!</p>;
+
         switch (selectedType) {
             case "1":
-                return <DPRDeclarationLetter data={DPRDeclarationLetterDummyData} />;
+                {
+                    const data = {
+                        _current_date: moment(new Date()).format("DD-MM-YYYY HH:mm:ss"),
+                        _application_type: applicationDetails?.applicationTypeName,
+                        _application_number: applicationDetails?.applicationNumber,
+                        _company_name: applicationDetails?.companyName,
+                        _documents: applicationDetails?.documents?.map((doc: any) => { return { _name: doc?.documentType, _udin: doc?.quotationID } }),
+                        _it_notification_no: "845-IT/O/117/2013",
+                        _it_notification_date: "12.7.2023",
+                        _it_notification_udin: "23-GGA001177-O-1692009699994",
+                        _rep_name: applicationDetails?.companyOrPersonName,
+                        _rep_phone: applicationDetails?.companyOrPersonContactNo,
+                        _ca_reg_number: "N/A",
+                        _ca_name: "N/A",
+                        _ca_phone: "N/A",
+                    }
+                    return <DPRDeclarationLetter data={data} />;
+                }
             case "4":
                 return <RentingSingleOwnerDeclaration data={RentingSingleOwnerDeclarationDummyData} />;
             case "5":
@@ -160,13 +194,12 @@ const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicatio
                                 </label>
                                 <div className="relative">
                                     <select
-                                        value={selectedNumber}
-                                        onChange={(e) => setSelectedNumber(e.target.value)}
+                                        value={applicationId || ""}
+                                        onChange={(e) => setApplicationId(e.target.value)}
                                         className="w-full h-9 px-3 pr-8 rounded-md bg-white text-slate-700 font-bold text-sm outline-none focus:ring-2 focus:ring-cyan-300 border border-transparent shadow-sm appearance-none cursor-pointer transition-shadow"
                                     >
                                         <option value="">Select Application Number</option>
-                                        {applications.map((app: any, index: number) => <option key={index} value={app.applicationNumber}>{app.applicationNumber}</option>)}
-                                        <option value="AP/DPRITVET/643/20251222071220">AP/DPRITVET/643/20251222071220</option>
+                                        {applications?.map((app: any, index: number) => <option key={index} value={app?.applicationId}>{app?.applicationNumber}</option>)}
                                     </select>
                                     <div className="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none">
                                         <ChevronDown className="w-4 h-4 text-slate-500" />
@@ -188,7 +221,7 @@ const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicatio
                 </div>
 
                 {/* --- CONDITIONAL LETTER CONTENT --- */}
-                {isBothSelected && (
+                {applicationDetails && (
                     <div className="p-4 bg-slate-50 animate-in fade-in slide-in-from-top-2 duration-500">
                         <div className="bg-white border-2 border-blue-700 rounded-lg shadow-inner overflow-hidden">
 

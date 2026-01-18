@@ -7,6 +7,8 @@ import {
 } from 'lucide-react';
 import { callAPI } from './apis/commonAPIs';
 import NonIndividualUploadDoc from './NonIndividualUploadDoc';
+import { useAuth } from '@/hooks/useAuth';
+import { getCookie } from '@/utils/cookies';
 
 // ... (Interfaces remain unchanged)
 
@@ -36,15 +38,13 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
 
     const [searchTermUDIN, setSearchTermUDIN] = useState("");
     const [searchTermApp, setSearchTermApp] = useState("");
-    const [userData, setUserData] = useState<any>(null);
     const [role, setRole] = useState<string>("");
+    const { user, isAuthenticated } = useAuth();
 
     useEffect(() => {
-        const userData_end = atob(localStorage.getItem("enData") || "");
-        const userData = JSON.parse(userData_end);
-        setRole(userData?.role || "");
-        setUserData(userData);
-    }, []);
+        if (!isAuthenticated) return;
+        setRole(user?.role || "");
+    }, [isAuthenticated]);
 
     // NEW API CALL: Fetch Required Documents
     const fetchRequiredDocs = async () => {
@@ -74,7 +74,8 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
             try {
                 const result = await callAPI("/application/GetProjectDetailsByDeptID", { "departmentID": 1 });
                 if (result.status === 0) setProjects(result.data);
-                applicationType && setSelectedProjectID(applicationType);
+                const appType = applicationType || getCookie("application-type");
+                setSelectedProjectID(appType);
             } catch (err) { console.error(err); }
             finally { setIsProjectsLoading(false); }
         };
@@ -93,10 +94,13 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
         const fetchApps = async () => {
             setIsAppsLoading(true);
             try {
-                const result = await callAPI("/application/GetApplicationNumber", { "entryUser": userData?.user_id, "projectID": parseInt(selectedProjectID) });
+                const result = await callAPI("/application/GetApplicationNumber", { "entryUser": user?.user_id, "projectID": parseInt(selectedProjectID) });
                 if (result.status === 0) setApplications(result.data);
                 const app = result.data.find((a: any) => a.applicationNumber == applicationNo);
-                setSelectedAppID(app?.applicationId.toString() || "");
+                console.log("app", app);
+
+                const applicationID = app?.applicationId.toString() || getCookie("application_id");
+                setSelectedAppID(applicationID);
             } catch (err) { console.error(err); }
             finally { setIsAppsLoading(false); }
         };
@@ -107,8 +111,11 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
         if (!selectedAppID) return;
         setIsTable2Loading(true);
         try {
-            const result = await callAPI("/application/GetApplicationDetailsByApplicationID", { "applicationID": 85 });
-            if (result.status === 0) setAppDetail(result.data);
+            const appID = selectedAppID || getCookie("application_id");
+            console.log("selectedAppID", selectedAppID);
+            console.log("appID", appID);
+            const result = await callAPI("/application/GetApplicationDetailsByApplicationID", { "applicationID": appID });
+            if (result.status == 0) setAppDetail(result.data);
         } catch (err) { console.error(err); }
         finally { setIsTable2Loading(false); }
     };
@@ -122,7 +129,9 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
         const fetchPoolData = async () => {
             setIsTable1Loading(true);
             try {
-                const result = await callAPI("/application/GetUploadedDocumentDetailsByApplicationTypeID", { "ownerID": 1, "applicationTypeID": 1, "userTypeID": 5 });
+                const ownerID = user?.owner_id;
+                const userTypeID = user?.user_type_id;
+                const result = await callAPI("/application/GetUploadedDocumentDetailsByApplicationTypeID", { "ownerID": ownerID, "applicationTypeID": parseInt(selectedProjectID), "userTypeID": userTypeID });
                 if (result.status === 0) setUdinDocs(result.data);
             } catch (err) { console.error(err); }
             finally { setIsTable1Loading(false); }
@@ -136,8 +145,10 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
     };
 
     const handleAddFromUDIN = async (doc: UDINDocument) => {
-        if (!appDetail || !selectedAppID || isLinking) return;
-        if (appDetail.documents.some(d => d.documentName === doc.docName)) {
+        console.log("doc", doc);
+
+        // if (!appDetail || !selectedAppID || isLinking) return;
+        if (appDetail?.documents?.some(d => d.documentName == doc.docName)) {
             alert("This document is already assigned to the application.");
             return;
         }
@@ -145,13 +156,13 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
         try {
             const result = await callAPI("/application/SetAssignUploadedDocByApplicationID", {
                 "application_id": parseInt(selectedAppID),
-                "doc_id": doc.docId,
-                "application_no": appDetail.applicationNumber,
-                "quotation_id": "",
-                "udin_no": doc.udinNo,
+                "doc_id": doc?.docId,
+                "application_no": appDetail?.applicationNumber || getCookie("application-no"),
+                "quotation_id": doc?.quotationID,
+                "udin_no": doc?.udinNo,
                 "application_amount": 0,
-                "pay_mode": "ONLINE",
-                "entry_user_id": userData?.user_id
+                "pay_mode": doc?.paymode || "ONLINE",
+                "entry_user_id": user?.user_id
             });
             if (result.status === 0) await fetchApplicationDetails();
         } catch (err) { console.error(err); } finally { setIsLinking(false); }
@@ -171,7 +182,7 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
                 "udin_no": appDetail.udinNumber,
                 "application_amount": targetDoc.documentAmount || 0,
                 "pay_mode": "ONLINE",
-                "entry_user_id": userData?.user_id
+                "entry_user_id": user?.user_id
             });
             if (result.status === 0) await fetchApplicationDetails();
         } catch (err) { console.error(err); } finally { setIsLinking(false); }
@@ -299,7 +310,9 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
                             <div className="relative group">
                                 <select
                                     value={selectedAppID}
-                                    onChange={(e) => setSelectedAppID(e.target.value)}
+                                    onChange={(e) => {
+                                        setSelectedAppID(e.target.value)
+                                    }}
                                     disabled={!selectedProjectID || isAppsLoading}
                                     className="w-full h-11 px-4 rounded-xl bg-white/95 text-slate-800 font-bold text-sm outline-none appearance-none disabled:bg-slate-200"
                                 >
@@ -412,7 +425,7 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
                     {/* ... (Rest of your existing code for Table 2) */}
                     <div className="relative bg-blue-700 p-4 flex justify-between items-center overflow-hidden">
                         <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
-                        <h2 className="text-white font-bold text-sm uppercase relative z-20">Documents For Application Number {appDetail?.applicationNumber || "..."}</h2>
+                        <h2 className="text-white font-bold text-sm uppercase relative z-20">Documents For Application Number {appDetail?.applicationNumber || getCookie("application_no")}</h2>
                         <div className="relative w-56 z-20">
                             <Search className="absolute left-3 top-2 w-3.5 h-3.5 text-slate-400" />
                             <input
@@ -430,13 +443,13 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
                             <div className="space-y-1">
                                 <label className="text-slate-400 text-[10px] font-bold uppercase">Application Number</label>
                                 <div className="flex items-center gap-3 h-11 px-4 rounded-lg bg-slate-50 border font-bold text-slate-700 text-sm italic">
-                                    <FileCheck size={16} className="text-blue-600" /> {appDetail?.applicationNumber}
+                                    <FileCheck size={16} className="text-blue-600" /> {appDetail?.applicationNumber || getCookie("application_no")}
                                 </div>
                             </div>
                             <div className="space-y-1">
-                                <label className="text-slate-400 text-[10px] font-bold uppercase">Company Name</label>
+                                <label className="text-slate-400 text-[10px] font-bold uppercase">{user?.role == "individual" ? "Individual Name" : "Company Name"}</label>
                                 <div className="flex items-center gap-3 h-11 px-4 rounded-lg bg-slate-50 border font-bold text-slate-700 text-sm">
-                                    <div className="p-1 bg-blue-600 rounded text-white"><Search size={12} /></div> {appDetail?.companyName}
+                                    <div className="p-1 bg-blue-600 rounded text-white"><Search size={12} /></div> {user?.account_name}
                                 </div>
                             </div>
                         </div>

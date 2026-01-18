@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { setCookie } from '@/utils/cookies';
 
 const OrganisationRegistrationDSC = () => {
     const [panNumber, setPanNumber] = useState('');
@@ -27,9 +28,9 @@ const OrganisationRegistrationDSC = () => {
     const handleLogin = () => {
         if (otp.length > 0) {
             if (typeof window !== 'undefined') {
-                localStorage.setItem("role", "company");
-                localStorage.setItem("authMethod", "dsc");
-                localStorage.setItem("isLogin", "1");
+                setCookie("role", "company");
+                setCookie("authMethod", "dsc");
+                setCookie("isLogin", "1");
             }
             router.push("/company-dashboard");
         } else {
@@ -66,7 +67,7 @@ const OrganisationRegistrationDSC = () => {
                     className={`flex-1 border-y border-r border-gray-300 px-3 text-xs text-gray-600 placeholder-gray-300 focus:outline-none focus:border-[#483EA8] transition-colors ${otpSent ? 'bg-gray-50' : ''}`}
                 />
                 {/* Verify Button (Toggles between Verify and Change) */}
-                <button 
+                <button
                     onClick={otpSent ? handleChangePan : handleVerifyPan}
                     className="bg-[#ffc107] hover:bg-yellow-500 text-black text-xs font-bold px-5 transition-colors rounded-r-sm min-w-[100px]"
                 >
@@ -77,7 +78,7 @@ const OrganisationRegistrationDSC = () => {
             {/* OTP Section - Appears only when otpSent is true */}
             {otpSent && (
                 <div className="animate-in fade-in slide-in-from-top-2 duration-300 mb-3">
-                     <label className="block text-xs font-bold text-gray-800 mb-1 mt-3">
+                    <label className="block text-xs font-bold text-gray-800 mb-1 mt-3">
                         Enter OTP <span className="text-red-500">*</span>
                     </label>
                     <div className="flex w-full h-9">
@@ -94,7 +95,7 @@ const OrganisationRegistrationDSC = () => {
                             className="flex-1 border-y border-r border-gray-300 px-3 text-xs text-gray-600 placeholder-gray-300 focus:outline-none focus:border-[#483EA8] transition-colors tracking-widest"
                         />
                         {/* Login Button (Reusing your style) */}
-                        <button 
+                        <button
                             onClick={handleLogin}
                             className="bg-[#ffc107] hover:bg-yellow-500 text-black text-xs font-bold px-5 transition-colors rounded-r-sm min-w-[100px]"
                         >
@@ -108,7 +109,7 @@ const OrganisationRegistrationDSC = () => {
             )}
 
             {/* Consent Text */}
-             <div className="flex items-start gap-2 mt-4">
+            <div className="flex items-start gap-2 mt-4">
                 <input type="checkbox" className="mt-0.5 h-3 w-3 border-blue-300 rounded text-blue-600 focus:ring-blue-500" />
                 <span className="text-[11px] text-gray-600">
                     I give my consent to UDIN to use my PAN number & OTP to verify identity of the organisation

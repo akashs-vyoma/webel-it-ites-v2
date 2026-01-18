@@ -40,7 +40,7 @@ export default function WizardPage() {
                     if (result?.status === "Success" || result?.statusCode === 200) {
                         // Use application no from API if available, otherwise fallback
                         setApplicationNo(result?.data?.application_no || "");
-                        setApplicationType(localStorage.getItem("application-type") || "");
+                        setApplicationType(getCookie("application-type") || "");
                         setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
                     } else {
                         Swal.fire({
