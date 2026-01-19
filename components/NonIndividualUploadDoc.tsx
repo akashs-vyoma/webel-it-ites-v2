@@ -22,8 +22,8 @@ import { deleteCookie, getCookie } from '@/utils/cookies';
 const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void, docId: any }> = ({ isWizard, onClose, docId }) => {
     const searchParams = useSearchParams();
 
-    const dcid = searchParams.get("dcid") || docId.project_id;
-    const dcnm = searchParams.get("dcnm") || docId.project_name;
+    const dcid = searchParams.get("dcid") || docId?.project_doc_type_id;
+    const dcnm = searchParams.get("dcnm") || docId?.project_name;
     const [showModal, setShowModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const { user, isAuthenticated, token } = useAuth();
@@ -93,7 +93,7 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
                 user_type: user?.user_type_id || "5",
                 doc_type_id: formData.DocTypeID,
                 doc_type: dcnm,
-                owner_id: user?.user_id || "",
+                owner_id: user?.owner_id || "",
                 ownership: "SELF",
                 doc_validity: formData.DocValidity,
                 doc_visibility: "PUBLIC",
@@ -106,20 +106,16 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
 
             const result = await uploadDocumentAPI('/udinDocument/udinDocumentUpload', selectedFile, docDetails);
 
-            if (result.status == 0) {
+            if (result?.status == 0) {
                 Swal.fire({
                     icon: "success",
                     title: "Uploaded!",
                     text: `${dcnm} document uploaded successfully`,
                     showConfirmButton: true,
-                    timer: 2500
-                }).then(result => {
-                    if (result.isConfirmed) {
-                        if (isWizard) {
-                            onClose()
-                        };
-                    }
-                });
+                })
+                if (isWizard) {
+                    onClose()
+                };
 
             } else {
                 if (result?.message?.includes("Invalid API token")) {
@@ -141,16 +137,16 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
                         title: "Failed to upload document",
                         text: result?.message?.split(". ")[0],
                         showConfirmButton: true,
-                        timer: 2500
+                        // timer: 2500
                     });
                 }
             }
-        } catch (error) {
+        } catch (error: any) {
             console.log("error", error);
             Swal.fire({
                 icon: "error",
                 title: "Failed to upload.",
-                text: "Something went wrong, Please try again later.",
+                text: error?.message || "Something went wrong, Please try again later.",
                 showConfirmButton: true,
             });
         } finally {

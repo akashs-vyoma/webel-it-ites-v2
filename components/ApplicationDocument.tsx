@@ -9,6 +9,7 @@ import { callAPI } from './apis/commonAPIs';
 import NonIndividualUploadDoc from './NonIndividualUploadDoc';
 import { useAuth } from '@/hooks/useAuth';
 import { getCookie } from '@/utils/cookies';
+import DocumentPreviewModal from './DocumentPreviewModal';
 
 // ... (Interfaces remain unchanged)
 
@@ -40,6 +41,12 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
     const [searchTermApp, setSearchTermApp] = useState("");
     const [role, setRole] = useState<string>("");
     const { user, isAuthenticated } = useAuth();
+    const [showDocumentModal, setShowDocumentModal] = useState(false);
+    const [document, setDocument] = useState<any | null>(null);
+    const [isUploadedDocumentLoading, setIsUploadedDocumentLoading] = useState<any>(false);
+    const [isUnassignedDocViewLoading, setIsUnassignedDocViewLoading] = useState<any>(false);
+    const [isAssignedDocumentLoading, setIsAssignedDocumentLoading] = useState<any>(false);
+    const [isUnassignedDocumentLoading, setIsUnassignedDocumentLoading] = useState<any>(false);
 
     useEffect(() => {
         if (!isAuthenticated) return;
@@ -115,7 +122,8 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
             console.log("selectedAppID", selectedAppID);
             console.log("appID", appID);
             const result = await callAPI("/application/GetApplicationDetailsByApplicationID", { "applicationID": appID });
-            if (result.status == 0) setAppDetail(result.data);
+            if (result?.status == 0 && result?.data?.documents?.length > 0) setAppDetail(result?.data);
+            else setAppDetail(null);
         } catch (err) { console.error(err); }
         finally { setIsTable2Loading(false); }
     };
@@ -131,7 +139,7 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
             try {
                 const ownerID = user?.owner_id;
                 const userTypeID = user?.user_type_id;
-                const result = await callAPI("/application/GetUploadedDocumentDetailsByApplicationTypeID", { "ownerID": ownerID, "applicationTypeID": parseInt(selectedProjectID), "userTypeID": userTypeID });
+                const result = await callAPI("/application/GetUploadedDocumentDetailsByApplicationTypeIDV1", { "ownerID": ownerID, "applicationTypeID": parseInt(selectedProjectID), "userTypeID": userTypeID });
                 if (result.status === 0) setUdinDocs(result.data);
             } catch (err) { console.error(err); }
             finally { setIsTable1Loading(false); }
@@ -144,11 +152,10 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
         return new Date(ts).toLocaleString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
     };
 
-    const handleAddFromUDIN = async (doc: UDINDocument) => {
-        console.log("doc", doc);
+    const handleAddFromUDIN = async (doc: any) => {
 
         // if (!appDetail || !selectedAppID || isLinking) return;
-        if (appDetail?.documents?.some(d => d.documentName == doc.docName)) {
+        if (appDetail?.documents?.some((d: any) => d?.documentName == doc?.docName)) {
             alert("This document is already assigned to the application.");
             return;
         }
@@ -165,42 +172,68 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
                 "entry_user_id": user?.user_id
             });
             if (result.status === 0) await fetchApplicationDetails();
-        } catch (err) { console.error(err); } finally { setIsLinking(false); }
+        } catch (err) { console.error(err); } finally { setIsLinking(false); setIsAssignedDocumentLoading(null); }
     };
 
     const handleGenerateDeclaration = async () => {
         if (!appDetail) return;
-        const targetDoc = appDetail.documents.find(d => d.documentTypeID === 100) || appDetail.documents[0];
+        const targetDoc = appDetail.documents.find((d: any) => d?.documentTypeID === 100) || appDetail?.documents[0];
         if (!targetDoc) return;
         setIsLinking(true);
         try {
             const result = await callAPI("/application/SetAssignUploadedDocByApplicationID", {
                 "application_id": parseInt(selectedAppID),
-                "doc_id": targetDoc.applicationDocID,
-                "application_no": appDetail.applicationNumber,
-                "quotation_id": targetDoc.quotationID || "",
-                "udin_no": appDetail.udinNumber,
-                "application_amount": targetDoc.documentAmount || 0,
+                "doc_id": targetDoc?.applicationDocID,
+                "application_no": appDetail?.applicationNumber || getCookie("application-no"),
+                "quotation_id": targetDoc?.quotationID || "",
+                "udin_no": appDetail?.udinNumber,
+                "application_amount": targetDoc?.documentAmount || 0,
                 "pay_mode": "ONLINE",
                 "entry_user_id": user?.user_id
             });
-            if (result.status === 0) await fetchApplicationDetails();
+            if (result?.status == 0) await fetchApplicationDetails();
         } catch (err) { console.error(err); } finally { setIsLinking(false); }
     };
 
-    const handleDelete = (id: number) => {
-        if (!appDetail) return;
-        setAppDetail({ ...appDetail, documents: appDetail.documents.filter(d => d.applicationDocID !== id) });
+    const handleDelete = async (doc: any) => {
+
+        setIsLinking(true);
+        try {
+            const result = await callAPI("/application/RemoveApplicationAssignedDoc", {
+                "doc_id": doc?.applicationDocID,
+                "application_id": parseInt(selectedAppID),
+                "entry_user_id": user?.user_id,
+                "error_code": 0
+            });
+            if (result?.status == 0) await fetchApplicationDetails();
+        } catch (err) { console.error(err); } finally { setIsLinking(false); setIsUnassignedDocumentLoading(null); }
     };
 
-    const filteredUdinDocs = udinDocs.filter(doc =>
-        doc.docName.toLowerCase().includes(searchTermUDIN.toLowerCase()) ||
-        doc.docType.toLowerCase().includes(searchTermUDIN.toLowerCase())
-    );
+    const handleView = async (udin: any) => {
 
-    const filteredAppDocs = appDetail?.documents.filter(doc =>
-        doc.documentName.toLowerCase().includes(searchTermApp.toLowerCase()) ||
-        doc.documentType.toLowerCase().includes(searchTermApp.toLowerCase())
+        setIsLinking(true);
+        try {
+            const token = getCookie("authToken");
+            const result = await callAPI("/udinDocument/VerifyUdin", {
+                "udin": udin,
+                "token": token,
+            });
+
+            if (result?.status == 0) {
+                setDocument(result?.data)
+                setShowDocumentModal(true)
+            };
+        } catch (err) { console.error(err); } finally { setIsLinking(false); setIsUploadedDocumentLoading(null); setIsUnassignedDocViewLoading(null); }
+    };
+
+    const filteredUdinDocs = udinDocs?.filter((doc: any) =>
+        doc?.docName?.toLowerCase()?.includes(searchTermUDIN?.toLowerCase()) ||
+        doc?.docType?.toLowerCase()?.includes(searchTermUDIN?.toLowerCase())
+    ) || [];
+
+    const filteredAppDocs = appDetail?.documents?.filter((doc: any) =>
+        doc?.documentName?.toLowerCase()?.includes(searchTermApp?.toLowerCase()) ||
+        doc?.documentType?.toLowerCase()?.includes(searchTermApp?.toLowerCase())
     ) || [];
 
     return (
@@ -237,8 +270,8 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
                                     <div className="max-h-[500px] overflow-y-auto flex flex-col gap-3 pr-1 custom-scrollbar">
                                         {requiredDocsList?.map((doc: any, idx: number) => {
                                             // Dynamic check: Is this required doc already in the application details?
-                                            const isUploaded = appDetail?.documents.some(d =>
-                                                d.documentName.toLowerCase().includes(doc.project_name.toLowerCase())
+                                            const isUploaded = appDetail?.documents?.some((d: any) =>
+                                                d?.documentName?.toLowerCase()?.includes(doc?.project_name?.toLowerCase())
                                             );
 
                                             return (
@@ -300,7 +333,7 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
                                     className="w-full h-11 px-4 rounded-xl bg-white/95 text-slate-800 font-bold text-sm outline-none appearance-none"
                                 >
                                     <option value="">{isProjectsLoading ? "Loading..." : "Select Application Type"}</option>
-                                    {projects.map((p) => <option key={p.projectID} value={p.projectID}>{p.projectName}</option>)}
+                                    {projects?.map((p: any, idx: number) => <option key={idx} value={p?.projectID}>{p?.projectName}</option>)}
                                 </select>
                                 <ChevronDown className="absolute right-4 top-3.5 w-4 h-4 text-slate-400" />
                             </div>
@@ -318,7 +351,7 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
                                     className="w-full h-11 px-4 rounded-xl bg-white/95 text-slate-800 font-bold text-sm outline-none appearance-none disabled:bg-slate-200"
                                 >
                                     <option value="">{isAppsLoading ? "Fetching..." : "Select Application Number"}</option>
-                                    {applications.map((app) => <option key={app.applicationId} value={app.applicationId}>{app.applicationNumber}</option>)}
+                                    {applications?.map((app: any, idx: number) => <option key={idx} value={app?.applicationId}>{app?.applicationNumber}</option>)}
                                 </select>
                                 <ChevronDown className="absolute right-4 top-3.5 w-4 h-4 text-slate-400" />
                             </div>
@@ -373,21 +406,21 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
                                     {isTable1Loading ? (
                                         <tr><td colSpan={7} className="py-8 text-center italic">Loading pool...</td></tr>
                                     ) : filteredUdinDocs.length > 0 ? (
-                                        filteredUdinDocs.map((doc, idx) => (
-                                            <tr key={doc.docId} className="border-b hover:bg-slate-50">
+                                        filteredUdinDocs.map((doc: any, idx: number) => (
+                                            <tr key={doc?.docId} className="border-b hover:bg-slate-50">
                                                 <td className="px-4 py-3 text-center font-bold">{idx + 1}</td>
-                                                <td className="px-4 py-3 font-bold text-slate-800">{doc.docType}</td>
-                                                <td className="px-4 py-3">{doc.docName}</td>
-                                                <td className="px-4 py-3"><span className="bg-green-500 text-white px-2 py-0.5 rounded-full text-[9px]">{doc.udinNo}</span></td>
-                                                <td className="px-4 py-3 text-slate-400">{formatTimestamp(doc.uploadOn)}</td>
-                                                <td className="px-4 py-3 text-center"><button className="p-1.5 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition-all"><Eye size={14} /></button></td>
+                                                <td className="px-4 py-3 font-bold text-slate-800">{doc?.docType}</td>
+                                                <td className="px-4 py-3">{doc?.docName}</td>
+                                                <td className="px-4 py-3"><span className="bg-green-500 text-white px-2 py-0.5 rounded-full text-[9px]">{doc?.udinNo}</span></td>
+                                                <td className="px-4 py-3 text-slate-400">{formatTimestamp(doc?.uploadOn)}</td>
+                                                <td className="px-4 py-3 text-center"><button onClick={() => { handleView(doc?.udinNo); setIsUploadedDocumentLoading(doc?.docId); }} disabled={isLinking} className={`p-1.5 ${isUploadedDocumentLoading == doc?.docId ? "bg-blue-600 text-white" : "bg-blue-100 text-blue-600"} rounded-full hover:bg-blue-600 hover:text-white transition-all disabled:opacity-70`}>{isUploadedDocumentLoading == doc?.docId ? <Loader2 size={14} className="animate-spin" /> : <Eye size={14} />}</button></td>
                                                 <td className="px-4 py-3 text-center">
                                                     <button
-                                                        onClick={() => handleAddFromUDIN(doc)}
+                                                        onClick={() => { handleAddFromUDIN(doc); setIsAssignedDocumentLoading(doc?.docId); }}
                                                         disabled={isLinking}
-                                                        className="p-1.5 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-600 hover:text-white transition-all disabled:opacity-50"
+                                                        className={`p-1.5 ${isAssignedDocumentLoading == doc?.docId ? "bg-blue-600 text-white" : "bg-blue-100 text-blue-600"} rounded-full hover:bg-blue-600 hover:text-white transition-all disabled:opacity-70`}
                                                     >
-                                                        <Plus size={14} />
+                                                        {isAssignedDocumentLoading == doc?.docId ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                                                     </button>
                                                 </td>
                                             </tr>
@@ -471,20 +504,20 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
                                 <tbody className="text-[12px] text-slate-600">
                                     {isTable2Loading ? (
                                         <tr><td colSpan={7} className="py-8 text-center italic">Loading details...</td></tr>
-                                    ) : filteredAppDocs.length > 0 ? (
-                                        filteredAppDocs.map((doc, idx) => (
-                                            <tr key={doc.applicationDocID} className="border-b hover:bg-slate-50">
+                                    ) : filteredAppDocs?.length > 0 ? (
+                                        filteredAppDocs?.map((doc: any, idx: number) => (
+                                            <tr key={doc?.applicationDocID} className="border-b hover:bg-slate-50">
                                                 <td className="px-4 py-3 text-center font-bold">{idx + 1}</td>
-                                                <td className="px-4 py-3 font-bold text-slate-800">{doc.documentType}</td>
-                                                <td className="px-4 py-3">{doc.documentName}</td>
-                                                <td className="px-4 py-3"><span className="bg-green-500 text-white px-2 py-0.5 rounded-full text-[9px]">{appDetail?.udinNumber}</span></td>
-                                                <td className="px-4 py-3 text-slate-400">{doc.docUploadOn}</td>
-                                                <td className="px-4 py-3 text-center"><button className="p-1.5 bg-blue-100 text-blue-600 rounded-full"><Eye size={14} /></button></td>
-                                                <td className="px-4 py-3 text-center"><button onClick={() => handleDelete(doc.applicationDocID)} className="p-1.5 bg-blue-100 text-red-600 rounded-full hover:bg-red-600 hover:text-white transition-all"><Trash2 size={14} /></button></td>
+                                                <td className="px-4 py-3 font-bold text-slate-800">{doc?.documentType}</td>
+                                                <td className="px-4 py-3">{doc?.documentName}</td>
+                                                <td className="px-4 py-3"><span className="bg-green-500 text-white px-2 py-0.5 rounded-full text-[9px]">{doc?.udinNumber}</span></td>
+                                                <td className="px-4 py-3 text-slate-400">{doc?.docUploadOn}</td>
+                                                <td className="px-4 py-3 text-center"><button onClick={() => { handleView(doc?.udinNumber); setIsUnassignedDocViewLoading(doc?.applicationDocID); }} disabled={isLinking || isUnassignedDocViewLoading == doc?.applicationDocID} className={`p-1.5 ${isUnassignedDocViewLoading == doc?.applicationDocID ? "bg-blue-600 text-white" : "bg-blue-100 text-blue-600"} rounded-full hover:bg-blue-600 hover:text-white transition-all disabled:opacity-70`}>{isUnassignedDocViewLoading == doc?.applicationDocID ? <Loader2 size={14} className="animate-spin" /> : <Eye size={14} />}</button></td>
+                                                <td className="px-4 py-3 text-center"><button onClick={() => { handleDelete(doc); setIsUnassignedDocumentLoading(doc?.applicationDocID); }} disabled={isLinking || isUnassignedDocumentLoading == doc?.applicationDocID} className={`p-1.5 ${isUnassignedDocumentLoading == doc?.applicationDocID ? "bg-red-600 text-white" : "bg-blue-100 text-red-600"} rounded-full hover:bg-red-600 hover:text-white transition-all disabled:opacity-70`}>{isUnassignedDocumentLoading == doc?.applicationDocID ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}</button></td>
                                             </tr>
                                         ))
                                     ) : (
-                                        <tr><td colSpan={7} className="py-8 text-center text-slate-400">No application documents linked.</td></tr>
+                                        <tr><td colSpan={7} className="py-8 text-center text-slate-400">No documents linked yet.</td></tr>
                                     )}
                                 </tbody>
                             </table>
@@ -502,6 +535,8 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
                     </div>
                 </div>
             )}
+
+            <DocumentPreviewModal showModal={showDocumentModal} setShowModal={setShowDocumentModal} document={document} />
         </div>
     );
 };

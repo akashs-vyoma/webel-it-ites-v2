@@ -16,36 +16,37 @@ interface MultiPartyDeclarationProps {
     _it_notification_udin?: string;
     _applicants?: Applicant[];
   };
+  ref?: any;
 }
 
-const MultiPartyDeclaration: React.FC<MultiPartyDeclarationProps> = ({ data }) => {
+const MultiPartyDeclaration: React.FC<MultiPartyDeclarationProps> = ({ data, ref }) => {
   return (
     <div className="bg-gray-200 min-h-screen flex justify-center py-10 px-4 print:p-0 print:bg-white">
       {/* A4 Page Container */}
-      <div className="relative bg-white w-[210mm] min-h-[297mm] shadow-2xl p-[15px] font-serif box-border overflow-hidden print:shadow-none print:w-full">
-        
+      <div ref={ref} className="relative bg-white w-[210mm] min-h-[297mm] shadow-2xl p-[15px] font-serif box-border overflow-hidden print:shadow-none print:w-full">
+
         {/* Standard Decorative Borders (Mimicking ::before and ::after) */}
         <div className="absolute inset-[5px] border-2 border-gray-600 pointer-events-none z-10" />
         <div className="absolute inset-[10px] border-[4px] border-double border-gray-600 pointer-events-none z-10" />
 
         {/* Dotted Frame Border */}
         <div className="relative w-full h-full border-2 border-dotted border-gray-800 p-1 flex flex-col box-border">
-          
+
           {/* Inner Double Border (Pattern Border) */}
           <div className="flex-grow border-[3px] border-double border-gray-800 py-10 px-[50px] relative z-20">
-            
+
             {/* Standard Watermark */}
             <div className="absolute inset-0 flex items-center justify-center opacity-10 pointer-events-none z-0">
-              <Image 
-                src={logo} 
-                alt="Watermark" 
-                className="w-4/5 h-auto grayscale" 
+              <Image
+                src={logo}
+                alt="Watermark"
+                className="w-4/5 h-auto grayscale"
               />
             </div>
 
             {/* Content Area */}
             <div className="relative z-30 text-[11pt] leading-[1.5] text-black">
-              
+
               {/* Header Logo */}
               <div className="flex justify-center mb-4">
                 <Image

@@ -1,7 +1,7 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
 import { Eye, X, ChevronDown, FileText, Info } from 'lucide-react';
-import { callAPI } from './apis/commonAPIs';
+import { callAPI, uploadDocumentAPI } from './apis/commonAPIs';
 import DPRDeclarationLetter from './Declarations/views/dpr/single/dpr-declaration-single';
 import RentingSingleOwnerDeclaration from './Declarations/views/renting/normal/single/renting-single-declaration';
 import { data as DPRDeclarationLetterDummyData } from '@/components/Declarations/dummy-data/dpr/single/dpr_declaration_single'
@@ -19,25 +19,21 @@ import { data as RentingRenewalSingleDeclarationDummyData } from '@/components/D
 import RentingRenewalMultiOwnerDeclaration from './Declarations/views/renting/renewal/multi/renting-renewal-multi-owner-declaration';
 import { data as RentingRenewalMultiOwnerDeclarationDummyData } from '@/components/Declarations/dummy-data/renting/renewal/multi/renting_renewal_multi_owner_declaration'
 import { useAuth } from '@/hooks/useAuth';
-import { getCookie } from '@/utils/cookies';
+import { deleteCookie, getCookie } from '@/utils/cookies';
 import moment from 'moment';
+import Swal from 'sweetalert2';
+import DocumentAadhaarVerifyModal from './DocumentAadhaarVerifyModal';
+import { toPng } from 'html-to-image';
+import jsPDF from 'jspdf';
 
-
-
-// --- OPTIONS DATA ---
-// const applicationTypes = [
-//     "Select Application Type",
-//     "DPR of IT & ITeS - Vetting - SINGLE PARTY",
-//     "NOC for Renting Out Leased property - SINGLE PARTY",
-//     "Certificate for Tax Exemption - SINGLE PARTY",
-//     "DPR of IT & ITeS - vetting - MULTIPARTY",
-//     "NOC for Renting Out Leased property - MULTIPARTY",
-//     "Certificate for Tax Exemption - MULTIPARTY",
-//     "Renewal of NOC Renting out Leased Property - SINGLE PARTY",
-//     "Renewal of NOC Renting out Leased Property - MULTI PARTY"
-// ];
-
-const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicationType?: string, category?: string }> = ({ isWizard = false, applicationNo = "", applicationType = "", category = "" }) => {
+interface NOCFormProps {
+    isWizard?: boolean;
+    applicationNo?: string;
+    applicationType?: string;
+    category?: string;
+}
+const NOCForm = forwardRef((props: NOCFormProps, ref) => {
+    const { isWizard, applicationNo, applicationType } = props;
     const [showModal, setShowModal] = useState(false);
     const [applicationTypes, setApplicationTypes] = useState([]);
     const [selectedType, setSelectedType] = useState("");
@@ -45,7 +41,120 @@ const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicatio
     const [applications, setApplications] = useState([]);
     const [applicationId, setApplicationId] = useState("");
     const [applicationDetails, setApplicationDetails] = useState<any>(null);
-    const { user, isAuthenticated } = useAuth();
+    const { user, isAuthenticated, token } = useAuth();
+    const [pdfFile, setPdfFile] = useState<File | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
+
+    // 1. Ref to the HTML element you want to convert
+    const contentRef = useRef(null);
+
+
+    // useEffect(() => {
+    //     if (!isAuthenticated) return;
+    //     const aadhaarAuth = getCookie("ad_auth");
+    //     if (aadhaarAuth) {
+    //         setShowModal(false);
+    //     } else {
+    //         setShowModal(true);
+    //     }
+
+    // }, [isAuthenticated])
+
+    useImperativeHandle(ref, () => ({
+        submit: async () => {
+
+            try {
+
+                if (!selectedType) {
+                    alert("Please select an application type");
+                    return;
+                };
+
+                if (!applicationId) {
+                    alert("Please select an application");
+                    return;
+                };
+
+                const applicationType = applicationTypes.find((item: any) => item?.projectID == parseInt(selectedType))?.projectName;
+                const application = applications?.find((item: any) => item?.applicationId == parseInt(applicationId))?.applicationNumber;
+
+
+                const docDetails = {
+                    token: token,
+                    user_type: user?.user_type_id || "5",
+                    doc_type_id: 100,
+                    doc_type: applicationType || "-",
+                    owner_id: user?.owner_id || "",
+                    ownership: "SELF",
+                    doc_validity: 50,
+                    doc_visibility: "PUBLIC",
+                    doc_name: applicationType || "-",
+                    doc_file_name: `${applicationType?.toLowerCase()?.replace(/\s/g, "_")}_${application}.pdf` || "-",
+                    doc_remarks: "N/A",
+                    doc_description: "N/A",
+                    entry_user_id: user?.user_id || "",
+                }
+
+                console.log("docDetails", docDetails);
+
+                const file = await convertToPdf(`${applicationType?.project_name?.toLowerCase()?.replace(/\s/g, "_")}_${application?.application_no}` || "noc_test.pdf");
+
+                console.log("file", file)
+                if (!file) {
+                    alert("Failed to generate PDF, Please try again.");
+                    return;
+                }
+
+                // const pdfUrl = URL.createObjectURL(file);
+                // window.open(pdfUrl, "_blank");
+
+                // // Cleanup
+                // setTimeout(() => URL.revokeObjectURL(pdfUrl), 3000);
+
+                const result = await uploadDocumentAPI('/udinDocument/udinDocumentUpload', file, docDetails);
+
+                if (result?.status == 0) {
+                    Swal.fire({
+                        icon: "success",
+                        title: "Uploaded!",
+                        text: `Declaration document uploaded successfully`,
+                        showConfirmButton: true,
+                    })
+
+                } else {
+                    if (result?.message?.includes("Invalid API token")) {
+                        deleteCookie("ad_auth");
+                        setShowModal(true);
+                        Swal.fire({
+                            icon: "error",
+                            title: "Session Expired.",
+                            text: "Aadhaar authentication expired. Please verify Aadhaar again.",
+                            showConfirmButton: true,
+                        })
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Failed to upload document",
+                            text: result?.message?.split(". ")[0],
+                            showConfirmButton: true,
+                        });
+                    }
+                }
+
+                return result;
+            } catch (error: any) {
+                console.log("error", error);
+                Swal.fire({
+                    icon: "error",
+                    title: "Failed to upload.",
+                    text: error?.message || "Something went wrong, Please try again later.",
+                    showConfirmButton: true,
+                });
+            }
+
+
+        }
+    }));
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -100,7 +209,7 @@ const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicatio
                         _application_type: applicationDetails?.applicationTypeName,
                         _application_number: applicationDetails?.applicationNumber,
                         _company_name: applicationDetails?.companyName,
-                        _documents: applicationDetails?.documents?.map((doc: any) => { return { _name: doc?.documentType, _udin: doc?.quotationID } }),
+                        _documents: applicationDetails?.documents?.map((doc: any) => { return { _name: doc?.documentType, _udin: doc?.udinNumber } }),
                         _it_notification_no: "845-IT/O/117/2013",
                         _it_notification_date: "12.7.2023",
                         _it_notification_udin: "23-GGA001177-O-1692009699994",
@@ -110,24 +219,62 @@ const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicatio
                         _ca_name: "N/A",
                         _ca_phone: "N/A",
                     }
-                    return <DPRDeclarationLetter data={data} />;
+                    return <DPRDeclarationLetter ref={contentRef} data={data} />;
                 }
             case "4":
-                return <RentingSingleOwnerDeclaration data={RentingSingleOwnerDeclarationDummyData} />;
+                return <RentingSingleOwnerDeclaration ref={contentRef} data={RentingSingleOwnerDeclarationDummyData} />;
             case "5":
-                return <TaxExemptionDeclaration data={TaxExemptionDeclarationDummyData} />;
+                return <TaxExemptionDeclaration ref={contentRef} data={TaxExemptionDeclarationDummyData} />;
             case "7":
-                return <MultiPartyDeclaration data={MultiPartyDeclarationDummyData} />;
+                return <MultiPartyDeclaration ref={contentRef} data={MultiPartyDeclarationDummyData} />;
             case "8":
-                return <MultiOwnerDeclaration data={MultiOwnerDeclarationDummyData} />;
+                return <MultiOwnerDeclaration ref={contentRef} data={MultiOwnerDeclarationDummyData} />;
             case "9":
-                return <FinalNOCExemption data={FinalNOCExemptionDummyData} />;
+                return <FinalNOCExemption ref={contentRef} data={FinalNOCExemptionDummyData} />;
             case "10":
-                return <RentingRenewalSingleDeclaration data={RentingRenewalSingleDeclarationDummyData} />;
+                return <RentingRenewalSingleDeclaration ref={contentRef} data={RentingRenewalSingleDeclarationDummyData} />;
             case "11":
-                return <RentingRenewalMultiOwnerDeclaration data={RentingRenewalMultiOwnerDeclarationDummyData} />;
+                return <RentingRenewalMultiOwnerDeclaration ref={contentRef} data={RentingRenewalMultiOwnerDeclarationDummyData} />;
             default:
                 return null;
+        }
+    };
+
+    const convertToPdf = async (file_name: string) => {
+        const element = contentRef.current;
+        if (!element) return;
+
+        setIsLoading(true);
+
+        try {
+            const element = contentRef.current;
+
+            // 1. Convert HTML to Image Data URL using html-to-image
+            const dataUrl = await toPng(element, { cacheBust: true });
+
+            // 2. Initialize PDF
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const imgWidth = 210;
+            const pageHeight = 297;
+
+            // Calculate Height
+            const imgProps = pdf.getImageProperties(dataUrl);
+            const imgHeight = (imgProps.height * imgWidth) / imgProps.width;
+
+            // 3. Add Image
+            pdf.addImage(dataUrl, 'PNG', 0, 0, imgWidth, imgHeight);
+
+            // 4. Save as File
+            const pdfBlob = pdf.output('blob');
+            const file = new File([pdfBlob], `${file_name}.pdf`, { type: "application/pdf" });
+
+            return file;
+
+        } catch (error) {
+            console.error("Error generating PDF:", error);
+            return null;
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -252,45 +399,10 @@ const NOCForm: React.FC<{ isWizard?: boolean, applicationNo?: string, applicatio
                 )}
 
                 {/* --- MODAL --- */}
-                {showModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-                        <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg overflow-hidden border border-white/20">
-                            <div className="bg-gradient-to-r from-blue-700 via-blue-600 to-cyan-500 px-6 py-4 flex justify-between items-center relative overflow-hidden">
-                                <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10 opacity-30"></div>
-                                <h2 className="text-white text-base font-bold tracking-wide relative z-20">Verify Aadhaar Number</h2>
-                                <button onClick={() => setShowModal(false)} className="text-white/80 hover:text-white bg-white/10 hover:bg-white/20 p-1 rounded-md relative z-20 transition-all"><X size={18} /></button>
-                            </div>
-                            <div className="p-6 space-y-6">
-                                <div>
-                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 ml-1">Aadhaar Number <span className="text-red-500">*</span></label>
-                                    <div className="flex h-10 rounded-lg overflow-hidden shadow-sm border border-slate-300 focus-within:border-blue-500 transition-all">
-                                        <div className="bg-slate-100 text-slate-600 border-r border-slate-300 px-4 flex items-center text-xs font-bold shrink-0">Aadhaar</div>
-                                        <div className="relative flex-1 bg-white">
-                                            <input type="text" placeholder="Enter Aadhaar Number" className="w-full h-full px-3 text-sm font-semibold outline-none" />
-                                            <button className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400"><Eye size={16} /></button>
-                                        </div>
-                                        <button className="bg-blue-700 hover:bg-blue-800 text-white px-5 text-xs font-bold uppercase shrink-0 transition-all">Send OTP</button>
-                                    </div>
-                                </div>
-                                <div className="bg-slate-50 p-4 rounded-lg border border-slate-100">
-                                    <div className="flex items-start gap-3">
-                                        <input type="checkbox" id="aadhaar-consent" className="mt-1 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer" />
-                                        <div className="text-[11px] text-slate-500 text-justify leading-relaxed font-medium">
-                                            <label htmlFor="aadhaar-consent" className="cursor-pointer">I hereby state that I have no objection in authenticating myself on Unique Document Identification Number (UDIN) portal with Aadhaar based authentication system.</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                {/*comment*/}
-                            </div>
-                            <div className="p-4 border-t border-slate-100 flex justify-end bg-slate-50">
-                                <button className="text-slate-600 hover:text-slate-900 bg-white border border-slate-300 font-bold text-xs px-4 py-2 rounded-md transition-colors" onClick={() => setShowModal(false)}>Cancel</button>
-                            </div>
-                        </div>
-                    </div>
-                )}
+                <DocumentAadhaarVerifyModal showModal={showModal} setShowModal={setShowModal} />
             </div>
         </>
     );
-};
+});
 
 export default NOCForm;

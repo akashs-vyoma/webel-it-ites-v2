@@ -1,3 +1,5 @@
+import { deleteCookie } from "@/utils/cookies";
+
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const callAPI = async (url: string, body: any) => {
@@ -26,6 +28,11 @@ export const uploadDocumentAPI = async (
     },
     body: formData,
   });
+
+  if(response?.status == 401) {
+    deleteCookie("ad_auth");
+    throw new Error(`Aadhaar authentication expired. Please verify Aadhaar again.`);
+  }
 
   if (!response.ok) {
     throw new Error(`Upload failed with status ${response.status}`);

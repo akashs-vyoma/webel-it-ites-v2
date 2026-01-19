@@ -10,8 +10,6 @@ import {
     User,
     FileText,
     Hash,
-    Send,
-    X,
     Building,
     Layers,
     Maximize,
@@ -22,32 +20,15 @@ import {
     Trash2,
     PhoneCall,
     CheckCircle2,
-    AlertCircle,
-    ChevronRight,
     Loader2
 } from 'lucide-react';
 import NonIndividualUploadDoc from './NonIndividualUploadDoc';
-import {
-    Dialog,
-    DialogContent,
-} from "@/components/ui/dialog";
 import { callAPI } from './apis/commonAPIs';
 import Swal from 'sweetalert2';
 import moment from 'moment';
 import { setCookie } from '@/utils/cookies';
 import { useAuth } from '@/hooks/useAuth';
 
-
-const APPLICATION_DOCUMENTS: Record<string, string[]> = {
-    "DPR of IT & ITeS - Vetting - SINGLE PARTY": ["Balance Sheet", "IT Return", "MOA", "Project Report"],
-    "NOC for Renting Out Leased property - SINGLE PARTY": ["Trade License of Tenant", "MOA", "Agreement with Tenant", "Mother Deed with Webel"],
-    "Certificate for Tax Exemption - SINGLE PARTY": ["Copy Agreement", "Balance sheet", "Letter from NDITA", "Trade License", "MOA"],
-    "DPR of IT & ITeS - vetting - MULTIPARTY": ["MultiParty Declaration Letter", "Balance Sheet", "IT Return", "MOA", "Project Report"],
-    "NOC for Renting Out Leased property - MULTIPARTY": ["MultiParty Declaration Letter", "Trade License of Tenant", "MOA", "Agreement with Tenant", "Mother Deed with Webel"],
-    "Certificate for Tax Exemption - MULTIPARTY": ["MultiParty Declaration Letter", "Copy Agreement", "Balance sheet", "Letter from NDITA", "Trade License", "MOA"],
-    "Renewal of NOC Renting out Leased Property - SINGLE PARTY": ["Last Invoice issued by Webel", "Old NOC", "Renewal Deed", "Original Deed", "Trade License of Tenant", "MOA", "Agreement with Tenant", "Mother Deed with Webel"],
-    "Renewal of NOC Renting out Leased Property - MULTI PARTY": ["Last Invoice issued by Webel", "Old NOC", "Renewal Deed", "Original Deed", "Trade License of Tenant", "MOA", "Agreement with Tenant", "Mother Deed with Webel"]
-};
 const TENANT_ACTIVITY_OPTIONS = [
     { id: 1, label: "IT&ITes Activity" },
     { id: 2, label: "Non IT&ITes Activity (Commercial-Resturant Activity Only)" },
@@ -145,7 +126,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
         value === "" || value === undefined ? null : value;
 
     useImperativeHandle(ref, () => ({
-        submitApplication: async () => {
+        submit: async () => {
 
             const isRequiredDocsUploaded = uploadedDocsStatus.every((doc: any) => doc?.is_uploaded);
             if (!isRequiredDocsUploaded) { Swal.fire("Required", "Please upload all required documents", "warning"); return null; }

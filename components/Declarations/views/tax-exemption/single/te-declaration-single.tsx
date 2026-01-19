@@ -23,14 +23,15 @@ interface TaxExemptionDeclarationProps {
     _ca_name?: string;
     _ca_phone?: string;
   };
+  ref?: any;
 }
 
-const TaxExemptionDeclaration: React.FC<TaxExemptionDeclarationProps> = ({ data }) => {
+const TaxExemptionDeclaration: React.FC<TaxExemptionDeclarationProps> = ({ data, ref }) => {
   return (
     <div className="bg-gray-200 min-h-screen flex justify-center py-10 px-4 print:p-0 print:bg-white">
       {/* Main Page Container (A4 Dimensions) */}
-      <div className="relative bg-white w-[210mm] min-h-[297mm] shadow-2xl p-[15px] font-serif box-border overflow-hidden print:shadow-none print:w-full">
-        
+      <div ref={ref} className="relative bg-white w-[210mm] min-h-[297mm] shadow-2xl p-[15px] font-serif box-border overflow-hidden print:shadow-none print:w-full">
+
         {/* Triple Border System (Replaces CSS pseudo-elements) */}
         {/* 1. Outer Solid Border (5px offset) */}
         <div className="absolute inset-[5px] border-2 border-gray-700 pointer-events-none z-10" />
@@ -39,22 +40,22 @@ const TaxExemptionDeclaration: React.FC<TaxExemptionDeclarationProps> = ({ data 
 
         {/* 3. Dotted Frame Border */}
         <div className="relative w-full h-full border-2 border-dotted border-gray-800 p-1 flex flex-col box-border">
-          
+
           {/* Inner Double Border (Pattern Border) */}
           <div className="flex-grow border-[3px] border-double border-gray-800 py-8 px-11 relative z-20">
-            
+
             {/* Watermark Section */}
             <div className="absolute inset-0 flex items-center justify-center opacity-[0.07] pointer-events-none z-0">
-              <Image 
-                src={logo} 
-                alt="Watermark" 
-                className="w-4/5 h-auto grayscale" 
+              <Image
+                src={logo}
+                alt="Watermark"
+                className="w-4/5 h-auto grayscale"
               />
             </div>
 
             {/* Content Area */}
             <div className="relative z-30 text-[11pt] leading-relaxed text-black">
-              
+
               {/* Header Logo */}
               <div className="flex justify-center mb-5">
                 <Image
@@ -81,7 +82,7 @@ const TaxExemptionDeclaration: React.FC<TaxExemptionDeclarationProps> = ({ data 
 
               {/* Intro Paragraph */}
               <p className="text-justify mb-3">
-                I am authorized representative of Company <span className="font-bold">{data?._company_name}</span>, 
+                I am authorized representative of Company <span className="font-bold">{data?._company_name}</span>,
                 hereby submits the following documents (as indicated by UDIN numbers ) for DPR of IT & ITeS - vetting –
               </p>
 
@@ -112,10 +113,10 @@ const TaxExemptionDeclaration: React.FC<TaxExemptionDeclarationProps> = ({ data 
               {/* Paragraph 1 */}
               <p className="text-justify mb-3">
                 On behalf as duly authorised & having competence to do so on behalf of{" "}
-                <span className="font-bold">{data?._company_name}</span>, I declare that we are applying for Tax exemption 
+                <span className="font-bold">{data?._company_name}</span>, I declare that we are applying for Tax exemption
                 certificate as the <span className="font-bold">{data?._company_name}</span> qualifies for the same as per Memo No:{" "}
                 <span className="font-bold">{data?._memo_no}</span> dated <span className="font-bold">{data?._memo_date}</span> (UDIN:{" "}
-                <span className="font-bold">{data?._memo_udin}</span>) . I shall indemnify and hold the state harmless, 
+                <span className="font-bold">{data?._memo_udin}</span>) . I shall indemnify and hold the state harmless,
                 including all associated costs in case of any miss-representation.
               </p>
 
@@ -132,9 +133,9 @@ const TaxExemptionDeclaration: React.FC<TaxExemptionDeclarationProps> = ({ data 
 
               {/* CA Declaration Section */}
               <p className="text-justify mb-3">
-                I am Chartered Accountant having <span className="font-bold">registration number {data?._ca_reg_number}</span> have 
-                gone through the relevant documents of the <span className="font-bold">{data?._company_name}</span> and concur 
-                that <span className="font-bold">{data?._company_name}</span> qualifies for the tax exemption certificate as 
+                I am Chartered Accountant having <span className="font-bold">registration number {data?._ca_reg_number}</span> have
+                gone through the relevant documents of the <span className="font-bold">{data?._company_name}</span> and concur
+                that <span className="font-bold">{data?._company_name}</span> qualifies for the tax exemption certificate as
                 per Memo No: <span className="font-bold">{data?._memo_no}</span> dated <span className="font-bold">{data?._memo_date}</span> (UDIN:{" "}
                 <span className="font-bold">{data?._memo_udin}</span>) .
               </p>

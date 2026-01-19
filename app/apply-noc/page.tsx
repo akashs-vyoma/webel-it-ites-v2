@@ -2,7 +2,7 @@
 
 import { useState, useRef } from 'react';
 import CreateApplicationForm from '@/components/ApplyNOC';
-import { ArrowLeft, BadgeCheck, Check, ClipboardEdit, CreditCard, FileCheck, FileUp, ListChecks, Send, Users } from 'lucide-react';
+import { ArrowLeft, BadgeCheck, Check, ClipboardEdit, CreditCard, FileCheck, FileUp, ListChecks, Loader2, Send, Users } from 'lucide-react';
 import DocumentUploadHeader from '@/components/ApplicationDocument';
 import NOCForm from '@/components/Noc';
 import MultiOwnPropertyForm from '@/components/ApplyForMultipartyDeclaration';
@@ -16,6 +16,7 @@ export default function WizardPage() {
     const [category, setCategory] = useState("");
     const [applicationType, setApplicationType] = useState("");
     const [applicationNo, setApplicationNo] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
     const childRef = useRef<any>(null);
     const totalSteps = 6;
 
@@ -37,22 +38,39 @@ export default function WizardPage() {
     ];
 
     const nextStep = async () => {
-        if (currentStep === 1) {
+        try {
+            setIsLoading(true);
+            if (currentStep === 1) {
 
-            const result = await childRef.current?.submitApplication();
+                const result = await childRef.current?.submit();
 
-            if (result && result.status === 0) {
+                if (result && result.status === 0) {
 
-                setApplicationNo(result?.data?.application_no);
-                setApplicationType(getCookie("application-type") || "");
-                setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
-            } else if (result) {
-                Swal.fire("Error", result.message || "Something went wrong", "error");
+                    setApplicationNo(result?.data?.application_no);
+                    setApplicationType(getCookie("application-type") || "");
+                    setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
+                } else if (result) {
+                    Swal.fire("Error", result.message || "Something went wrong", "error");
+                }
             }
-        } else if (currentStep === 2 && category === "SINGLE") {
-            setCurrentStep(4);
-        } else {
-            setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
+            else if (currentStep === 4) {
+                const result = await childRef.current?.submit();
+                if (result && result.status == 0) {
+                    setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
+                } else if (result) {
+                    Swal.fire("Error", result.message || "Something went wrong", "error");
+                }
+            }
+            else if (currentStep === 2 && category === "SINGLE") {
+                setCurrentStep(4);
+            } else {
+                setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
+            }
+        } catch (error) {
+            console.error("Error in nextStep:", error);
+            Swal.fire("Error", "Something went wrong", "error");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -61,13 +79,14 @@ export default function WizardPage() {
         else setCurrentStep((prev) => Math.max(prev - 1, 1));
     };
 
-    const SubmitButton = ({ onClick, label }: { onClick?: () => void, label: string }) => (
+    const SubmitButton = ({ onClick, label, isLoading }: { onClick?: () => void, label: string, isLoading?: boolean }) => (
         <button
             onClick={onClick}
-            className="cursor-pointer bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2 active:scale-95"
+            disabled={isLoading}
+            className="cursor-pointer bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white px-8 py-2.5 rounded-lg font-bold shadow-md transition-all flex items-center gap-2 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-            <Send size={18} />
-            {label}
+            {isLoading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+            {isLoading ? "Processing..." : label}
         </button>
     );
 
@@ -80,7 +99,7 @@ export default function WizardPage() {
             case 3:
                 return <MultiOwnPropertyForm isWizard={true} />;
             case 4:
-                return <NOCForm applicationNo={applicationNo} applicationType={applicationType} category={category} isWizard={true} />;
+                return <NOCForm ref={childRef} applicationNo={applicationNo} applicationType={applicationType} category={category} isWizard={true} />;
             case 5:
                 return <CoSignerApplication />;
             case 6:
@@ -181,7 +200,7 @@ export default function WizardPage() {
                     {/* Skip Button: Only shows if not on the last step */}
 
                     {currentStep < totalSteps ? (
-                        <SubmitButton onClick={() => nextStep()} label="Submit & Continue" />
+                        <SubmitButton isLoading={isLoading} onClick={() => nextStep()} label={isLoading ? "Submitting..." : "Submit & Continue"} />
                     ) : (
                         <button
                             onClick={() => Swal.fire({

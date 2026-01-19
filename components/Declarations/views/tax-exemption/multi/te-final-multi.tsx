@@ -27,12 +27,13 @@ interface NOCExemptionProps {
     _it_operation_desc?: string;
     _details_date?: string;
   };
+  ref?: any;
 }
 
-const FinalNOCExemption: React.FC<NOCExemptionProps> = ({ data }) => {
+const FinalNOCExemption: React.FC<NOCExemptionProps> = ({ data, ref }) => {
   // Reusable Border Frame Component to keep code clean
   const PageFrame = ({ children }: { children: React.ReactNode }) => (
-    <div className="relative bg-white w-[210mm] min-h-[297mm] shadow-2xl p-[15px] font-serif box-border overflow-hidden print:shadow-none print:w-full print:my-0 my-5">
+    <div ref={ref} className="relative bg-white w-[210mm] min-h-[297mm] shadow-2xl p-[15px] font-serif box-border overflow-hidden print:shadow-none print:w-full print:my-0 my-5">
       {/* Frame lines standard from reference */}
       <div className="absolute inset-[5px] border-2 border-gray-600 pointer-events-none z-10" />
       <div className="absolute inset-[10px] border-[4px] border-double border-gray-600 pointer-events-none z-10" />
@@ -53,7 +54,7 @@ const FinalNOCExemption: React.FC<NOCExemptionProps> = ({ data }) => {
 
   return (
     <div className="bg-gray-200 min-h-screen flex flex-col items-center py-10 px-4 print:p-0 print:bg-white">
-      
+
       {/* PAGE 1: NOC LETTER */}
       <PageFrame>
         <div className="relative z-30 text-[11pt] leading-[1.5] text-black">
@@ -84,7 +85,7 @@ const FinalNOCExemption: React.FC<NOCExemptionProps> = ({ data }) => {
 
           <p className="text-justify mb-4">
             Reference notification no. <span className="font-bold">{data?._ref_notification_no}</span> dated{" "}
-            <span className="font-bold">{data?._ref_notification_date}</span> of Department of IT&E, delegating power to MD Webel 
+            <span className="font-bold">{data?._ref_notification_date}</span> of Department of IT&E, delegating power to MD Webel
             for issuance of certificate of exemption of property tax u/s 102B of the West Bengal Municipal Act, 1993.
           </p>
 
@@ -114,8 +115,8 @@ const FinalNOCExemption: React.FC<NOCExemptionProps> = ({ data }) => {
                   <td className="border border-black p-2 text-sm">{applicant?._address}</td>
                   <td className="border border-black p-2 text-center">{applicant?._tax_id}</td>
                   {index === 0 && (
-                    <td 
-                      className="border border-black p-2 text-center font-bold align-middle bg-white" 
+                    <td
+                      className="border border-black p-2 text-center font-bold align-middle bg-white"
                       rowSpan={data?._applicants?.length}
                     >
                       {data?._area_sqft}

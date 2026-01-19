@@ -23,13 +23,14 @@ interface DPRDeclarationProps {
         _ca_name?: string;
         _ca_phone?: string;
     };
+    ref?: any;
 }
 
-const DPRDeclarationLetter: React.FC<DPRDeclarationProps> = ({ data }) => {
+const DPRDeclarationLetter: React.FC<DPRDeclarationProps> = ({ data, ref }) => {
     return (
         <div className="bg-gray-200 min-h-screen flex justify-center py-10 px-4 print:p-0 print:bg-white">
             {/* Main Page Container (A4 Size) */}
-            <div className="relative bg-white w-[210mm] min-h-[297mm] shadow-2xl p-[15px] font-serif box-border overflow-hidden print:shadow-none print:w-full">
+            <div ref={ref} className="relative bg-white w-[210mm] min-h-[297mm] shadow-2xl p-[15px] font-serif box-border overflow-hidden print:shadow-none print:w-full">
 
                 {/* Decorative Outer Border 1 (Equivalent to ::before) */}
                 <div className="absolute inset-[5px] border-2 border-gray-700 pointer-events-none" />

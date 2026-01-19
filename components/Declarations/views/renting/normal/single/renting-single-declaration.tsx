@@ -29,14 +29,15 @@ interface RentingDeclarationProps {
     _cs_name?: string;
     _cs_phone?: string;
   };
+  ref?: any;
 }
 
-const RentingSingleOwnerDeclaration: React.FC<RentingDeclarationProps> = ({ data }) => {
+const RentingSingleOwnerDeclaration: React.FC<RentingDeclarationProps> = ({ data, ref }) => {
   return (
     <div className="bg-gray-200 min-h-screen flex justify-center py-10 px-4 print:p-0 print:bg-white">
       {/* Main Page Sheet (A4 Dimensions) */}
-      <div className="relative bg-white w-[210mm] min-h-[297mm] shadow-2xl p-[15px] font-serif box-border overflow-hidden print:shadow-none print:w-full">
-        
+      <div ref={ref} className="relative bg-white w-[210mm] min-h-[297mm] shadow-2xl p-[15px] font-serif box-border overflow-hidden print:shadow-none print:w-full">
+
         {/* Triple Border Generation (Replaces CSS pseudo-elements) */}
         {/* Layer 1: Solid Border (5px offset) */}
         <div className="absolute inset-[5px] border-2 border-gray-600 pointer-events-none z-10" />
@@ -45,22 +46,22 @@ const RentingSingleOwnerDeclaration: React.FC<RentingDeclarationProps> = ({ data
 
         {/* Dotted Border Frame */}
         <div className="relative h-full w-full border-2 border-dotted border-gray-800 p-1 flex flex-col box-border">
-          
+
           {/* Inner Double Pattern Border */}
           <div className="flex-grow border-[3px] border-double border-gray-800 py-8 px-10 relative z-20">
-            
+
             {/* Watermark Section */}
             <div className="absolute inset-0 flex items-center justify-center opacity-[0.08] pointer-events-none z-0">
-              <Image 
-                src={logo} 
-                alt="Watermark" 
-                className="w-4/5 h-auto grayscale" 
+              <Image
+                src={logo}
+                alt="Watermark"
+                className="w-4/5 h-auto grayscale"
               />
             </div>
 
             {/* Content Area */}
             <div className="relative z-30 text-[11pt] leading-[1.4] text-black">
-              
+
               {/* Header Logo */}
               <div className="flex justify-center mb-5">
                 <Image
@@ -118,11 +119,11 @@ const RentingSingleOwnerDeclaration: React.FC<RentingDeclarationProps> = ({ data
               {/* Body Paragraph 1 */}
               <p className="text-justify mb-4">
                 On behalf as duly authorised & having competence to do so on behalf of <span className="font-bold">{data?._company_name}</span>, I
-                declare that the <span className="font-bold">{data?._tenant_name}</span> having {data?._tenant_id} 
-                has agreed to conduct activity covered under IT & ITeS activities as notified by IT&E dept. vide 
-                notification 845-IT/O/117/2013 dated 12.7.2023 (UDIN: <span className="font-bold">{data?._it_notification_udin}</span>). 
-                I shall indemnify and hold the state harmless, including all associated costs in case of any miss-representation. 
-                The data provided by me including total area of building {data?._building_area_sqft} (sqft) and total 
+                declare that the <span className="font-bold">{data?._tenant_name}</span> having {data?._tenant_id}
+                has agreed to conduct activity covered under IT & ITeS activities as notified by IT&E dept. vide
+                notification 845-IT/O/117/2013 dated 12.7.2023 (UDIN: <span className="font-bold">{data?._it_notification_udin}</span>).
+                I shall indemnify and hold the state harmless, including all associated costs in case of any miss-representation.
+                The data provided by me including total area of building {data?._building_area_sqft} (sqft) and total
                 commercial area {data?._commercial_area_sqft} (sqft) is true to best of my knowledge.
               </p>
 
@@ -140,10 +141,10 @@ const RentingSingleOwnerDeclaration: React.FC<RentingDeclarationProps> = ({ data
 
               {/* Body Paragraph 2 (Tenant Context) */}
               <p className="text-justify mb-4">
-                On behalf as duly authorised & having competence to do so on behalf of <span className="font-bold">{data?._tenant_name}</span> having 
-                {data?._tenant_id} declare that the {data?._sublet_area_sqft} (sqft) space is being rented for IT&ITeS Activity as 
-                permitted vide notification 1967/UD/O/M/SL(AL/NR)/7L-23/95(Pt.) dated 3rd June 2008 
-                (UDIN: <span className="font-bold">{data?._tenant_notification_udin}</span>). I shall indemnify and hold the state 
+                On behalf as duly authorised & having competence to do so on behalf of <span className="font-bold">{data?._tenant_name}</span> having
+                {data?._tenant_id} declare that the {data?._sublet_area_sqft} (sqft) space is being rented for IT&ITeS Activity as
+                permitted vide notification 1967/UD/O/M/SL(AL/NR)/7L-23/95(Pt.) dated 3rd June 2008
+                (UDIN: <span className="font-bold">{data?._tenant_notification_udin}</span>). I shall indemnify and hold the state
                 harmless, including all associated costs in case of any miss-representation.
               </p>
 
@@ -160,9 +161,9 @@ const RentingSingleOwnerDeclaration: React.FC<RentingDeclarationProps> = ({ data
 
               {/* CS Declaration Section */}
               <p className="text-justify mb-4">
-                I am Company Secretary having <span className="font-bold">registration number {data?._cs_reg_number}</span> have 
-                gone through the project report as submitted by authorized representative of the <span className="font-bold">{data?._company_name}</span> 
-                and concur from his views that this project report is covered under IT & ITeS activities as notified by IT&E dept. 
+                I am Company Secretary having <span className="font-bold">registration number {data?._cs_reg_number}</span> have
+                gone through the project report as submitted by authorized representative of the <span className="font-bold">{data?._company_name}</span>
+                and concur from his views that this project report is covered under IT & ITeS activities as notified by IT&E dept.
                 vide notification 845-IT/O/117/2013 dated 12.7.23 (UDIN: <span className="font-bold">{data?._it_notification_udin}</span>).
               </p>
 
