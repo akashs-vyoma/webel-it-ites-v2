@@ -4,6 +4,8 @@ import React, { useState } from "react"
 import { Eye, EyeOff, Key, LogIn, Smartphone, User, ShieldCheck } from "lucide-react"
 import { useRouter } from "next/navigation";
 import { setCookie } from "@/utils/cookies";
+import { callAPI } from "./apis/commonAPIs";
+import Swal from "sweetalert2";
 
 export default function DepartmentSignIn() {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
@@ -30,13 +32,25 @@ export default function DepartmentSignIn() {
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Logic for Super Admin
     if (isSuperAdmin) {
       if (password.length > 0) {
-        proceedToDashboard(null);
+        const result = await callAPI("/authorityLoginAuthentication", {
+          "authorityPassword": "123456",
+          "deptID": 1,
+          "contactNo": "9851020611",
+          "userName": "test_api_user",
+          "userType": 10
+        });
+
+        if (result?.status == 0) {
+          proceedToDashboard(result?.data);
+        } else {
+          Swal.fire("Failed!", result?.message, "error");
+        }
       } else {
         alert("Please enter password");
       }
