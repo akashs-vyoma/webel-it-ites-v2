@@ -28,7 +28,7 @@ const AdminDashboard = () => {
     const [toDate, setToDate] = useState(today);
 
     const handleCardClick = (status_id: number) => {
-        router.push(`/get-pending-provisional-noc?status_id=${btoa(status_id?.toString())}&from=${btoa(fromDate?.toString())}&to=${btoa(toDate?.toString())}`);
+        router.push(`/authority-application-details?status_id=${btoa(status_id?.toString())}&from=${btoa(fromDate?.toString())}&to=${btoa(toDate?.toString())}`);
     };
 
     // Reusable fetch function
@@ -90,8 +90,8 @@ const AdminDashboard = () => {
         { title: "Transfer Of Lease Rights", status_id: 15, value: dashboardData?.total_noc_transfer_lease_rights_count, icon: <FileText size={20} />, color: "bg-purple-600" },
         { title: "Pending Authority Declaration (After 4 Days)", status_id: 16, value: dashboardData?.total_pending_webel_declation_after_four_days, icon: <AlertTriangle size={20} className="text-white" />, color: "bg-sky-600" },
         { title: "Total Renewal of NOC Renting", status_id: 17, value: dashboardData?.total_renewal_application_count, icon: <FileText size={20} />, color: "bg-blue-500" },
-        { title: "*Total Payment Collected", status_id: 16, value: dashboardData?.payment_collected, icon: <IndianRupee size={18} />, color: "bg-violet-700" },
-        { title: "*Total Transaction Count", status_id: 1, value: dashboardData?.total_transaction_count, icon: <ArrowRightLeft size={20} />, color: "bg-purple-500" },
+        { title: "*Total Payment Collected", status_id: 18, value: dashboardData?.payment_collected, icon: <IndianRupee size={18} />, color: "bg-violet-700" },
+        { title: "*Total Transaction Count", status_id: 19, value: dashboardData?.total_transaction_count, icon: <ArrowRightLeft size={20} />, color: "bg-purple-500" },
     ];
 
     return (
