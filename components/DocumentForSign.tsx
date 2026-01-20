@@ -1,6 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import { Folder, PhoneCall } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const SignDocument: React.FC = () => {
     const [udin, setUdin] = useState('');
@@ -8,9 +9,9 @@ const SignDocument: React.FC = () => {
 
     const handleGenerateOtp = () => { 
         if (phoneNumber.length === 10) {
-            alert(`OTP generated for ${phoneNumber}`);
+            Swal.fire(`OTP generated for ${phoneNumber}`);
         } else {
-            alert("Please enter a valid 10-digit phone number");
+            Swal.fire("Please enter a valid 10-digit phone number");
         }
     };
 

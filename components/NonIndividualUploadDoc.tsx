@@ -86,7 +86,7 @@ const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void,
             setIsLoading(true);
 
             if (!selectedFile) {
-                alert("Please select a file");
+                Swal.fire("Please select a file");
                 return;
             };
 

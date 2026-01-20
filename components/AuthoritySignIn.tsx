@@ -4,6 +4,7 @@ import React, { useState } from "react"
 import { Eye, EyeOff, Key, LogIn, Smartphone, User, ShieldCheck } from "lucide-react"
 import { useRouter } from "next/navigation";
 import { setCookie } from "@/utils/cookies";
+import Swal from "sweetalert2";
 
 export default function DepartmentSignIn() {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
@@ -26,7 +27,7 @@ export default function DepartmentSignIn() {
 
       setOtpSent(true);
     } else {
-      alert("Please enter a valid 10-digit phone number");
+      Swal.fire("Please enter a valid 10-digit phone number");
     }
   };
 
@@ -38,7 +39,7 @@ export default function DepartmentSignIn() {
       if (password.length > 0) {
         proceedToDashboard(null);
       } else {
-        alert("Please enter password");
+        Swal.fire("Please enter password");
       }
       return;
     }
@@ -50,7 +51,7 @@ export default function DepartmentSignIn() {
       if (otp.length > 0) {
         proceedToDashboard(null);
       } else {
-        alert("Please enter the OTP");
+        Swal.fire("Please enter the OTP");
       }
     }
   };

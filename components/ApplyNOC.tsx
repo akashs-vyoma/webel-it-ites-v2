@@ -322,7 +322,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
 
     const handleAddTenant = () => {
         if (!tenantForm.tenantName || !tenantForm.tenantGstn || !tenantForm.tenantPan || !tenantForm.tenantActivity) {
-            alert("Please fill all tenant details before adding.");
+           Swal.fire("Please fill all tenant details before adding.");
             return;
         }
         setTenantList([...tenantList, { ...tenantForm, id: Date.now() }]);

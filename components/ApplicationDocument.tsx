@@ -10,6 +10,7 @@ import NonIndividualUploadDoc from './NonIndividualUploadDoc';
 import { useAuth } from '@/hooks/useAuth';
 import { getCookie } from '@/utils/cookies';
 import DocumentPreviewModal from './DocumentPreviewModal';
+import Swal from 'sweetalert2';
 
 // ... (Interfaces remain unchanged)
 
@@ -56,7 +57,13 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
     // NEW API CALL: Fetch Required Documents
     const fetchRequiredDocs = async () => {
         if (!selectedProjectID) {
-            alert("Please select an application type first.");
+            Swal.fire({
+                title: 'Error!',
+                text: 'Please select an application type first.',
+                icon: 'error',
+                confirmButtonColor: '#111827',
+                borderRadius: '1.5rem',
+            });
             return;
         }
         setIsReqDocModalOpen(true);
@@ -156,7 +163,7 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
 
         // if (!appDetail || !selectedAppID || isLinking) return;
         if (appDetail?.documents?.some((d: any) => d?.documentName == doc?.docName)) {
-            alert("This document is already assigned to the application.");
+            Swal.fire("This document is already assigned to the application.");
             return;
         }
         setIsLinking(true);

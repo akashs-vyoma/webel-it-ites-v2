@@ -35,7 +35,7 @@ const OrganisationRegByGSTIN = () => {
             }
             router.push("/company-dashboard");
         } else {
-            alert("Please enter the OTP");
+            Swal.fire("Please enter the OTP");
         }
     };
 

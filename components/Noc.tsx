@@ -66,12 +66,22 @@ const NOCForm = forwardRef((props: NOCFormProps, ref) => {
             try {
 
                 if (!selectedType) {
-                    alert("Please select an application type");
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Please select an application type.',
+                        icon: 'error',
+                        confirmButtonColor: '#111827',
+                    });
                     return;
                 };
 
                 if (!applicationId) {
-                    alert("Please select an application");
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Please select an application.',
+                        icon: 'error',
+                        confirmButtonColor: '#111827',
+                    });
                     return;
                 };
 
@@ -101,7 +111,12 @@ const NOCForm = forwardRef((props: NOCFormProps, ref) => {
 
                 console.log("file", file)
                 if (!file) {
-                    alert("Failed to generate PDF, Please try again.");
+                    Swal.fire({
+                        title: 'Error!',
+                        text: 'Failed to generate PDF, Please try again.',
+                        icon: 'error',
+                        confirmButtonColor: '#111827',
+                    });
                     return;
                 }
 

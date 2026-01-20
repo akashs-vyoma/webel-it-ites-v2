@@ -1,7 +1,7 @@
 "use client"
 import React, { useState } from 'react';
 import { Building2, CreditCard, MapPin, FileText, Save, CheckCircle2 } from 'lucide-react';
-
+import Swal from 'sweetalert2';
 const AddCompanyDetails: React.FC = () => {
     // State management for form fields
     const [formData, setFormData] = useState({
@@ -20,13 +20,20 @@ const AddCompanyDetails: React.FC = () => {
     };
 
     const handleSave = () => {
-        setIsSaving(true);
-        // Simulate API call
-        setTimeout(() => {
-            alert("Company details saved successfully!");
-            setIsSaving(false);
-        }, 1000);
-    };
+    setIsSaving(true);
+
+    setTimeout(() => {
+        setIsSaving(false);
+        
+        Swal.fire({
+            title: 'Success!',
+            text: 'Company details saved successfully!',
+            icon: 'success',
+            confirmButtonColor: '#111827', 
+        });
+
+    }, 1000);
+};
 
     return (
         <div className="w-full flex items-center justify-center p-6 font-sans">

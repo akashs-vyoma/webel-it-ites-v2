@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { setCookie } from '@/utils/cookies';
+import Swal from 'sweetalert2';
 
 const OrganisationRegistrationDSC = () => {
     const [panNumber, setPanNumber] = useState('');
@@ -14,7 +15,12 @@ const OrganisationRegistrationDSC = () => {
         if (panNumber.length >= 10) { // Basic length check for mock
             setOtpSent(true);
         } else {
-            alert("Please enter a valid 10-digit PAN Number");
+            Swal.fire({
+                title: 'Error!',
+                text: 'Please enter a valid 10-digit PAN Number.',
+                icon: 'error',
+                confirmButtonColor: '#111827',
+            });
         }
     };
 
@@ -34,7 +40,12 @@ const OrganisationRegistrationDSC = () => {
             }
             router.push("/company-dashboard");
         } else {
-            alert("Please enter the OTP");
+            Swal.fire({
+                title: 'Error!',
+                text: 'Please enter the OTP.',
+                icon: 'error',
+                confirmButtonColor: '#111827',
+            });
         }
     };
 

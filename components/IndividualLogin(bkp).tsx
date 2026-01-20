@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Smartphone, Key, ShieldCheck, ChevronRight, User, Building2, Sparkles, Lock } from 'lucide-react';
 import { useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 // Shadcn UI Imports
 import {
@@ -26,7 +27,7 @@ const IndividualLogin: React.FC = () => {
             setShowSwalAlert(true);
             setTimeout(() => setShowSwalAlert(false), 4000);
         } else {
-            alert("Please enter a valid 12-digit aadhaar number");
+            Swal.fire("Please enter a valid 12-digit aadhaar number");
         }
     };
 
@@ -34,7 +35,7 @@ const IndividualLogin: React.FC = () => {
         if (otp.length > 0) {
             setShowRoleModal(true);
         } else {
-            alert("Please enter the OTP");
+            Swal.fire("Please enter the OTP");
         }
     };
     const router = useRouter();

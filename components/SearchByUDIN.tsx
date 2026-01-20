@@ -1,13 +1,26 @@
 "use client"
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
+import Swal from 'sweetalert2';
 
 const UdinSearch: React.FC = () => {
     const [udin, setUdin] = useState('');
 
     const handleSearch = () => {
         if (udin.trim()) {
-            alert(`Searching for UDIN: ${udin}`);
+            Swal.fire({
+                title: 'Searching for UDIN',
+                text: `Searching for UDIN: ${udin}`,
+                icon: 'info',
+                confirmButtonColor: '#111827',
+            });
+        } else {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Please enter a valid UDIN.',
+                icon: 'error',
+                confirmButtonColor: '#111827',
+            });
         }
     };
 
