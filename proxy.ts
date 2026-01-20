@@ -35,7 +35,7 @@ export function proxy(req: NextRequest) {
     return NextResponse.next();
   }
 
-  return NextResponse.redirect(new URL("/unauthorized", req.url));
+  return NextResponse.redirect(new URL("/un-authorized", req.url));
 }
 
 export const config = {
