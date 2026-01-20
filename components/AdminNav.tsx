@@ -26,8 +26,7 @@ const AdminNav = () => {
 
     useEffect(() => {
         const encData = getCookie("enData");
-        const userData = atob(encData);
-        setIsLoggedIn(userData?.isAdminLogin || "0");
+        setIsLoggedIn(encData?.isAdminLogin || "0");
 
     }, []);
 
