@@ -1,3 +1,4 @@
+import { Loader2 } from 'lucide-react';
 import React from 'react';
 
 interface StatCardProps {
@@ -5,12 +6,13 @@ interface StatCardProps {
     value: string | number;
     icon: React.ReactNode;
     color: string;
+    isLoading?: boolean;
 }
 
-const StatCard = ({ title, value, icon, color }: StatCardProps) => {
+const StatCard = ({ title, value, icon, color, isLoading = false }: StatCardProps) => {
     return (
         <div className={`relative overflow-hidden group ${color} rounded-2xl p-5 shadow-lg border border-white/10 transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl h-full`}>
-            
+
             {/* The Shimmer Div */}
             <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
 
@@ -21,10 +23,12 @@ const StatCard = ({ title, value, icon, color }: StatCardProps) => {
                         {icon}
                     </div>
                     <span className="text-2xl xl:text-3xl font-black tracking-tight truncate">
-                        {value}
+                        {isLoading ? (
+                            <Loader2 className="animate-spin" />
+                        ) : value}
                     </span>
                 </div>
-                
+
                 <h3 className="text-[11px] font-bold uppercase tracking-wider text-white/90 leading-tight min-h-[2rem]">
                     {title}
                 </h3>
@@ -32,8 +36,8 @@ const StatCard = ({ title, value, icon, color }: StatCardProps) => {
 
             {/* Ghost Icon Decoration */}
             <div className="absolute -right-4 -bottom-4 opacity-10 text-white rotate-12 pointer-events-none">
-                {React.isValidElement(icon) 
-                    ? React.cloneElement(icon as React.ReactElement, { }) 
+                {React.isValidElement(icon)
+                    ? React.cloneElement(icon as React.ReactElement, {})
                     : null
                 }
             </div>

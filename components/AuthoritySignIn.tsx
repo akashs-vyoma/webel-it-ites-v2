@@ -78,7 +78,10 @@ export default function DepartmentSignIn() {
         "isAdminLogin": "1",
         "user_type_id": "10"
       }
+      console.log("userData", userData);
+
       setUserData(userData);
+      setCookie("isAuth", "1");
     }
     router.push("/authority-dashboard");
   };
