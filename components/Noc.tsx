@@ -322,7 +322,7 @@ const NOCForm = forwardRef((props: NOCFormProps, ref) => {
                                     <select
                                         value={selectedType}
                                         onChange={(e) => setSelectedType(e.target.value)}
-                                        disabled={isWizard}
+                                        // disabled={isWizard}
                                         className="w-full h-9 px-3 pr-8 rounded-md bg-white text-slate-700 font-bold text-sm outline-none focus:ring-2 focus:ring-cyan-300 border border-transparent shadow-sm appearance-none cursor-pointer transition-shadow"
                                     >
                                         <option value="">{isProjectsLoading ? "Loading..." : "Select Type"}</option>
@@ -344,7 +344,7 @@ const NOCForm = forwardRef((props: NOCFormProps, ref) => {
                                     <select
                                         value={applicationId || ""}
                                         onChange={(e) => setApplicationId(e.target.value)}
-                                        disabled={isWizard}
+                                        // disabled={isWizard}
                                         className="w-full h-9 px-3 pr-8 rounded-md bg-white text-slate-700 font-bold text-sm outline-none focus:ring-2 focus:ring-cyan-300 border border-transparent shadow-sm appearance-none cursor-pointer transition-shadow"
                                     >
                                         <option value="">Select Application Number</option>

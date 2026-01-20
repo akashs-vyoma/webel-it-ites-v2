@@ -107,7 +107,7 @@ const IndividualRegistration: React.FC = () => {
             "token": result?.data?.token
           });
 
-          if (response.status == 0) {
+          if (response?.status == 0) {
             Swal.fire({
               icon: 'success',
               title: 'Registered!',
@@ -125,10 +125,17 @@ const IndividualRegistration: React.FC = () => {
             Swal.fire({
               icon: 'error',
               title: 'Verification Failed',
-              text: result.message,
+              text: response?.message,
               confirmButtonColor: '#1F51FF'
             });
           }
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Verification Failed',
+            text: result?.message,
+            confirmButtonColor: '#1F51FF'
+          });
         }
       } else {
         Swal.fire({
