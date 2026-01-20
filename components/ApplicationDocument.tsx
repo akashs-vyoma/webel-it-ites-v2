@@ -329,7 +329,7 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
                                 <select
                                     value={selectedProjectID}
                                     onChange={(e) => { setSelectedProjectID(e.target.value); setSelectedAppID(""); }}
-                                    disabled={isWizard}
+                                    // disabled={isWizard}
                                     className="w-full h-11 px-4 rounded-xl bg-white/95 text-slate-800 font-bold text-sm outline-none appearance-none"
                                 >
                                     <option value="">{isProjectsLoading ? "Loading..." : "Select Application Type"}</option>
@@ -347,7 +347,7 @@ const DocumentUploadHeader: React.FC<{ isWizard?: boolean, applicationNo?: strin
                                     onChange={(e) => {
                                         setSelectedAppID(e.target.value)
                                     }}
-                                    disabled={isWizard || !selectedProjectID || isAppsLoading}
+                                    // disabled={isWizard || !selectedProjectID || isAppsLoading}
                                     className="w-full h-11 px-4 rounded-xl bg-white/95 text-slate-800 font-bold text-sm outline-none appearance-none disabled:bg-slate-200"
                                 >
                                     <option value="">{isAppsLoading ? "Fetching..." : "Select Application Number"}</option>

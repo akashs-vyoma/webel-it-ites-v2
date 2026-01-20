@@ -222,7 +222,32 @@ const NOCForm = forwardRef((props: NOCFormProps, ref) => {
                     return <DPRDeclarationLetter ref={contentRef} data={data} />;
                 }
             case "4":
-                return <RentingSingleOwnerDeclaration ref={contentRef} data={RentingSingleOwnerDeclarationDummyData} />;
+                {
+                    const data = {
+                        _current_date: moment(new Date()).format("DD-MM-YYYY HH:mm:ss"),
+                        _application_type: applicationDetails?.applicationTypeName,
+                        _application_number: applicationDetails?.applicationNumber,
+                        _company_name: applicationDetails?.companyName,
+                        _documents: applicationDetails?.documents?.map((doc: any) => { return { _name: doc?.documentType, _udin: doc?.udinNumber } }),
+                        _it_notification_udin: "23-GGA001177-O-1692009699994",
+                        _tenant_notification_udin: "23-G-GA001177-O-1692019086903",
+                        _building_area_sqft: applicationDetails?.buildingAreaSqft,
+                        _commercial_area_sqft: applicationDetails?.commercialAreaRentSqft,
+                        _company_rep_name: applicationDetails?.companyOrPersonName,
+                        _company_rep_phone: applicationDetails?.companyOrPersonContactNo,
+                        _sublet_area_sqft: applicationDetails?.subletAreaSqft,
+                        _tenant_id: `${applicationDetails?.tenantGSTNo} / ${applicationDetails?.tenantPANNo}`,
+                        _tenant_name: applicationDetails?.companyName,
+                        _tenant_rep_name: applicationDetails?.companyOrPersonName,
+                        _tenant_rep_phone: applicationDetails?.tenantContactNo,
+                        _tenant_activity: applicationDetails?.tenantActivity,
+                        _cs_reg_number: applicationDetails?.companyRegdNumber,
+                        _cs_name: applicationDetails?.companyOrPersonName,
+                        _cs_phone: applicationDetails?.companyOrPersonContactNo,
+                    };
+
+                    return <RentingSingleOwnerDeclaration ref={contentRef} data={data} />;
+                }
             case "5":
                 return <TaxExemptionDeclaration ref={contentRef} data={TaxExemptionDeclarationDummyData} />;
             case "7":
@@ -322,7 +347,7 @@ const NOCForm = forwardRef((props: NOCFormProps, ref) => {
                                     <select
                                         value={selectedType}
                                         onChange={(e) => setSelectedType(e.target.value)}
-                                        disabled={isWizard}
+                                        // disabled={isWizard}
                                         className="w-full h-9 px-3 pr-8 rounded-md bg-white text-slate-700 font-bold text-sm outline-none focus:ring-2 focus:ring-cyan-300 border border-transparent shadow-sm appearance-none cursor-pointer transition-shadow"
                                     >
                                         <option value="">{isProjectsLoading ? "Loading..." : "Select Type"}</option>
@@ -344,7 +369,7 @@ const NOCForm = forwardRef((props: NOCFormProps, ref) => {
                                     <select
                                         value={applicationId || ""}
                                         onChange={(e) => setApplicationId(e.target.value)}
-                                        disabled={isWizard}
+                                        // disabled={isWizard}
                                         className="w-full h-9 px-3 pr-8 rounded-md bg-white text-slate-700 font-bold text-sm outline-none focus:ring-2 focus:ring-cyan-300 border border-transparent shadow-sm appearance-none cursor-pointer transition-shadow"
                                     >
                                         <option value="">Select Application Number</option>

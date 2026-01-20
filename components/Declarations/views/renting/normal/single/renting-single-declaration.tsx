@@ -16,6 +16,7 @@ interface RentingDeclarationProps {
     _documents?: DocumentItem[];
     _tenant_name?: string;
     _tenant_id?: string;
+    _tenant_activity?: string;
     _it_notification_udin?: string;
     _building_area_sqft?: string;
     _commercial_area_sqft?: string;
@@ -120,7 +121,7 @@ const RentingSingleOwnerDeclaration: React.FC<RentingDeclarationProps> = ({ data
               <p className="text-justify mb-4">
                 On behalf as duly authorised & having competence to do so on behalf of <span className="font-bold">{data?._company_name}</span>, I
                 declare that the <span className="font-bold">{data?._tenant_name}</span> having {data?._tenant_id}
-                has agreed to conduct activity covered under IT & ITeS activities as notified by IT&E dept. vide
+                has agreed to conduct activity covered under {data?._tenant_activity} as notified by IT&E dept. vide
                 notification 845-IT/O/117/2013 dated 12.7.2023 (UDIN: <span className="font-bold">{data?._it_notification_udin}</span>).
                 I shall indemnify and hold the state harmless, including all associated costs in case of any miss-representation.
                 The data provided by me including total area of building {data?._building_area_sqft} (sqft) and total

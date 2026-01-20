@@ -29,6 +29,7 @@ export const data = {
     _tenant_id: "AANCA1175G / 19AANCA1175G1ZK",
     _tenant_rep_name: "Duke Das",
     _tenant_rep_phone: "8402841853",
+    _tenant_activity: "IT & ITES",
     // Area Details
     _building_area_sqft: "540603",
     _commercial_area_sqft: "108121",
