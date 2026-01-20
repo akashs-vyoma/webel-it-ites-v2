@@ -3,13 +3,13 @@ import { deleteCookie } from "@/utils/cookies";
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const callAPI = async (url: string, body: any) => {
-    const response = await fetch(`${BASE_URL}${url}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-    });
-    const result = await response.json();
-    return result;
+  const response = await fetch(`${BASE_URL}${url}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  const result = await response?.json();
+  return result;
 }
 
 export const uploadDocumentAPI = async (
@@ -29,14 +29,14 @@ export const uploadDocumentAPI = async (
     body: formData,
   });
 
-  if(response?.status == 401) {
+  if (response?.status == 401) {
     deleteCookie("ad_auth");
     throw new Error(`Aadhaar authentication expired. Please verify Aadhaar again.`);
   }
 
-  if (!response.ok) {
-    throw new Error(`Upload failed with status ${response.status}`);
+  if (!response?.ok) {
+    throw new Error(`Upload failed with status ${response?.status}`);
   }
 
-  return await response.json();
+  return await response?.json();
 };

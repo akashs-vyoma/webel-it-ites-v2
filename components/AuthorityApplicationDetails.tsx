@@ -18,7 +18,7 @@ const AuthorityApplicationDetails = () => {
     const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        if (!searchParams) return;
+        if (!searchParams || !isAuthenticated || !user?.authority_id) return;
         const status_id = searchParams.get('status_id');
         const from = searchParams.get('from');
         const to = searchParams.get('to');
@@ -31,6 +31,8 @@ const AuthorityApplicationDetails = () => {
         setFromDate(decodedFrom);
         setToDate(decodedTo);
 
+       
+        
         if (isAuthenticated && decodedStatus) {
             fetchApplicationDetails(decodedStatus, decodedFrom, decodedTo);
         }
