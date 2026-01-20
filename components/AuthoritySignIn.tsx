@@ -38,7 +38,7 @@ export default function DepartmentSignIn() {
     // Logic for Super Admin
     if (isSuperAdmin) {
       if (password.length > 0) {
-        const result = await callAPI("/authorityLoginAuthentication", {
+        const result = await callAPI("/admin/getAuthorityLoginAuthentication", {
           "authorityPassword": "123456",
           "deptID": 1,
           "contactNo": "9851020611",
