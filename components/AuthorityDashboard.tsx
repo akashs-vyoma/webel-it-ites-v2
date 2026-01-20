@@ -28,7 +28,7 @@ const AdminDashboard = () => {
     const [toDate, setToDate] = useState(today);
 
     const handleCardClick = (status_id: number) => {
-        router.push(`/get-pending-provisional-noc?status_id=${btoa(status_id.toString())}`);
+        router.push(`/get-pending-provisional-noc?status_id=${btoa(status_id?.toString())}&from=${btoa(fromDate?.toString())}&to=${btoa(toDate?.toString())}`);
     };
 
     // Reusable fetch function
