@@ -13,7 +13,7 @@ import {
 import Image from 'next/image'
 import webelLogo from '@/components/images/webel-logo.png'
 import { useRouter } from 'next/navigation';
-import { deleteAllCookies } from '@/utils/cookies';
+import { deleteAllCookies, getCookie } from '@/utils/cookies';
 
 const AdminNav = () => {
     const router = useRouter();
@@ -25,11 +25,10 @@ const AdminNav = () => {
     };
 
     useEffect(() => {
-        const isAdminLogin = getCookie("isAdminLogin");
-        setIsLoggedIn(isAdminLogin || "0");
-        if (!isAdminLogin) {
-            router.push("/authority-sign-in");
-        }
+        const encData = getCookie("enData");
+        const userData = atob(encData);
+        setIsLoggedIn(userData?.isAdminLogin || "0");
+
     }, []);
 
 

@@ -23,6 +23,7 @@ export default function DepartmentSignIn() {
 
   const handleSendOtp = () => {
     if (phone.length === 10) {
+
       setOtpSent(true);
     } else {
       alert("Please enter a valid 10-digit phone number");
@@ -35,7 +36,7 @@ export default function DepartmentSignIn() {
     // Logic for Super Admin
     if (isSuperAdmin) {
       if (password.length > 0) {
-        proceedToDashboard();
+        proceedToDashboard(null);
       } else {
         alert("Please enter password");
       }
@@ -47,16 +48,20 @@ export default function DepartmentSignIn() {
       handleSendOtp();
     } else {
       if (otp.length > 0) {
-        proceedToDashboard();
+        proceedToDashboard(null);
       } else {
         alert("Please enter the OTP");
       }
     }
   };
 
-  const proceedToDashboard = () => {
+  const proceedToDashboard = (data: any) => {
     if (typeof window !== 'undefined') {
-      setCookie("isAdminLogin", "1");
+      const userData = {
+        ...data,
+        "isAdminLogin": "1"
+      }
+      setCookie("encData", userData);
     }
     router.push("/authority-dashboard");
   };
