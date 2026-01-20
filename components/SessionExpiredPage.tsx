@@ -18,7 +18,7 @@ export default function SessionExpiredPage() {
       </div>
 
       {/* Main Card */}
-      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-900">
+      <div className="w-full max-w-md overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-900 p-8 md:p-12 text-center transition-all hover:shadow-2xl">
 
         {/* Top Accent Line */}
         <div className="h-1.5 w-full bg-blue-600 dark:bg-blue-500" />

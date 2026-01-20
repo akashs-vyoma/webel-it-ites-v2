@@ -6,10 +6,12 @@ import { useRouter } from "next/navigation";
 import { setCookie } from "@/utils/cookies";
 import { callAPI } from "./apis/commonAPIs";
 import Swal from "sweetalert2";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function DepartmentSignIn() {
   const [isSuperAdmin, setIsSuperAdmin] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
+  const { setUserData } = useAuth();
 
   // Logic States
   const [phone, setPhone] = useState("")
@@ -76,7 +78,7 @@ export default function DepartmentSignIn() {
         "isAdminLogin": "1",
         "user_type_id": "10"
       }
-      setCookie("encData", userData);
+      setUserData(userData);
     }
     router.push("/authority-dashboard");
   };
