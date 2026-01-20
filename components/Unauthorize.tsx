@@ -3,19 +3,23 @@ import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { Lock } from 'lucide-react'; // Optional: icon library
 import { deleteAllCookies } from '@/utils/cookies';
+import Image from 'next/image';
+import logo from "@/components/images/webel-logo.png"
 
 const Unauthorized: React.FC = () => {
   useEffect(() => {
     deleteAllCookies();
   }, [])
   return (
-    <div className="flex items-center justify-center min-h-[70vh] w-full px-4">
+    <div className="flex flex-col gap-1 items-center justify-center min-h-[70vh] w-full px-4">
+      <div>
+        <Image width={100} height={100} alt="logo" src={logo} />
+      </div>
       <div className="max-w-md w-full bg-white rounded-3xl shadow-xl border border-gray-100 p-8 md:p-12 text-center transition-all hover:shadow-2xl">
-
         {/* Icon Header */}
         <div className="flex justify-center mb-6">
-          <div className="p-4 bg-red-50 rounded-2xl">
-            <Lock className="w-12 h-12 text-red-500" />
+          <div className="p-4 bg-red-50 rounded-full">
+            <Lock className="w-8 h-8 text-red-500" />
           </div>
         </div>
 
