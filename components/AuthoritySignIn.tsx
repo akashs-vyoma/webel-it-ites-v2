@@ -38,7 +38,7 @@ export default function DepartmentSignIn() {
     // Logic for Super Admin
     if (isSuperAdmin) {
       if (password.length > 0) {
-        const result = await callAPI("/authorityLoginAuthentication", {
+        const result = await callAPI("/admin/getAuthorityLoginAuthentication", {
           "authorityPassword": "123456",
           "deptID": 1,
           "contactNo": "9851020611",
@@ -73,7 +73,8 @@ export default function DepartmentSignIn() {
     if (typeof window !== 'undefined') {
       const userData = {
         ...data,
-        "isAdminLogin": "1"
+        "isAdminLogin": "1",
+        "user_type_id": "10"
       }
       setCookie("encData", userData);
     }
