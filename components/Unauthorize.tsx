@@ -24,7 +24,7 @@ const Unauthorized: React.FC = () => {
         </div>
 
         {/* Required Text */}
-        <h1 className="text-4xl font-black tracking-tighter text-gray-900 mb-2">
+        <h1 className="text-4xl font-black tracking-tighter text-gray-700 mb-2">
           Access Denied!
         </h1>
 
