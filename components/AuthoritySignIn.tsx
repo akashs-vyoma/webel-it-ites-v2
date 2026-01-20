@@ -73,7 +73,8 @@ export default function DepartmentSignIn() {
     if (typeof window !== 'undefined') {
       const userData = {
         ...data,
-        "isAdminLogin": "1"
+        "isAdminLogin": "1",
+        "user_type_id": "10"
       }
       setCookie("encData", userData);
     }
