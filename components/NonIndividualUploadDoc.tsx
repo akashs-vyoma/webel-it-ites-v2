@@ -22,7 +22,9 @@ import { deleteCookie, getCookie } from '@/utils/cookies';
 const NonIndividualUploadDoc: React.FC<{ isWizard: boolean, onClose: () => void, docId: any }> = ({ isWizard, onClose, docId }) => {
     const searchParams = useSearchParams();
 
-    const dcid = searchParams.get("dcid") || docId?.project_doc_type_id;
+    // const dcid = searchParams.get("dcid") || docId?.project_doc_type_id;
+    const dcid = searchParams.get("dcid") || docId?.project_id;
+
     const dcnm = searchParams.get("dcnm") || docId?.project_name;
     const [showModal, setShowModal] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
