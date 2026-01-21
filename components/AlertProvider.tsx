@@ -94,7 +94,7 @@ export const AlertProvider = ({ children }: { children: ReactNode }) => {
 
                         {/* Footer */}
                         <div className="mt-6 pt-3 border-t border-gray-200 text-xs text-gray-500 text-center">
-                            <Dot className="text-green-500 h-6 w-6 inline-block" />Webel Online Services
+                            ©️Webel Online Services
                         </div>
 
                         {/* Close */}
