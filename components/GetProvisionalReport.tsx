@@ -1,6 +1,7 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Calendar, Search, ChevronDown } from 'lucide-react';
+import { callAPI } from './apis/commonAPIs';
 
 interface ReportFilterProps {
     title?: string; // OPTIONAL — default will be used
@@ -12,20 +13,27 @@ const ReportFilterSection: React.FC<ReportFilterProps> = ({
     onSearch
 }) => {
     const [service, setService] = useState("");
-    const [fromDate, setFromDate] = useState("2025-12-18");
-    const [toDate, setToDate] = useState("2025-12-18");
+    const [fromDate, setFromDate] = useState("");
+    const [toDate, setToDate] = useState("");
+    const [projects, setProjects] = useState([]);
+    const [isLoadingProjects, setIsLoadingProjects] = useState(false);
 
-    const services = [
-        "All",
-        "DPR of IT & ITeS - Vetting - SINGLE PARTY",
-        "NOC for Renting Out Leased property - SINGLE PARTY",
-        "Certificate for Tax Exemption - SINGLE PARTY",
-        "DPR of IT & ITeS - vetting - MULTIPARTY",
-        "NOC for Renting Out Leased property - MULTIPARTY",
-        "Certificate for Tax Exemption - MULTIPARTY",
-        "Renewal of NOC Renting out Leased Property - SINGLE PARTY",
-        "Renewal of NOC Renting out Leased Property - MULTI PARTY"
-    ];
+    const fetchProjects = async () => {
+        try {
+            const result = await callAPI('/application/GetProjectDetailsByDeptID', { "departmentID": 1 });
+
+            if (result && Array.isArray(result?.data)) setProjects(result?.data);
+            else setProjects([]);
+        } catch (error) {
+            console.error("Error fetching projects:", error);
+        } finally {
+            setIsLoadingProjects(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchProjects();
+    }, [])
 
     const handleSearch = () => {
         onSearch?.({ service, fromDate, toDate });
@@ -33,7 +41,7 @@ const ReportFilterSection: React.FC<ReportFilterProps> = ({
 
     return (
         <div className="max-w-[1600px] mx-auto p-4 lg:p-6">
-            <div className="bg-white rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100 overflow-hidden">
+            <div className="bg-white min-w-[70%] rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] border border-slate-100 overflow-hidden">
 
                 {/* ================= HEADER ================= */}
                 <div className="relative bg-gradient-to-r from-blue-700 to-cyan-600 px-6 py-4">
@@ -64,9 +72,9 @@ const ReportFilterSection: React.FC<ReportFilterProps> = ({
                                     <option value="" disabled>
                                         Select Service Name
                                     </option>
-                                    {services.map((item, idx) => (
-                                        <option key={idx} value={item}>
-                                            {item}
+                                    {projects?.map((item: any, idx: number) => (
+                                        <option key={idx} value={item?.projectId}>
+                                            {item?.projectName}
                                         </option>
                                     ))}
                                 </select>
