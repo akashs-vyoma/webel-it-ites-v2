@@ -1,21 +1,44 @@
 "use client";
 import React, { useEffect, useState } from 'react';
 import { FileSpreadsheet, FileText, Search, ChevronLeft, ChevronRight, Loader2, Eye } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { callAPI } from './apis/commonAPIs';
 import { useAuth } from '@/hooks/useAuth';
 
 const AuthorityApplicationDetails = () => {
     const searchParams = useSearchParams();
     const { user, isAuthenticated } = useAuth();
-    
-    const [statusId, setStatusId] = useState('');
+
+    const [statusId, setStatusId] = useState<number>(0);
     const [fromDate, setFromDate] = useState('');
     const [toDate, setToDate] = useState('');
-    
+
     const [applications, setApplications] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
+    const router = useRouter();
+
+    const titles: Record<number, string> = {
+        1: "Pending Provisional NOC",
+        2: "Pending Provisional NOC (After 1 Day)",
+        3: "Pending Final NOC",
+        4: "Pending Final NOC (After 4 Day)",
+        5: "Pending Payment",
+        6: "Pending Co-signer Verification",
+        7: "Total Application",
+        8: "Total Provisional NOC Issued",
+        9: "Total Final NOC Issued",
+        10: "Approval Pending",
+        11: "Approval Issued",
+        12: "Query Approval Pending",
+        13: "Total Rejected",
+        14: "Mortgage Lease Rights",
+        15: "Transfer Of Lease Rights",
+        16: "Pending Authority Declaration (After 4 Days)",
+        17: "Total Renewal of NOC Renting",
+        18: "Total Payment Collected",
+        19: "Total Transaction Count",
+    }
 
     useEffect(() => {
         if (!searchParams || !isAuthenticated || !user?.authority_id) return;
@@ -27,12 +50,10 @@ const AuthorityApplicationDetails = () => {
         const decodedFrom = atob(from || "") || '';
         const decodedTo = atob(to || "") || '';
 
-        setStatusId(decodedStatus);
+        setStatusId(parseInt(decodedStatus));
         setFromDate(decodedFrom);
         setToDate(decodedTo);
 
-       
-        
         if (isAuthenticated && decodedStatus) {
             fetchApplicationDetails(decodedStatus, decodedFrom, decodedTo);
         }
@@ -41,13 +62,13 @@ const AuthorityApplicationDetails = () => {
     const fetchApplicationDetails = async (sid: string, fromDate: string, toDate: string) => {
         try {
             setIsLoading(true);
-            const response = await callAPI("/admin/GetApplicationDetailsByStatusV2", {
+            const response = await callAPI("/authority/GetApplicationDetailsByStatusV2", {
                 "user_id": user?.authority_id,
                 "status_id": parseInt(sid),
                 "from_date": fromDate,
                 "to_date": toDate
             });
-            
+
             if (response?.status === "success" || response?.data) {
                 setApplications(response.data || []);
             }
@@ -58,15 +79,20 @@ const AuthorityApplicationDetails = () => {
         }
     };
 
+    const handleViewDocs = (application_id: number) => {
+        router.push(`/authority-application-doc?aid=${btoa(application_id.toString())}`);
+    }
+
     const headers = [
-        "Sl No.", "Action", "Application#", "Name",
+        "Sl No.", "Action", "Application", "Name",
         "Application Type", "Application Status", "Application Date",
+
         "Provisional NOC Status", "Final NOC Status"
     ];
 
     // Filter logic for the search bar
-    const filteredApplications = applications.filter(app => 
-        Object.values(app).some(val => 
+    const filteredApplications = applications.filter(app =>
+        Object.values(app).some(val =>
             String(val).toLowerCase().includes(searchTerm.toLowerCase())
         )
     );
@@ -80,7 +106,7 @@ const AuthorityApplicationDetails = () => {
                     <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
                     <h2 className="relative z-20 text-white font-bold tracking-wide flex items-center gap-2">
                         <span className="w-2 h-2 bg-cyan-300 rounded-full animate-pulse shadow-[0_0_10px_cyan]"></span>
-                        Application Details (Status ID: {statusId})
+                        Application Details ({titles[statusId]})
                     </h2>
                 </div>
 
@@ -140,26 +166,26 @@ const AuthorityApplicationDetails = () => {
                                     <tr key={index} className="hover:bg-slate-50/80 transition-colors border-b border-slate-100 last:border-0">
                                         <td className="px-4 py-3 text-xs font-bold text-slate-500">{index + 1}</td>
                                         <td className="px-4 py-3">
-                                            <button className="p-1.5 bg-cyan-50 text-cyan-600 rounded-md hover:bg-cyan-600 hover:text-white transition-all">
+                                            <button onClick={() => handleViewDocs(app?.application_id)} className="p-1.5 bg-cyan-50 text-cyan-600 rounded-md hover:bg-cyan-600 hover:text-white transition-all">
                                                 <Eye size={14} />
                                             </button>
                                         </td>
-                                        <td className="px-4 py-3 text-xs font-bold text-slate-700">{app.application_no}</td>
-                                        <td className="px-4 py-3 text-xs font-medium text-slate-600">{app.applicant_name}</td>
-                                        <td className="px-4 py-3 text-[10px] font-bold text-slate-500 uppercase">{app.application_type || 'N/A'}</td>
+                                        <td className="px-4 py-3 text-xs font-bold text-slate-700">{app.application_number}</td>
+                                        <td className="px-4 py-3 text-xs font-medium text-slate-600">{app.company_name}</td>
+                                        <td className="px-4 py-3 text-[10px] font-bold text-slate-500 uppercase">{app.service_name || 'N/A'}</td>
                                         <td className="px-4 py-3">
-                                            <span className="px-2 py-1 bg-amber-50 text-amber-600 text-[10px] font-black rounded-md uppercase border border-amber-100">
-                                                {app.status_desc}
+                                            <span className="px-2 py-1 text-center text-amber-600 text-[10px] font-black rounded-md uppercase">
+                                                {app.application_status}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-3 text-xs text-slate-500">{app.created_date}</td>
+                                        <td className="px-4 py-3 text-xs text-slate-500">{app.application_date || 'N/A'}</td>
                                         <td className="px-4 py-3">
-                                            <span className={`px-2 py-1 text-[10px] font-black rounded-md uppercase border ${app.provisional_noc_status === 'Issued' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-slate-50 text-slate-400 border-slate-100'}`}>
+                                            <span className={`px-2 py-1 text-[10px] font-black rounded-md uppercase border ${app.provisional_noc_status === 'DONE' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-slate-50 text-slate-400 border-slate-100'}`}>
                                                 {app.provisional_noc_status || 'Pending'}
                                             </span>
                                         </td>
                                         <td className="px-4 py-3">
-                                            <span className={`px-2 py-1 text-[10px] font-black rounded-md uppercase border ${app.final_noc_status === 'Issued' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-slate-50 text-slate-400 border-slate-100'}`}>
+                                            <span className={`px-2 py-1 text-[10px] font-black rounded-md uppercase border ${app.final_noc_status === 'DONE' ? 'bg-green-50 text-green-600 border-green-100' : 'bg-slate-50 text-slate-400 border-slate-100'}`}>
                                                 {app.final_noc_status || 'Pending'}
                                             </span>
                                         </td>

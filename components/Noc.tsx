@@ -50,16 +50,16 @@ const NOCForm = forwardRef((props: NOCFormProps, ref) => {
     const contentRef = useRef(null);
 
 
-    // useEffect(() => {
-    //     if (!isAuthenticated) return;
-    //     const aadhaarAuth = getCookie("ad_auth");
-    //     if (aadhaarAuth) {
-    //         setShowModal(false);
-    //     } else {
-    //         setShowModal(true);
-    //     }
+    useEffect(() => {
+        if (!isAuthenticated) return;
+        const aadhaarAuth = getCookie("ad_auth");
+        if (aadhaarAuth) {
+            setShowModal(false);
+        } else {
+            setShowModal(true);
+        }
 
-    // }, [isAuthenticated])
+    }, [isAuthenticated])
 
     useImperativeHandle(ref, () => ({
         submit: async () => {
@@ -265,15 +265,61 @@ const NOCForm = forwardRef((props: NOCFormProps, ref) => {
                     return <RentingSingleOwnerDeclaration ref={contentRef} data={data} />;
                 }
             case "5":
-                return <TaxExemptionDeclaration ref={contentRef} data={TaxExemptionDeclarationDummyData} />;
+                {
+                    const data = {
+                        _current_date: moment(new Date()).format("DD-MM-YYYY HH:mm:ss"),
+                       _application_type: applicationDetails?.applicationTypeName,
+                      _application_number: applicationDetails?.applicationNumber,
+                        _company_name: applicationDetails?.companyName,
+                     _documents: applicationDetails?.documents?.map((doc: any) => { return { _name: doc?.documentType, _udin: doc?.udinNumber } }),
+   
+                    _rep_name: applicationDetails?.companyOrPersonName,
+                    _rep_phone: applicationDetails?.companyOrPersonContactNo,
+                    _ca_reg_number: "N/A",
+                    _ca_name: "N/A",
+                    _ca_phone: "N/A",
+                        _memo_no: "224/1(6)-JS/IT/O/117/2013",
+                        _memo_date: "17th July 2014",
+                        _memo_udin: "23-G-GA001177-O-169235653018",
+                    };
+                    return <TaxExemptionDeclaration ref={contentRef} data={data} />;
+                }
             case "7":
-                return <MultiPartyDeclaration ref={contentRef} data={MultiPartyDeclarationDummyData} />;
+                {
+                const data = {
+                    _current_date: moment(new Date()).format("DD-MM-YYYY HH:mm:ss"),
+                    _it_notification_no: "845-IT/O/117/2013",
+                    _it_notification_date: "12.7. 2023",
+                    _it_notification_udin: "23-G-GA001177-O-1692009699994",
+                    _applicants: applicationDetails?.applicants?.map((applicant: any) => { return { _name: applicant?.name, _address: applicant?.address, _tax_id: applicant?.taxId } }),
+                }
+                return <MultiPartyDeclaration ref={contentRef} data={data} />;
+        }
             case "8":
                 return <MultiOwnerDeclaration ref={contentRef} data={MultiOwnerDeclarationDummyData} />;
             case "9":
                 return <FinalNOCExemption ref={contentRef} data={FinalNOCExemptionDummyData} />;
             case "10":
-                return <RentingRenewalSingleDeclaration ref={contentRef} data={RentingRenewalSingleDeclarationDummyData} />;
+                const data = {
+                    _current_date: moment(new Date()).format("DD-MM-YYYY HH:mm:ss"),
+                    _application_type: applicationDetails?.applicationTypeName,
+                    _application_number: applicationDetails?.applicationNumber,
+                    _company_name: applicationDetails?.companyName,
+                    _documents: applicationDetails?.documents?.map((doc: any) => { return { _name: doc?.documentType, _udin: doc?.udinNumber } }),
+                    _tenant_name: applicationDetails?.companyName,
+                    _tenant_id: `${applicationDetails?.tenantGSTNo} / ${applicationDetails?.tenantPANNo}`,
+                    _activity_type: applicationDetails?.activityType,
+                    _building_area_sqft: applicationDetails?.buildingAreaSqft,
+                    _commercial_area_sqft: applicationDetails?.commercialAreaRentSqft,
+                    _rep_name: applicationDetails?.companyOrPersonName,
+                    _rep_phone: applicationDetails?.companyOrPersonContactNo,
+                    _tenant_rep_name: applicationDetails?.companyOrPersonName,
+                    _tenant_rep_phone: applicationDetails?.tenantContactNo,
+                    _it_notification_no: "1967/UD/O/M/SL(AL/NR)/7L-23/95(Pt.)",
+                    _it_notification_date: "3rd June 2008",
+                    _it_notification_udin: "23-G-GA001177-O-1692019086903",
+                };
+                return <RentingRenewalSingleDeclaration ref={contentRef} data={data} />;
             case "11":
                 return <RentingRenewalMultiOwnerDeclaration ref={contentRef} data={RentingRenewalMultiOwnerDeclarationDummyData} />;
             default:
