@@ -35,7 +35,7 @@ const AdminDashboard = () => {
     const fetchDashboardData = async () => {
         try {
             setIsLoading(true);
-            const response = await callAPI("/admin/GetAdminDashboardDetails", {
+            const response = await callAPI("/authority/GetAdminDashboardDetails", {
                 "user_id": user?.authority_id,
                 "from_date": fromDate,
                 "to_date": toDate

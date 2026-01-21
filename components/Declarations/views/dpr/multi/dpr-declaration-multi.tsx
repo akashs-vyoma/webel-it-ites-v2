@@ -15,6 +15,7 @@ interface MultiPartyDeclarationProps {
     _it_notification_date?: string;
     _it_notification_udin?: string;
     _applicants?: Applicant[];
+    
   };
   ref?: any;
 }

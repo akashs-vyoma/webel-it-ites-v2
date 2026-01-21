@@ -244,12 +244,12 @@ const DocumentAadhaarVerifyModal = ({ showModal, setShowModal }: { showModal: bo
 
                 {/* Modal Footer */}
                 <div className="p-5 border-t border-gray-100 flex justify-end">
-                    {/* <button
+                    <button
                         className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-2 rounded-lg font-medium transition-colors text-sm"
                         onClick={() => setShowModal(false)}
                     >
                         Cancel
-                    </button> */}
+                    </button>
                 </div>
             </DialogContent>
         </Dialog>
