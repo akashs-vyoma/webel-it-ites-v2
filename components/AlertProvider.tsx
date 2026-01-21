@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useState, ReactNode } from "react";
-import { Check, X, AlertTriangle, Dot } from "lucide-react";
+import { Check, X, AlertTriangle, Dot, AlertCircle } from "lucide-react";
 
 type AlertType = "success" | "error";
 
@@ -62,9 +62,9 @@ export const AlertProvider = ({ children }: { children: ReactNode }) => {
                                     }`}
                             >
                                 {isSuccess ? (
-                                    <Check size={40} className="text-white stroke-[3]" />
+                                    <Check size={40} className="text-white stroke-[3] animate-pulse" />
                                 ) : (
-                                    <AlertTriangle size={40} className="text-white stroke-[3]" />
+                                    <AlertTriangle size={40} className="text-white stroke-[3] animate-caret-blink" />
                                 )}
                             </div>
                         </div>
@@ -94,7 +94,7 @@ export const AlertProvider = ({ children }: { children: ReactNode }) => {
 
                         {/* Footer */}
                         <div className="mt-6 pt-3 border-t border-gray-200 text-xs text-gray-500 text-center">
-                            ©️Webel Online Services
+                            ©️ Webel Online Services
                         </div>
 
                         {/* Close */}
