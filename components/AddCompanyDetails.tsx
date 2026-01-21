@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Building2, CreditCard, MapPin, FileText, Save, CheckCircle2 } from 'lucide-react';
 import Swal from 'sweetalert2';
+import { smallSwal } from '@/components/SwalFooter';
 const AddCompanyDetails: React.FC = () => {
     // State management for form fields
     const [formData, setFormData] = useState({
@@ -20,20 +21,20 @@ const AddCompanyDetails: React.FC = () => {
     };
 
     const handleSave = () => {
-    setIsSaving(true);
+        setIsSaving(true);
 
-    setTimeout(() => {
-        setIsSaving(false);
-        
-        Swal.fire({
-            title: 'Success!',
-            text: 'Company details saved successfully!',
-            icon: 'success',
-            confirmButtonColor: '#111827', 
-        });
+        setTimeout(() => {
+            setIsSaving(false);
 
-    }, 1000);
-};
+            Swal.fire({
+                title: 'Success!',
+                text: 'Company details saved successfully!',
+                icon: 'success',
+                confirmButtonColor: '#111827',
+            });
+
+        }, 1000);
+    };
 
     return (
         <div className="w-full flex items-center justify-center p-6 font-sans">
@@ -48,12 +49,12 @@ const AddCompanyDetails: React.FC = () => {
                 <div className="bg-[#1F51FF] px-8 py-5 flex items-center justify-between relative overflow-hidden">
                     {/* Decorative background element */}
                     <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -mr-20 -mt-20 pointer-events-none"></div>
-                     <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
+                    <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
                     <h2 className="text-white text-lg font-bold tracking-wide flex items-center gap-2 relative z-10">
                         <Building2 className="text-blue-200" size={24} />
                         Add Company Details
                     </h2>
-                    
+
                     <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse relative z-10"></div>
                 </div>
 
@@ -179,12 +180,12 @@ const AddCompanyDetails: React.FC = () => {
 
                     {/* Footer Actions */}
                     <div className="pt-4 flex justify-end">
-                        <button 
+                        <button
                             onClick={handleSave}
                             disabled={isSaving}
-                      className="relative overflow-hidden flex items-center gap-2 px-8 py-3 bg-[#1F51FF] text-white rounded-xl font-bold text-sm shadow-[0_4px_14px_rgba(31,81,255,0.4)] transition-all"
+                            className="relative overflow-hidden flex items-center gap-2 px-8 py-3 bg-[#1F51FF] text-white rounded-xl font-bold text-sm shadow-[0_4px_14px_rgba(31,81,255,0.4)] transition-all"
                         >
-                            
+
                             <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
 
                             {isSaving ? (

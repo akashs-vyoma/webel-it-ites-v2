@@ -2,12 +2,13 @@
 import React, { useState } from 'react';
 import { Folder, PhoneCall } from 'lucide-react';
 import Swal from 'sweetalert2';
+import { smallSwal } from '@/components/SwalFooter';
 
 const SignDocument: React.FC = () => {
     const [udin, setUdin] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
 
-    const handleGenerateOtp = () => { 
+    const handleGenerateOtp = () => {
         if (phoneNumber.length === 10) {
             Swal.fire(`OTP generated for ${phoneNumber}`);
         } else {
@@ -26,7 +27,7 @@ const SignDocument: React.FC = () => {
             {/* Header */}
             <div className="px-6 py-3 border-b border-slate-200
                             bg-[#1F51FF] rounded-t-xl">
-                 <div className="absolute inset-0 gradient-shimmer pointer-events-none"></div>
+                <div className="absolute inset-0 gradient-shimmer pointer-events-none"></div>
                 <h2 className="text-white text-base font-semibold tracking-wide">
                     Sign Document
                 </h2>
@@ -79,10 +80,10 @@ const SignDocument: React.FC = () => {
                                         focus-within:shadow-[0_0_0_2px_rgba(31,81,255,0.15)]
                                         transition">
 
-                       <div className="px-3 py-2 flex items-center justify-center 
+                            <div className="px-3 py-2 flex items-center justify-center 
                 bg-slate-100 text-[#1F51FF] rounded-md">
-  <PhoneCall size={16} />
-</div>
+                                <PhoneCall size={16} />
+                            </div>
 
 
 
@@ -99,9 +100,9 @@ const SignDocument: React.FC = () => {
                                            outline-none bg-transparent
                                            text-sm font-medium"
                             />
-<button
-  onClick={handleGenerateOtp}
-  className="
+                            <button
+                                onClick={handleGenerateOtp}
+                                className="
     px-2 py-3
     text-xs font-bold
     bg-[#1F51FF] text-white
@@ -113,9 +114,9 @@ const SignDocument: React.FC = () => {
     whitespace-nowrap
     flex= items-center justify-center
   "
->
-  Generate OTP
-</button>
+                            >
+                                Generate OTP
+                            </button>
 
 
                         </div>

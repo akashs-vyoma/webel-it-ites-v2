@@ -1,8 +1,6 @@
 "use client"
 import React, { useState, useEffect } from 'react';
 import { Smartphone, Key, ShieldCheck, ChevronRight, User, Building2, Sparkles, Lock, Loader2 } from 'lucide-react';
-import { useRouter } from "next/navigation";
-
 
 // Shadcn UI Imports
 import {
@@ -11,10 +9,13 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { callAPI } from './apis/commonAPIs';
 import Swal from "sweetalert2";
 import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from "next/navigation";
+import { smallSwal } from '@/components/SwalFooter';
+import { callAPI } from './apis/commonAPIs';
 import { deleteCookie, getCookie, setCookie } from '@/utils/cookies';
+import { useAlert } from '@/hooks/useAlert';
 
 const IndividualLogin: React.FC = () => {
     const [aadhaarNumber, setAadhaarNumber] = useState('');
@@ -35,6 +36,7 @@ const IndividualLogin: React.FC = () => {
     const [timer, setTimer] = useState(0);
     const { setUserData } = useAuth();
     const router = useRouter();
+    const { showAlert } = useAlert();
 
     // Countdown logic
     useEffect(() => {
@@ -47,16 +49,6 @@ const IndividualLogin: React.FC = () => {
         return () => clearInterval(interval);
     }, [timer]);
 
-    // Small Swal Config Helper
-    const smallSwal = {
-        width: '340px',
-        customClass: {
-            title: 'text-lg font-bold',
-            htmlContainer: 'text-sm',
-            confirmButton: 'text-xs px-4 py-2'
-        }
-    };
-
     const handleSendOtp = async () => {
         try {
             setSendingOtp(true);
@@ -66,43 +58,34 @@ const IndividualLogin: React.FC = () => {
                 if (result.status == 0) {
                     setCookie("token", result.data.token)
                     setOtpSent(true);
-                    setShowSwalAlert(true);
                     setTimer(60);
 
-                    Swal.fire({
-                        ...smallSwal,
-                        icon: "success",
-                        title: "OTP Sent",
-                        text: `OTP sent to mobile linked with Aadhaar`,
-                        confirmButtonColor: "#06b6d4",
+                    showAlert({
+                        type: 'success',
+                        title: 'OTP Sent',
+                        message: 'OTP sent to mobile linked with Aadhaar.'
                     });
 
                 } else {
-                    Swal.fire({
-                        ...smallSwal,
-                        icon: "error",
-                        title: "Error",
-                        text: result.message,
-                        confirmButtonColor: "#ef4444",
+                    showAlert({
+                        type: 'error',
+                        title: 'Error',
+                        message: result.message
                     });
                 }
             } else {
-                Swal.fire({
-                    ...smallSwal,
-                    icon: "warning",
-                    title: "Invalid Aadhaar",
-                    text: "Please enter a valid 12-digit number",
-                    confirmButtonColor: "#f59e0b",
+                showAlert({
+                    type: 'error',
+                    title: 'Invalid Aadhaar',
+                    message: 'Please enter a valid 12-digit number'
                 });
             }
         } catch (error) {
             console.error("Error sending OTP:", error);
-            Swal.fire({
-                ...smallSwal,
-                icon: "error",
-                title: "Failed",
-                text: "Failed to send OTP. Try again later.",
-                confirmButtonColor: "#ef4444",
+            showAlert({
+                type: 'error',
+                title: 'Failed',
+                message: 'Failed to send OTP. Try again later.'
             });
         } finally {
             setShowSwalAlert(false);
@@ -124,50 +107,44 @@ const IndividualLogin: React.FC = () => {
                 const result = await callAPI("/udin/individualLoginValidateAadhaarOtp", { aadhaar_number: aadhaarNumber, otp, token });
 
                 if (result.status == 0) {
-                    Swal.fire({
-                        ...smallSwal,
-                        icon: "success",
-                        title: "Verified",
-                        text: "OTP verified successfully",
-                        confirmButtonColor: "#06b6d4",
-                    }).then(() => {
-                        deleteCookie("token");
-                        setCookie("authToken", result.data.token);
-                        setAccounts(result?.data?.udin_profile_details?.accounts);
-                        if (result?.data?.udin_profile_details?.accounts?.length == 1) {
-                            console.log(result?.data?.udin_profile_details?.accounts[0]);
-                            setSelectedAccount(result?.data?.udin_profile_details?.accounts[0]);
-                            setSelectedRole(result?.data?.udin_profile_details?.accounts[0]?.account_type === 'INDIVIDUAL' ? 'individual' : 'company');
-                            setAccountName(result?.data?.udin_profile_details?.accounts[0]?.account_name);
+                    showAlert({
+                        type: 'success',
+                        title: 'Verified',
+                        message: 'OTP verified successfully',
+                        onConfirm: () => {
+                            setShowRoleModal(true);
                         }
-                        setShowRoleModal(true);
                     });
+
+                    deleteCookie("token");
+                    setCookie("authToken", result.data.token);
+                    setAccounts(result?.data?.udin_profile_details?.accounts);
+                    if (result?.data?.udin_profile_details?.accounts?.length == 1) {
+                        console.log(result?.data?.udin_profile_details?.accounts[0]);
+                        setSelectedAccount(result?.data?.udin_profile_details?.accounts[0]);
+                        setSelectedRole(result?.data?.udin_profile_details?.accounts[0]?.account_type === 'INDIVIDUAL' ? 'individual' : 'company');
+                        setAccountName(result?.data?.udin_profile_details?.accounts[0]?.account_name);
+                    }
                 } else {
-                    Swal.fire({
-                        ...smallSwal,
-                        icon: "error",
-                        title: "Failed",
-                        text: result.message,
-                        confirmButtonColor: "#ef4444",
+                    showAlert({
+                        type: 'error',
+                        title: 'Failed',
+                        message: result.message,
                     });
                 }
             } else {
-                Swal.fire({
-                    ...smallSwal,
-                    icon: "warning",
+                showAlert({
+                    type: 'error',
                     title: "Required",
-                    text: "Please enter the OTP",
-                    confirmButtonColor: "#f59e0b",
+                    message: "Please enter the OTP",
                 });
             }
         } catch (error) {
             console.error("Error verifying OTP:", error);
-            Swal.fire({
-                ...smallSwal,
-                icon: "error",
-                title: "Failed",
-                text: "Failed to verify. Try again later.",
-                confirmButtonColor: "#ef4444",
+            showAlert({
+                type: 'error',
+                title: 'Failed',
+                message: 'Failed to verify. Try again later.',
             });
         } finally {
             setVerifyingOtp(false);
@@ -186,24 +163,6 @@ const IndividualLogin: React.FC = () => {
         <>
             <div className="min-h-screen w-full flex items-center justify-center p-4 md:p-6">
                 <div className="w-full max-w-[460px] relative">
-                    {/* Success Notification Bar */}
-                    {showSwalAlert && (
-                        <div className="mb-5 animate-slide-in-down">
-                            <div className="glass-morphism rounded-3xl p-5 border border-indigo-100">
-                                <div className="flex items-start gap-4">
-                                    <div className="flex-shrink-0 w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg">
-                                        <ShieldCheck className="text-white" size={24} />
-                                    </div>
-                                    <div className="flex-1 pt-1">
-                                        <h4 className="text-sm font-bold text-slate-900 mb-1">OTP Sent Successfully</h4>
-                                        <p className="text-xs text-slate-600 leading-relaxed">
-                                            Verification code sent to your linked mobile.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
 
                     {/* Main Card */}
                     <div className="glass-morphism rounded-[32px] overflow-hidden border border-white/60 animate-scale-in">

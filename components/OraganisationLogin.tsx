@@ -1,8 +1,8 @@
 "use client"
 import React, { useState } from 'react';
-import OrganisationRegByGSTIN from './OrganisationRegByGSTIN';
-import OrganisationRegByDSC from './OrganisationRegByDSC';
 import Link from 'next/link';
+import OrganisationLoginByGSTIN from './OrganisationLoginByGSTIN';
+import OrganisationLoginByDSC from './OrganisationLoginByDSC';
 
 const OrganisationLogin = () => {
   const [activeTab, setActiveTab] = useState('gstn');
@@ -60,8 +60,8 @@ const OrganisationLogin = () => {
           {/* Dynamic Form */}
           <div className="mb-5">
             {activeTab === 'gstn'
-              ? <OrganisationRegByGSTIN />
-              : <OrganisationRegByDSC />
+              ? <OrganisationLoginByGSTIN />
+              : <OrganisationLoginByDSC />
             }
           </div>
 
@@ -89,9 +89,9 @@ const OrganisationLogin = () => {
           <span className="font-semibold text-[#1F51FF]">
             Instruction:
           </span>{' '}
-          To sign in, please select your preferred method. If using <b>GSTN</b>, 
-          ensure your credentials are valid. If using <b>DSC</b>, insert the 
-          <b> USB Token</b> and click on <b>Verify DSC</b>. The system will 
+          To sign in, please select your preferred method. If using <b>GSTN</b>,
+          ensure your credentials are valid. If using <b>DSC</b>, insert the
+          <b> USB Token</b> and click on <b>Verify DSC</b>. The system will
           automatically authenticate your credentials.
         </div>
 

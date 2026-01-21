@@ -2,10 +2,12 @@
 import React, { useState } from 'react';
 import { User, Phone, Building2, UserPlus, Send, Check, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useAlert } from '@/hooks/useAlert';
 
 const AddAuthorizedPerson: React.FC = () => {
     const router = useRouter();
-    
+    const { showAlert } = useAlert();
+
     // Form State
     const [formData, setFormData] = useState({
         name: '',
@@ -13,29 +15,24 @@ const AddAuthorizedPerson: React.FC = () => {
         department: ''
     });
 
-    // Alert State
-    const [showSwal, setShowSwal] = useState(false);
-
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        // Here you would typically send data to backend
-        // On success, show the alert
-        setShowSwal(true);
-    };
 
-    const handleConfirmRedirect = () => {
-        setShowSwal(false);
-        // Redirect to the verification page
+        showAlert({
+            type: 'success',
+            title: 'The authorize person added.',
+            message: 'The authorized person details have been added. You will now be redirected to the verification page.'
+        });
         router.push('/add-org-authorize-person');
     };
 
     return (
         <div className="w-full flex items-center justify-center p-6 font-sans relative">
-            
+
             {/* ---------------- MAIN FORM CARD ---------------- */}
             <div className="w-full max-w-3xl 
                             bg-white 
@@ -45,23 +42,23 @@ const AddAuthorizedPerson: React.FC = () => {
                             overflow-hidden">
 
                 {/* Header */}
-             <div className="bg-[#1F51FF] px-8 py-5 flex items-center justify-between relative overflow-hidden">
+                <div className="bg-[#1F51FF] px-8 py-5 flex items-center justify-between relative overflow-hidden">
 
-    <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
+                    <div className="absolute inset-0 gradient-shimmer pointer-events-none z-10"></div>
 
-    <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-10 -mt-10 pointer-events-none"></div>
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white opacity-10 rounded-full -mr-10 -mt-10 pointer-events-none"></div>
 
-    <h2 className="text-white text-lg font-bold tracking-wide flex items-center gap-2 relative z-20">
-        <UserPlus className="text-blue-200" size={22} />
-        Add Authorized Person
-    </h2>
+                    <h2 className="text-white text-lg font-bold tracking-wide flex items-center gap-2 relative z-20">
+                        <UserPlus className="text-blue-200" size={22} />
+                        Add Authorized Person
+                    </h2>
 
-</div>
+                </div>
 
 
                 {/* Form Content */}
                 <form onSubmit={handleSubmit} className="p-8 space-y-8">
-                    
+
                     {/* Row 1: Name and Phone */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {/* Name Input */}
@@ -138,7 +135,7 @@ const AddAuthorizedPerson: React.FC = () => {
 
                         {/* Submit Button */}
                         <div className="w-full">
-                            <button 
+                            <button
                                 type="submit"
                                 className="w-full md:w-auto h-12 px-8 flex items-center justify-center gap-2
                                            bg-[#1F51FF] text-white 
@@ -156,49 +153,6 @@ const AddAuthorizedPerson: React.FC = () => {
                     </div>
                 </form>
             </div>
-
-            
-            {showSwal && (
-                <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-                    <div className="bg-white rounded-[32px] shadow-2xl w-full max-w-[400px] p-8 text-center animate-in zoom-in-95 duration-300 relative overflow-hidden border border-white/20">
-                        
-                        {/* Success Icon Animation */}
-                        <div className="mx-auto w-24 h-24 rounded-full bg-green-50 flex items-center justify-center mb-6 relative">
-                            <div className="absolute inset-0 rounded-full border-4 border-green-100 animate-[ping_2s_cubic-bezier(0,0,0.2,1)_infinite]"></div>
-                            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-green-400 to-green-500 flex items-center justify-center shadow-lg shadow-green-200">
-                                <Check size={40} className="text-white stroke-[3]" />
-                            </div>
-                        </div>
-
-                        {/* Text Content */}
-                        <div className="space-y-3 mb-8">
-                            <h3 className="text-xl font-bold text-slate-900 tracking-tight">
-                                Submission Successful!
-                            </h3>
-                            <p className="text-slate-500 text-sm leading-relaxed">
-                                The authorized person details have been added. You will now be redirected to the verification page.
-                            </p>
-                        </div>
-
-                        {/* OK Button */}
-                        <button
-                            onClick={handleConfirmRedirect}
-                            className="w-full py-3.5 bg-[#1F51FF] hover:bg-blue-600 text-white rounded-xl font-bold text-sm shadow-[0_4px_14px_rgba(31,81,255,0.4)] hover:shadow-[0_6px_20px_rgba(31,81,255,0.6)] transition-all active:scale-[0.98]"
-                        >
-                            OK
-                        </button>
-
-                        {/* Optional Close Top Right */}
-                        <button 
-                            onClick={() => setShowSwal(false)}
-                            className="absolute top-4 right-4 p-2 text-slate-300 hover:text-slate-500 transition-colors"
-                        >
-                            <X size={20} />
-                        </button>
-                    </div>
-                </div>
-            )}
-
         </div>
     );
 };

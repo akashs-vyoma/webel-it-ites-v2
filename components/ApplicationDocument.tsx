@@ -11,6 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { getCookie } from '@/utils/cookies';
 import DocumentPreviewModal from './DocumentPreviewModal';
 import Swal from 'sweetalert2';
+import { smallSwal } from '@/components/SwalFooter';
 
 // ... (Interfaces remain unchanged)
 
