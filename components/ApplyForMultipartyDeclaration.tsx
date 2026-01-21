@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { callAPI } from './apis/commonAPIs';
 import { useAuth } from '@/hooks/useAuth';   
+import { deleteCookie, getCookie } from '@/utils/cookies';
 
 
 interface FormInputProps {
@@ -52,15 +53,16 @@ const SectionHeader: React.FC<{ title: string; icon?: React.ReactNode }> = ({ ti
 const MultiOwnPropertyForm: React.FC<{ isWizard?: boolean }> = ({ isWizard = false }) => {
     const { user, isAuthenticated } = useAuth();
     
-    
     const [projects, setProjects] = useState<any[]>([]);
     const [selectedProjectID, setSelectedProjectID] = useState<string>("");
     const [applications, setApplications] = useState<any[]>([]);
     const [selectedAppID, setSelectedAppID] = useState<string>("");
     
+    const [applicationDetails, setApplicationDetails] = useState<any>(null);
     
     const [isProjectsLoading, setIsProjectsLoading] = useState(true);
     const [isAppsLoading, setIsAppsLoading] = useState(false);
+    const [isDetailsLoading, setIsDetailsLoading] = useState(false);
 
     useEffect(() => {
         const fetchProjects = async () => {
@@ -75,8 +77,8 @@ const MultiOwnPropertyForm: React.FC<{ isWizard?: boolean }> = ({ isWizard = fal
         };
         fetchProjects();
     }, []);
+    
 
-   
     useEffect(() => {
         if (!selectedProjectID || !user?.user_id) {
             setApplications([]);
@@ -99,6 +101,26 @@ const MultiOwnPropertyForm: React.FC<{ isWizard?: boolean }> = ({ isWizard = fal
         fetchApps();
     }, [selectedProjectID, user?.user_id]);
 
+    // NEW API IMPLEMENTATION
+    useEffect(() => {
+
+        const fetchApplicationDetailsByApplicationId = async () => {
+            setIsDetailsLoading(true);
+            try {
+                const applicationId = getCookie("application_id")
+                const result = await callAPI("/application/GetApplicationDetailsByApplicationID", { "applicationID": parseInt(applicationId) });
+                if (result?.status === 0) {
+                    setApplicationDetails(result?.data);
+                }
+            } catch (err) { 
+                console.error("Error fetching application details:", err); 
+            } finally {
+                setIsDetailsLoading(false);
+            }
+        };
+        fetchApplicationDetailsByApplicationId();
+    }, []);
+
     return (
         <div className="min-h-screen p-4 md:p-6 font-sans">
             <div className="w-full mx-auto bg-white shadow-xl rounded-xl border border-slate-100 overflow-hidden">
@@ -113,9 +135,28 @@ const MultiOwnPropertyForm: React.FC<{ isWizard?: boolean }> = ({ isWizard = fal
                     <div className="shadow-sm rounded-lg border border-slate-100">
                         <SectionHeader title="Property Details" icon={<Building2 />} />
                         <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 bg-white rounded-b-lg">
-                            <FormInput label="Name of the Property*" icon={<Building2 />} placeholder="Name" />
-                            <FormInput label="Area in sqft." icon={<Building2 />} placeholder="Area in sqft." />
-                            <FormInput label="Address of Property*" icon={<MapPin />} placeholder="Address" className="md:col-span-2" />
+                            <FormInput 
+                                label="Name of the Property*" 
+                                icon={<Building2 />} 
+                                placeholder="Name" 
+                                value={applicationDetails?.companyName || ""}
+                                readOnly
+                            />
+                            <FormInput 
+                                label="Area in sqft." 
+                                icon={<Building2 />} 
+                                placeholder="Area in sqft." 
+                                value={applicationDetails?.buildingAreaSqft || ""}
+                                readOnly
+                            />
+                            <FormInput 
+                                label="Address of Property*" 
+                                icon={<MapPin />} 
+                                placeholder="Address" 
+                                className="md:col-span-2" 
+                                value={applicationDetails?.companyRegdAddress || ""}
+                                readOnly
+                            />
                         </div>
                     </div>
 
@@ -124,7 +165,7 @@ const MultiOwnPropertyForm: React.FC<{ isWizard?: boolean }> = ({ isWizard = fal
                         <SectionHeader title="Owners Details" icon={<Users />} />
                         <div className="p-6 space-y-8 bg-white rounded-b-lg">
 
-                            {/* 2.1 Add Yourself (Dynamic based on Auth User) */}
+                            {/* 2.1 Add Yourself */}
                             <div className="bg-slate-50/50 border border-blue-100 rounded-lg overflow-hidden">
                                 <div className="bg-blue-100/50 text-blue-800 py-2.5 px-4 text-xs font-bold uppercase tracking-wide flex items-center gap-2 border-b border-blue-100">
                                     <div className="bg-blue-600 text-white p-1 rounded-full"><Plus size={12} /></div>
@@ -133,12 +174,12 @@ const MultiOwnPropertyForm: React.FC<{ isWizard?: boolean }> = ({ isWizard = fal
                                 <div className="p-5">
                                     <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mb-5">
                                         <FormInput label="Type*" icon={<User />} value={user?.role || ""} readOnly />
-                                        <FormInput label="Name As Per GSTN*" icon={<User />} value={user?.account_name || ""} readOnly />
-                                        <FormInput label="Phone Number of Organization*" icon={<Phone />}  />
-                                        <FormInput label="GSTN*" icon={<CreditCard />} />
+                                        <FormInput label="Name As Per GSTN*" icon={<User />} value={applicationDetails?.companyName || user?.account_name || ""} readOnly />
+                                        <FormInput label="Phone Number of Organization*" icon={<Phone />} value={applicationDetails?.companyOrPersonContactNo || ""} readOnly />
+                                        <FormInput label="GSTN*" icon={<CreditCard />} value={applicationDetails?.companyGSTNumber || ""} readOnly />
                                     </div>
                                     <div className="mb-5">
-                                        <FormInput label="Address As Per GSTN*" icon={<MapPin />} value={user?.address || ""} readOnly />
+                                        <FormInput label="Address As Per GSTN*" icon={<MapPin />} value={applicationDetails?.companyRegdAddress || user?.address || ""} readOnly />
                                     </div>
                                     <div className="flex justify-end">
                                         <button className="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold py-2.5 px-6 rounded-lg shadow-md flex items-center gap-2 transition-all">
@@ -212,7 +253,7 @@ const MultiOwnPropertyForm: React.FC<{ isWizard?: boolean }> = ({ isWizard = fal
                         </div>
                     </div>
 
-                    {/* SECTION 3: APPLICATION DETAILS (Dynamic) */}
+                    {/* SECTION 3: APPLICATION DETAILS */}
                     <div className="shadow-sm rounded-lg border border-slate-100">
                         <SectionHeader title="Application Details" icon={<FileText />} />
                         <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-6 items-end bg-white rounded-b-lg">
@@ -222,7 +263,7 @@ const MultiOwnPropertyForm: React.FC<{ isWizard?: boolean }> = ({ isWizard = fal
                                 <div className="relative">
                                     <select 
                                         value={selectedProjectID}
-                                        onChange={(e) => { setSelectedProjectID(e.target.value); setSelectedAppID(""); }}
+                                        onChange={(e) => { setSelectedProjectID(e.target.value); setSelectedAppID(""); setApplicationDetails(null); }}
                                         className="h-10 w-full border border-slate-300 px-3 text-sm font-medium text-slate-700 outline-none rounded-lg focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400 bg-white appearance-none cursor-pointer"
                                     >
                                         <option value="">{isProjectsLoading ? "Loading..." : "Select Application Type"}</option>
@@ -252,7 +293,13 @@ const MultiOwnPropertyForm: React.FC<{ isWizard?: boolean }> = ({ isWizard = fal
                                 </div>
                             </div>
 
-                            <FormInput label="Year*" icon={<Calendar />} placeholder="Year" />
+                            <FormInput 
+                                label="Year*" 
+                                icon={<Calendar />} 
+                                placeholder="Year" 
+                                value={applicationDetails?.applicationNumber?.split('/')[3]?.substring(0, 4) || ""}
+                                readOnly
+                            />
                         </div>
                     </div>
 
