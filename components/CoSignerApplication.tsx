@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { RefreshCw, CheckCircle2, Clock, Send } from 'lucide-react'; // Added Send icon
 import Swal from 'sweetalert2';
+import { smallSwal } from '@/components/SwalFooter';
 interface CoSignerData {
     slNo: number;
     name: string;
@@ -34,15 +35,15 @@ const CoSignerTable: React.FC = () => {
     };
 
     // SMS Handler
-const handleSendSMS = (name: string) => {
-    Swal.fire({
-        title: 'SMS Sent 📩',
-        text: `SMS notification sent to ${name}`,
-        icon: 'success',
-        confirmButtonText: 'OK',
-        confirmButtonColor: '#06b6d4',
-    });
-};
+    const handleSendSMS = (name: string) => {
+        Swal.fire({
+            title: 'SMS Sent 📩',
+            text: `SMS notification sent to ${name}`,
+            icon: 'success',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#06b6d4',
+        });
+    };
     return (
         <div className="w-full max-w-screen mx-auto p-4 font-sans">
 
@@ -111,7 +112,7 @@ const handleSendSMS = (name: string) => {
                                                         Pending
                                                     </span>
                                                     {/* Added Send SMS Button */}
-                                                    <button 
+                                                    <button
                                                         onClick={() => handleSendSMS(row.name)}
                                                         className="flex items-center gap-1 bg-blue-50 hover:bg-blue-100 text-blue-600 px-2 py-1 rounded text-[10px] font-bold border border-blue-200 transition-colors active:scale-95"
                                                     >

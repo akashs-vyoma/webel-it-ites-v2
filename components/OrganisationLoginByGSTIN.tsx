@@ -1,24 +1,63 @@
 "use client"
 import React, { useState } from 'react'
 import { useRouter } from "next/navigation";
-import { setCookie } from '@/utils/cookies';
+import { deleteCookie, getCookie, setCookie } from '@/utils/cookies';
 import Swal from 'sweetalert2';
 import { smallSwal } from '@/components/SwalFooter';
 import { callAPI } from './apis/commonAPIs';
+import { useAuth } from '@/hooks/useAuth';
 
-const OrganisationRegByGSTIN = () => {
+const OrganisationLoginByGSTIN = () => {
     const [gstNumber, setGstNumber] = useState('');
     const [otp, setOtp] = useState('');
     const [otpSent, setOtpSent] = useState(false);
     const router = useRouter();
+    const [isVerifying, setIsVerifying] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { setUserData } = useAuth();
+
 
     // Logic to simulate sending OTP
     const handleVerifyGst = async () => {
-        if (gstNumber?.length > 5) { // Basic mock validation
-            setOtpSent(true);
-            // In a real app, API call goes here
-        } else {
-            alert("Please enter a valid GSTN");
+        try {
+            if (gstNumber?.length > 5) {
+                setIsVerifying(true);
+                const response = await callAPI("/udin/gstinLoginSendOtp", {
+                    gstin: gstNumber
+                });
+
+                if (response?.status == 0) {
+                    setCookie("trans_id", response?.data?.data?.transaction_no);
+                    setCookie("udin_profile", response?.data?.data?.udin_profile);
+                    setOtpSent(true);
+                    Swal.fire({
+                        ...smallSwal,
+                        icon: "success",
+                        title: "Success",
+                        text: "OTP sent successfully.",
+                    });
+                } else {
+                    Swal.fire({
+                        ...smallSwal,
+                        icon: "error",
+                        title: "Failed",
+                        text: response?.message,
+                    });
+                }
+            } else {
+                Swal.fire({
+                    ...smallSwal,
+                    icon: "error",
+                    title: "Failed",
+                    text: "Please enter a valid GSTN",
+                });
+            }
+        }
+        catch (error) {
+            console.log(error);
+        }
+        finally {
+            setIsVerifying(false);
         }
     };
 
@@ -26,19 +65,57 @@ const OrganisationRegByGSTIN = () => {
     const handleChangeGst = () => {
         setOtpSent(false);
         setOtp('');
+        deleteCookie("udin_profile");
+        deleteCookie("trans_id");
     };
 
     // Logic to Verify OTP and Login
-    const handleLogin = () => {
-        if (otp.length > 0) {
-            if (typeof window !== 'undefined') {
-                setCookie("role", "company");
-                setCookie("gstin", gstNumber);
-                setCookie("isLogin", "1");
+    const handleLogin = async () => {
+        try {
+            if (otp?.length > 0) {
+                if (typeof window !== 'undefined') {
+                    setIsSubmitting(true);
+                    const companyName = getCookie("udin_profile");
+                    const response = await callAPI("/udin/gstinLoginValidateOtp", {
+                        transaction: getCookie("trans_id"),
+                        otp: otp,
+                        gstin: gstNumber,
+                        company_name: companyName
+                    });
+
+                    if (response?.status == 0) {
+                        const encData = { ...response?.data?.data, role: "company-admin", user_type_id: "1", company_name: companyName };
+                        setUserData(encData);
+                        setCookie("isAuth", "1");
+                        deleteCookie("udin_profile");
+                        deleteCookie("trans_id");
+                        router.push("/company-dashboard");
+                    } else {
+                        Swal.fire({
+                            ...smallSwal,
+                            icon: "error",
+                            title: "Failed",
+                            text: response?.message,
+                        });
+                    }
+                }
+            } else {
+                Swal.fire({
+                    ...smallSwal,
+                    icon: "error",
+                    title: "Failed",
+                    text: "Please enter the OTP",
+                });
             }
-            router.push("/company-dashboard");
-        } else {
-            Swal.fire("Please enter the OTP");
+        } catch (error) {
+            Swal.fire({
+                ...smallSwal,
+                icon: "error",
+                title: "Failed",
+                text: "Something went wrong",
+            });
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -69,7 +146,7 @@ const OrganisationRegByGSTIN = () => {
                     onClick={otpSent ? handleChangeGst : handleVerifyGst}
                     className="bg-[#ffc107] hover:bg-yellow-500 text-black text-xs font-bold px-5 transition-colors rounded-r-sm min-w-[100px]"
                 >
-                    {otpSent ? "Change" : "Verify GSTN"}
+                    {isVerifying ? "Verifying..." : otpSent ? "Change" : "Verify GSTN"}
                 </button>
             </div>
 
@@ -97,7 +174,7 @@ const OrganisationRegByGSTIN = () => {
                             onClick={handleLogin}
                             className="bg-[#ffc107] hover:bg-yellow-500 text-black text-xs font-bold px-5 transition-colors rounded-r-sm min-w-[100px]"
                         >
-                            Login
+                            {isSubmitting ? "Loading..." : "Login"}
                         </button>
                     </div>
                     <div className="text-[10px] text-green-600 text-right mt-1 font-medium">
@@ -117,4 +194,4 @@ const OrganisationRegByGSTIN = () => {
     )
 }
 
-export default OrganisationRegByGSTIN
+export default OrganisationLoginByGSTIN

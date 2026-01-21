@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { Search } from 'lucide-react';
 import Swal from 'sweetalert2';
+import { smallSwal } from '@/components/SwalFooter';
 
 const UdinSearch: React.FC = () => {
     const [udin, setUdin] = useState('');
@@ -26,7 +27,7 @@ const UdinSearch: React.FC = () => {
 
     return (
         <div className="w-full max-w-3xl mx-auto px-4 mt-10">
-             <div className="absolute inset-0 gradient-shimmer pointer-events-none"></div>
+            <div className="absolute inset-0 gradient-shimmer pointer-events-none"></div>
             {/* Search Bar Container - Reduced height to h-11 for a sleek look */}
             <div className="flex w-full bg-white rounded-full overflow-hidden h-11 items-center
                 border border-[#1F51FF]
@@ -34,7 +35,7 @@ const UdinSearch: React.FC = () => {
                 hover:shadow-[0_0_15px_rgba(31,81,255,0.4)]
                 focus-within:shadow-[0_0_20px_rgba(31,81,255,0.5),0_0_40px_rgba(31,81,255,0.2)]
                 transition-all duration-300 ease-out">
-                    
+
 
                 {/* Input Field - Text reduced to text-sm */}
                 <input

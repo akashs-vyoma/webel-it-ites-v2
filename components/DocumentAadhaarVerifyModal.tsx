@@ -9,6 +9,7 @@ import {
 import { Eye, EyeOff, Info, Loader2, CheckCircle } from 'lucide-react';
 import { callAPI } from './apis/commonAPIs';
 import Swal from 'sweetalert2';
+import { smallSwal } from '@/components/SwalFooter';
 import { deleteCookie, getCookie, setCookie } from '@/utils/cookies';
 
 const DocumentAadhaarVerifyModal = ({ showModal, setShowModal }: { showModal: boolean, setShowModal: (showModal: boolean) => void }) => {

@@ -9,6 +9,7 @@ import MultiOwnPropertyForm from '@/components/ApplyForMultipartyDeclaration';
 import PaymentCard from '@/components/InitPayment';
 import CoSignerApplication from '@/components/CoSignerApplication';
 import Swal from 'sweetalert2';
+import { smallSwal } from '@/components/SwalFooter';
 
 export default function WizardPage() {
     const [currentStep, setCurrentStep] = useState(1);

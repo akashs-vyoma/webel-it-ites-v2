@@ -9,6 +9,7 @@ import MultiOwnPropertyForm from '@/components/ApplyForMultipartyDeclaration';
 import PaymentCard from '@/components/InitPayment';
 import CoSignerApplication from '@/components/CoSignerApplication';
 import Swal from 'sweetalert2';
+import { smallSwal } from '@/components/SwalFooter';
 import { getCookie } from '@/utils/cookies';
 
 export default function WizardPage() {

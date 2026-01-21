@@ -5,7 +5,7 @@ import { setCookie } from '@/utils/cookies';
 import Swal from 'sweetalert2';
 import { smallSwal } from '@/components/SwalFooter';
 
-const OrganisationRegistrationDSC = () => {
+const OrganisationLoginByDSC = () => {
     const [panNumber, setPanNumber] = useState('');
     const [otp, setOtp] = useState('');
     const [otpSent, setOtpSent] = useState(false);
@@ -131,4 +131,4 @@ const OrganisationRegistrationDSC = () => {
     );
 };
 
-export default OrganisationRegistrationDSC;
+export default OrganisationLoginByDSC;

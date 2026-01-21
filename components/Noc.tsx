@@ -22,6 +22,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { deleteCookie, getCookie } from '@/utils/cookies';
 import moment from 'moment';
 import Swal from 'sweetalert2';
+import { smallSwal } from '@/components/SwalFooter';
 import DocumentAadhaarVerifyModal from './DocumentAadhaarVerifyModal';
 import { toPng } from 'html-to-image';
 import jsPDF from 'jspdf';

@@ -2,7 +2,8 @@
 import React, { useState } from 'react';
 import { Eye, EyeOff, Fingerprint, KeyRound, ArrowRight, ShieldCheck, Sparkles, PenSquare, CheckCircle2, Loader2, Phone } from 'lucide-react';
 import Link from 'next/link';
-import Swal from 'sweetalert2'; // Added SweetAlert2
+import Swal from 'sweetalert2';
+import { smallSwal } from '@/components/SwalFooter'; // Added SweetAlert2
 import CommonCard from './common-card';
 import { callAPI } from './apis/commonAPIs';
 import router from 'next/router';

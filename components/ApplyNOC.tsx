@@ -25,6 +25,7 @@ import {
 import NonIndividualUploadDoc from './NonIndividualUploadDoc';
 import { callAPI } from './apis/commonAPIs';
 import Swal from 'sweetalert2';
+import { smallSwal } from '@/components/SwalFooter';
 import moment from 'moment';
 import { setCookie } from '@/utils/cookies';
 import { useAuth } from '@/hooks/useAuth';
@@ -322,7 +323,7 @@ const CreateApplicationForm = forwardRef((props: CreateApplicationFormProps, ref
 
     const handleAddTenant = () => {
         if (!tenantForm.tenantName || !tenantForm.tenantGstn || !tenantForm.tenantPan || !tenantForm.tenantActivity) {
-           Swal.fire("Please fill all tenant details before adding.");
+            Swal.fire("Please fill all tenant details before adding.");
             return;
         }
         setTenantList([...tenantList, { ...tenantForm, id: Date.now() }]);

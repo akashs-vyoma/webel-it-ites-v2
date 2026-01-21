@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { PhoneCall, KeyRound, Fingerprint, Check, X, ShieldCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
+import { smallSwal } from '@/components/SwalFooter';
 
 const VerifyOrgAuthorizedPerson: React.FC = () => {
     const router = useRouter();
@@ -34,7 +35,7 @@ const VerifyOrgAuthorizedPerson: React.FC = () => {
 
     const handleSubmit = () => {
         if (!otp) {
-                Swal.fire("Please enter the OTP");
+            Swal.fire("Please enter the OTP");
             return;
         }
         setShowSuccessAlert(true);

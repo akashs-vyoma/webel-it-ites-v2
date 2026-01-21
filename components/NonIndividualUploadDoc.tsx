@@ -16,6 +16,7 @@ import { useSearchParams } from 'next/navigation';
 import DocumentAadhaarVerifyModal from './DocumentAadhaarVerifyModal';
 import { uploadDocumentAPI } from './apis/commonAPIs';
 import Swal from 'sweetalert2';
+import { smallSwal } from '@/components/SwalFooter';
 import { useAuth } from '@/hooks/useAuth';
 import { deleteCookie, getCookie } from '@/utils/cookies';
 
